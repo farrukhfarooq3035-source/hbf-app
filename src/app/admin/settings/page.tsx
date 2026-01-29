@@ -16,8 +16,8 @@ export default function AdminSettingsPage() {
 
   useEffect(() => {
     fetch('/api/settings/business')
-      .then((res) => res.ok ? res.json() : {})
-      .then((data) => {
+      .then((res) => res.ok ? res.json() : Promise.resolve({}))
+      .then((data: { open_time?: string; close_time?: string; closed_days?: number[] }) => {
         if (data.open_time) setOpenTime(String(data.open_time));
         if (data.close_time) setCloseTime(String(data.close_time));
         if (Array.isArray(data.closed_days)) setClosedDays(data.closed_days);
