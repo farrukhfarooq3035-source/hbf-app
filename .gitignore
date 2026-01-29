@@ -28,6 +28,9 @@ yarn-error.log*
 # OpenNext / Cloudflare
 .open-next
 
+# Railway
+.railway
+
 # IDE
 .idea
 .vscode

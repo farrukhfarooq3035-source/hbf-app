@@ -7,10 +7,11 @@
     "dev:mobile": "next dev --hostname 0.0.0.0",
     "build": "next build",
     "start": "next start",
+    "start:railway": "next start -p ${PORT:-3000}",
     "lint": "next lint",
     "cf:build": "opennextjs-cloudflare build",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+    "deploy": "opennextjs-cloudflare build && node scripts/patch-worker-no-images.js && opennextjs-cloudflare deploy"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
@@ -26,7 +27,7 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
-    "@opennextjs/cloudflare": "^1.0.0-beta.19",
+    "@opennextjs/cloudflare": "^1.16.1",
     "@types/node": "^20.10.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
@@ -36,6 +37,6 @@
     "postcss": "^8.4.32",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.3.0",
-    "wrangler": "^3.99.0"
+    "wrangler": "^4.59.2"
   }
 }
