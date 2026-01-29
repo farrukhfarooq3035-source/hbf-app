@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design tokens */
+:root {
+  --primary: #E50914;
+  --primary-hover: #c40812;
+  --accent: #FFC83D;
+  --dark: #1E1E1E;
+  --bg: #ffffff;
+  --bg-muted: #f9fafb;
+  --text: #1E1E1E;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --radius: 0.75rem;
+  --radius-lg: 1rem;
+}
+
+.dark {
+  --bg: #111827;
+  --bg-muted: #1f2937;
+  --text: #f9fafb;
+  --text-muted: #9ca3af;
+  --border: #374151;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.2);
+}
+
+body {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* Typography scale */
+@layer base {
+  h1 { @apply text-2xl md:text-3xl font-bold tracking-tight; }
+  h2 { @apply text-lg font-bold; }
+  h3 { @apply text-base font-semibold; }
+}
+
+/* Glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.dark .glass {
+  background: rgba(17, 24, 39, 0.8);
+}
+
+/* Depth / soft shadows */
+.shadow-soft {
+  box-shadow: var(--shadow);
+}
+.shadow-soft-lg {
+  box-shadow: var(--shadow-lg);
+}
+
+/* Micro-interactions */
+@layer utilities {
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .tap-highlight {
+    @apply active:scale-[0.98] transition-transform duration-150;
+  }
+  .hover-lift {
+    @apply transition-shadow duration-200 hover:shadow-lg;
+  }
+}
+
+/* Animations */
+@keyframes cart-bump {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-cart-bump {
+  animation: cart-bump 0.3s ease-out;
+}
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out;
+}

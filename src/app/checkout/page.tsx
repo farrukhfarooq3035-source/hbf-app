@@ -1,0 +1,281 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCartStore } from '@/store/cart-store';
+import { useBusinessHours } from '@/hooks/use-business-hours';
+import { useAuth } from '@/hooks/use-auth';
+import { supabase } from '@/lib/supabase';
+import { Clock } from 'lucide-react';
+
+interface Zone { id: string; name: string; min_order: number; delivery_fee: number; free_above: number | null }
+
+export default function CheckoutPage() {
+  const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
+  const { items, getSubtotal, getDeliveryFee, getGrandTotal, getDistanceKm, getEstimatedDeliveryMinutes, clearCart } = useCartStore();
+  const { isOpen, openTime, closeTime } = useBusinessHours();
+  const estMins = getEstimatedDeliveryMinutes();
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [notes, setNotes] = useState('');
+  const [promoCode, setPromoCode] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState<{ id: string; code: string; discount: number } | null>(null);
+  const [promoError, setPromoError] = useState('');
+  const [zones, setZones] = useState<Zone[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const subtotal = getSubtotal();
+  const geoDeliveryFee = getDeliveryFee();
+  const matchedZone = address.trim() ? zones.find((z) => address.toLowerCase().includes(z.name.toLowerCase())) : null;
+  const deliveryFee = matchedZone
+    ? (matchedZone.free_above != null && subtotal >= matchedZone.free_above ? 0 : (matchedZone.delivery_fee ?? 0))
+    : geoDeliveryFee;
+  const minOrder = matchedZone?.min_order ?? 0;
+  const discount = appliedPromo?.discount ?? 0;
+  const total = Math.max(0, subtotal + deliveryFee - discount);
+
+  useEffect(() => {
+    fetch('/api/zones')
+      .then((res) => res.ok ? res.json() : [])
+      .then((data) => setZones(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.replace('/login?next=' + encodeURIComponent('/checkout'));
+    }
+  }, [authLoading, user, router]);
+
+  useEffect(() => {
+    if (items.length === 0 && !loading) {
+      router.replace('/menu');
+    }
+  }, [items.length, loading, router]);
+
+  const applyPromo = () => {
+    setPromoError('');
+    if (!promoCode.trim()) return;
+    fetch(`/api/promo/validate?code=${encodeURIComponent(promoCode.trim())}&subtotal=${subtotal}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.valid) {
+          setAppliedPromo({ id: data.promo_id, code: data.code, discount: data.discount });
+        } else {
+          setPromoError(data.error || 'Invalid code');
+        }
+      })
+      .catch(() => setPromoError('Could not validate'));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    if (!isOpen) {
+      setError(`We're closed. Open ${openTime} – ${closeTime}.`);
+      return;
+    }
+    if (!name.trim() || !phone.trim() || !address.trim()) {
+      setError('Please fill in all required fields');
+      return;
+    }
+    if (minOrder > 0 && subtotal < minOrder) {
+      setError(`Minimum order for your area is Rs ${minOrder}/-.`);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const distanceKm = getDistanceKm();
+
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user?.id ?? null,
+          customer_name: name.trim(),
+          phone: phone.trim(),
+          address: address.trim(),
+          notes: notes.trim() || null,
+          total_price: total,
+          status: 'new',
+          distance_km: distanceKm ?? null,
+          discount_amount: discount,
+          promo_code_id: appliedPromo?.id || null,
+          delivery_zone_id: matchedZone?.id || null,
+        })
+        .select('id')
+        .single();
+
+      if (orderError) throw orderError;
+
+      for (const item of items) {
+        await supabase.from('order_items').insert({
+          order_id: order.id,
+          product_id: item.product_id || null,
+          deal_id: item.deal_id || null,
+          qty: item.qty,
+          price: item.price,
+          item_name: item.name,
+        });
+      }
+
+      if (appliedPromo?.id) {
+        await fetch('/api/promo/use', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ promo_id: appliedPromo.id }),
+        });
+      }
+
+      clearCart();
+      router.push(`/order/${order.id}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to place order');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin w-10 h-10 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (items.length === 0 && !loading) {
+    return null;
+  }
+
+  return (
+    <div className="min-h-screen max-w-2xl mx-auto pb-8">
+      <div className="p-4">
+        <h1 className="text-2xl font-bold mb-4">Checkout</h1>
+        {!isOpen && (
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 mb-4">
+            <Clock className="w-5 h-5 text-amber-600 flex-shrink-0" />
+            <p className="text-amber-800 dark:text-amber-200 font-medium">
+              We&apos;re closed. Open {openTime} – {closeTime}. Order when we&apos;re open.
+            </p>
+          </div>
+        )}
+        <p className="text-gray-600 dark:text-gray-400 mb-2">
+          {items.length} items • Subtotal Rs {subtotal}/-
+        </p>
+        {deliveryFee > 0 && (
+          <p className="text-gray-600 dark:text-gray-400 mb-2">
+            Delivery fee: Rs {deliveryFee}/-
+          </p>
+        )}
+        {matchedZone && matchedZone.free_above != null && subtotal < matchedZone.free_above && (
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+            Free delivery on orders above Rs {matchedZone.free_above}/-
+          </p>
+        )}
+        {minOrder > 0 && subtotal < minOrder && (
+          <p className="text-sm text-amber-600 dark:text-amber-400 mb-1">
+            Min order for your area: Rs {minOrder}/-
+          </p>
+        )}
+        {appliedPromo && (
+          <p className="text-green-600 dark:text-green-400 text-sm mb-2">
+            Promo {appliedPromo.code}: -Rs {appliedPromo.discount}/-
+          </p>
+        )}
+        {estMins != null && (
+          <p className="text-gray-600 dark:text-gray-400 mb-2">
+            Estimated delivery: ~{estMins} min
+          </p>
+        )}
+        <p className="font-semibold text-primary mb-6">
+          Total: Rs {total}/-
+        </p>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Promo code"
+              value={promoCode}
+              onChange={(e) => { setPromoCode(e.target.value.toUpperCase()); setPromoError(''); }}
+              className="flex-1 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800"
+            />
+            <button type="button" onClick={applyPromo} className="px-4 py-2 rounded-xl border border-primary text-primary font-medium hover:bg-primary/5">
+              Apply
+            </button>
+          </div>
+          {promoError && <p className="text-sm text-red-600">{promoError}</p>}
+          {error && (
+            <div className="p-3 bg-red-50 text-red-600 rounded-xl text-sm">
+              {error}
+            </div>
+          )}
+
+          <div>
+            <label className="block font-medium mb-1">Name *</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block font-medium mb-1">Phone *</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="03XX XXXXXXX"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block font-medium mb-1">Delivery Address *</label>
+            <textarea
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Street, area, city"
+              rows={3}
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block font-medium mb-1">Order Notes (optional)</label>
+            <input
+              type="text"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="e.g. Call on arrival"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            />
+          </div>
+
+          <div className="pt-4">
+            <p className="text-sm text-gray-500 mb-2">
+              Payment: Cash on Delivery (COD)
+            </p>
+            <button
+              type="submit"
+              disabled={loading || !isOpen || (minOrder > 0 && subtotal < minOrder)}
+              className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50"
+            >
+              {loading ? 'Placing Order...' : !isOpen ? `Closed - Open ${openTime}` : `Place Order - Rs ${total}/-`}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
