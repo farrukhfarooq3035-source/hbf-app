@@ -8,7 +8,7 @@ export async function POST(
   try {
     const { id } = await context.params;
 
-    let body: { phone?: string; stars?: number; delivery?: number; quality?: number; comment?: string };
+    let body: { phone?: string; stars?: number; delivery?: number | string; quality?: number | string; comment?: string };
     try {
       body = await req.json();
     } catch {
