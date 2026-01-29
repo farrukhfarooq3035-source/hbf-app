@@ -6,6 +6,9 @@ import Image from 'next/image';
 import { Minus, Plus } from 'lucide-react';
 import { useDeal } from '@/hooks/use-menu';
 import { useCartStore } from '@/store/cart-store';
+import type { Deal } from '@/types';
+
+type DealItem = NonNullable<Deal['deal_items']>[number];
 
 export default function DealDetailPage() {
   const params = useParams();
@@ -23,6 +26,7 @@ export default function DealDetailPage() {
   }
 
   const totalPrice = deal.price * qty;
+  const dealItems: DealItem[] = deal.deal_items ?? [];
 
   return (
     <div className="max-w-2xl mx-auto pb-32">
@@ -48,15 +52,15 @@ export default function DealDetailPage() {
             Rs {deal.price}/-
           </p>
 
-          {deal.deal_items && deal.deal_items.length > 0 && (
+          {dealItems.length > 0 && (
             <div className="mt-4">
               <p className="font-medium text-sm text-gray-700 mb-2">Includes</p>
               <ul className="space-y-1 text-gray-600">
-                {deal.deal_items.map((item, i) => (
+                {dealItems.map((item: DealItem, i: number) => (
                   <li key={i} className="flex items-center gap-2">
                     <span className="text-primary">•</span>
                     {item.qty > 1 && `${item.qty}x `}
-                    Item
+                    {item.product_name ?? 'Item'}
                   </li>
                 ))}
               </ul>
