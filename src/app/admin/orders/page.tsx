@@ -149,10 +149,9 @@ export default function AdminOrdersPage() {
                     <p className="font-semibold text-sm flex items-center gap-1">
                       {formatOrderNumber(order.id)} • Rs {order.total_price}/-
                       {isRegular && (
-                        <Star
-                          className="w-3.5 h-3.5 fill-amber-500 text-amber-500 flex-shrink-0"
-                          title="Regular customer (3+ orders)"
-                        />
+                        <span title="Regular customer (3+ orders)">
+                          <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500 flex-shrink-0" />
+                        </span>
                       )}
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
