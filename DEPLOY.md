@@ -36,7 +36,10 @@ Agar repo abhi GitHub pe nahi hai:
 
    Ye values apne `.env` se copy kar sakte ho (Supabase Dashboard → Settings → API).
 
-4. **Deploy** dabao. Build complete hone ke baad live URL milega, jaise: `https://hbf-xyz.vercel.app`. Is URL ko copy karo — Google OAuth aur Supabase ke liye chahiye.
+4. **Root Directory** check karo: **Configure Project** screen pe **Root Directory** **khali** hona chahiye (ya `.`). Agar koi path likha hai (jaise `frontend`, `app`) to **clear** karo — isse "No Next.js version detected" error aata hai.
+5. **Deploy** dabao. Build complete hone ke baad live URL milega, jaise: `https://hbf-xyz.vercel.app`. Is URL ko copy karo — Google OAuth aur Supabase ke liye chahiye.
+
+**Agar "No Next.js version detected" aaye:** Vercel → Project → **Settings** → **General** → **Root Directory** → **Edit** → path **delete** karke **khali** chhod do → **Save** → **Deployments** → **Redeploy**.
 
 ## 4. Google OAuth (mobile / live site ke liye)
 
