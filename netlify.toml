@@ -1,0 +1,6 @@
+# Netlify deploy config for HBF Next.js app
+# https://docs.netlify.com/build/frameworks/framework-setup-guides/nextjs/overview/
+# Next.js is auto-detected; OpenNext adapter handles build + publish.
+
+[build]
+  command = "npm run build"
