@@ -73,7 +73,7 @@ export function FoodImage({
   return (
     <div
       data-food-image
-      className={`${aspectClass} bg-gray-100 dark:bg-gray-700 relative overflow-hidden ${className}`}
+      className={`${aspectClass} bg-gray-100 dark:bg-gray-700 relative overflow-hidden touch-manipulation ${className}`}
       onClick={() => onClick?.()}
       onDoubleClick={(e) => {
         e.preventDefault();
@@ -97,7 +97,7 @@ export function FoodImage({
         alt={alt}
         fill
         sizes={sizes}
-        className={`object-cover transition-all duration-300 ease-smooth ${
+        className={`object-cover transition-all duration-300 ease-smooth pointer-events-none ${
           loaded ? 'opacity-100 blur-0 scale-100' : 'opacity-0 blur-md scale-105'
         }`}
         onLoad={() => setLoaded(true)}

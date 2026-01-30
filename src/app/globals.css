@@ -55,6 +55,8 @@ body {
   /* Reduce scroll jank, GPU-friendly */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Mobile: smooth vertical scroll, no zoom wait */
+  touch-action: pan-y pinch-zoom;
 }
 
 /* Typography scale */
@@ -134,6 +136,10 @@ body {
   overscroll-behavior-x: contain;
   /* Snappier, faster feel */
   scroll-snap-stop: always;
+  /* Mobile scroll performance: no zoom wait, smooth pan */
+  touch-action: pan-x;
+  /* Rendering optimization */
+  contain: layout style;
 }
 @media (prefers-reduced-motion: reduce) {
   .horizontal-scroll-strip {
@@ -165,6 +171,7 @@ body {
   }
   .hover-lift:hover {
     box-shadow: var(--shadow-lg);
+    will-change: transform, box-shadow;
   }
   /* Premium transition for buttons/cards */
   .transition-premium {

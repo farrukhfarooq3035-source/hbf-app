@@ -25,7 +25,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const { add: addToCompare, has: isInCompare } = useCompareStore();
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-soft border border-gray-100 dark:border-gray-700 overflow-hidden hover-lift dark:ring-1 dark:ring-primary/20 h-full flex flex-col">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-soft border border-gray-100 dark:border-gray-700 overflow-hidden hover-lift dark:ring-1 dark:ring-primary/20 h-full flex flex-col touch-manipulation [contain:layout_style]">
       <div className="relative flex-shrink-0 aspect-square w-full">
         <div className="absolute top-2 right-2 z-10 flex gap-1">
           {product.image_url && (
