@@ -97,7 +97,7 @@ export function FoodImage({
         alt={alt}
         fill
         sizes={sizes}
-        className={`object-cover transition-all duration-300 ${
+        className={`object-cover transition-all duration-300 ease-smooth ${
           loaded ? 'opacity-100 blur-0 scale-100' : 'opacity-0 blur-md scale-105'
         }`}
         onLoad={() => setLoaded(true)}

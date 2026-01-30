@@ -262,7 +262,7 @@ export default function MenuPage() {
                 onClick={() =>
                   scrollToSection(key === TOP_SALE_VIEW ? SECTION_ID_TOP_SALE : `section-${key}`)
                 }
-                className="flex-shrink-0 flex flex-col items-center gap-2 tap-highlight text-left"
+                className="flex-shrink-0 flex flex-col items-center gap-2 tap-highlight text-left scroll-snap-item"
               >
                 <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-soft ring-2 ring-transparent focus:ring-primary/30">
                   <FoodImage
@@ -287,7 +287,9 @@ export default function MenuPage() {
             <h2 className="font-bold text-lg mb-3">Top Sale</h2>
             <div className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
               {filteredMainDeals.map((deal) => (
-                <DealCard key={deal.id} deal={deal} />
+                <div key={deal.id} className="scroll-snap-item flex-shrink-0">
+                  <DealCard deal={deal} />
+                </div>
               ))}
             </div>
           </div>
@@ -323,7 +325,7 @@ export default function MenuPage() {
                   <h2 className="font-bold text-lg mb-3">{cat.name}</h2>
                   <div className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
                     {list.map((product) => (
-                      <div key={product.id} className="flex-shrink-0 w-44">
+                      <div key={product.id} className="flex-shrink-0 w-44 scroll-snap-item">
                         <ProductCard product={product} />
                       </div>
                     ))}

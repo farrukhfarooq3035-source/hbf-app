@@ -18,6 +18,13 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --radius: 0.75rem;
   --radius-lg: 1rem;
+  /* Premium motion: high-end app feel */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 280ms;
+  --duration-smooth: 400ms;
 }
 
 .dark {
@@ -31,10 +38,23 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.2);
 }
 
+/* Premium smooth scroll: native feel like high-end apps */
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   font-family: var(--font-plus-jakarta), system-ui, sans-serif;
   background-color: var(--bg);
   color: var(--text);
+  /* Reduce scroll jank, GPU-friendly */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Typography scale */
@@ -76,38 +96,77 @@ body {
   display: none;
 }
 
-/* Horizontal scroll strip: smooth touch scroll, all categories visible */
+/* Horizontal scroll strip: premium smooth touch scroll */
 .horizontal-scroll-strip {
   -webkit-overflow-scrolling: touch;
   overflow-x: auto;
   overflow-y: hidden;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 1rem;
+  /* Smooth momentum, no jank */
+  overscroll-behavior-x: contain;
+}
+@media (prefers-reduced-motion: reduce) {
+  .horizontal-scroll-strip {
+    scroll-behavior: auto;
+    scroll-snap-type: none;
+  }
 }
 
-/* Micro-interactions */
+/* Optional: snap children in horizontal strips (add .scroll-snap-item to each card) */
+.scroll-snap-item {
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+}
+
+/* Micro-interactions: premium timing */
 @layer utilities {
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0);
   }
   .tap-highlight {
-    @apply active:scale-[0.98] transition-transform duration-150;
+    transition: transform var(--duration-fast) var(--ease-out-expo);
+  }
+  .tap-highlight:active {
+    transform: scale(0.98);
   }
   .hover-lift {
-    @apply transition-shadow duration-200 hover:shadow-lg;
+    transition: box-shadow var(--duration-smooth) var(--ease-smooth), transform var(--duration-smooth) var(--ease-smooth);
+  }
+  .hover-lift:hover {
+    box-shadow: var(--shadow-lg);
+  }
+  /* Premium transition for buttons/cards */
+  .transition-premium {
+    transition-duration: var(--duration-normal);
+    transition-timing-function: var(--ease-smooth);
+  }
+  .transition-premium-slow {
+    transition-duration: var(--duration-smooth);
+    transition-timing-function: var(--ease-out-expo);
   }
 }
 
-/* Animations */
+/* Animations: premium easing */
 @keyframes cart-bump {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.15); }
+  50% { transform: scale(1.12); }
 }
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(-8px); }
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-up-soft {
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-cart-bump {
-  animation: cart-bump 0.3s ease-out;
+  animation: cart-bump 0.35s var(--ease-out-expo);
 }
 .animate-fade-in {
-  animation: fade-in 0.25s ease-out;
+  animation: fade-in 0.3s var(--ease-smooth);
+}
+.animate-slide-up {
+  animation: slide-up-soft 0.35s var(--ease-out-expo);
 }

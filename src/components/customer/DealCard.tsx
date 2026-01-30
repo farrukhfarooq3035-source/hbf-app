@@ -87,7 +87,7 @@ export function DealCard({ deal, grid }: DealCardProps) {
                 price: deal.price,
               });
             }}
-            className="w-full py-2 bg-primary text-white rounded-xl flex items-center justify-center gap-2 font-medium hover:bg-primary-hover transition-colors tap-highlight"
+            className="w-full py-2 bg-primary text-white rounded-xl flex items-center justify-center gap-2 font-medium hover:bg-primary-hover transition-colors duration-280 ease-smooth tap-highlight"
           >
             <Plus className="w-4 h-4" />
             Add
@@ -165,7 +165,7 @@ export function DealCard({ deal, grid }: DealCardProps) {
               price: deal.price,
             });
           }}
-          className="w-full py-2 bg-primary text-white rounded-xl flex items-center justify-center gap-2 font-medium hover:bg-primary-hover transition-colors tap-highlight"
+          className="w-full py-2 bg-primary text-white rounded-xl flex items-center justify-center gap-2 font-medium hover:bg-primary-hover transition-colors duration-280 ease-smooth tap-highlight"
         >
           <Plus className="w-4 h-4" />
           Add

@@ -100,7 +100,7 @@ export function ImageModal({
       ref={containerRef}
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm"
       style={{
-        transition: `opacity ${ANIMATION_MS}ms ease`,
+        transition: `opacity ${ANIMATION_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`,
         opacity: visible ? 1 : 0,
       }}
       onTouchStart={onTouchStart}

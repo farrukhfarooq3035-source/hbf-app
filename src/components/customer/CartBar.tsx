@@ -26,7 +26,7 @@ export function CartBar() {
   return (
     <Link
       href="/cart"
-      className={`fixed bottom-0 left-0 right-0 z-50 bg-primary text-white p-4 flex items-center justify-between safe-area-bottom shadow-soft-lg tap-highlight transition-transform ${bump ? 'animate-cart-bump' : ''}`}
+      className={`fixed bottom-0 left-0 right-0 z-50 bg-primary text-white p-4 flex items-center justify-between safe-area-bottom shadow-soft-lg tap-highlight transition-transform duration-280 ease-out-expo ${bump ? 'animate-cart-bump' : ''}`}
     >
       <div className="flex items-center gap-3">
         <div className="relative">
