@@ -55,8 +55,6 @@ body {
   /* Reduce scroll jank, GPU-friendly */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Mobile: smooth vertical scroll, no zoom wait */
-  touch-action: pan-y pinch-zoom;
 }
 
 /* Typography scale */
@@ -125,34 +123,17 @@ body {
   }
 }
 
-/* Horizontal scroll strip: fast smooth + desktop wheel scroll (use HorizontalScrollStrip wrapper) */
+/* Horizontal scroll strip: simple smooth scroll */
 .horizontal-scroll-strip {
   -webkit-overflow-scrolling: touch;
   overflow-x: auto;
   overflow-y: hidden;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
-  scroll-padding-inline: 1rem;
   overscroll-behavior-x: contain;
-  /* Snappier, faster feel */
-  scroll-snap-stop: always;
-  /* Mobile scroll performance: no zoom wait, smooth pan */
-  touch-action: pan-x;
-  /* Rendering optimization */
-  contain: layout style;
-}
-@media (prefers-reduced-motion: reduce) {
-  .horizontal-scroll-strip {
-    scroll-behavior: auto;
-    scroll-snap-type: none;
-    scroll-snap-stop: normal;
-  }
 }
 
-/* Optional: snap children in horizontal strips (add .scroll-snap-item to each card) */
+/* Cards in strips - no scroll-snap for smoother scrolling */
 .scroll-snap-item {
-  scroll-snap-align: start;
-  scroll-snap-stop: normal;
+  /* Removed scroll-snap for smoother mobile scroll */
 }
 
 /* Micro-interactions: premium timing */
@@ -160,18 +141,14 @@ body {
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0);
   }
-  .tap-highlight {
-    transition: transform var(--duration-fast) var(--ease-out-expo);
-  }
   .tap-highlight:active {
-    transform: scale(0.98);
+    opacity: 0.8;
   }
   .hover-lift {
-    transition: box-shadow var(--duration-smooth) var(--ease-smooth), transform var(--duration-smooth) var(--ease-smooth);
+    transition: box-shadow 0.2s ease;
   }
   .hover-lift:hover {
     box-shadow: var(--shadow-lg);
-    will-change: transform, box-shadow;
   }
   /* Premium transition for buttons/cards */
   .transition-premium {
@@ -207,12 +184,12 @@ body {
   animation: slide-up-soft 0.35s var(--ease-out-expo);
 }
 
-/* Lively: subtle hover scale for cards and category pills */
-.hover-scale-subtle {
-  transition: transform var(--duration-normal) var(--ease-out-expo);
-}
-.hover-scale-subtle:hover {
-  transform: scale(1.02);
+/* Desktop only: subtle hover scale for cards */
+@media (hover: hover) {
+  .hover-scale-subtle:hover {
+    transform: scale(1.01);
+    transition: transform 0.15s ease;
+  }
 }
 /* Card appear: slight scale-in */
 @keyframes card-appear {

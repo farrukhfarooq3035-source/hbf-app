@@ -284,12 +284,12 @@ export default function MenuPage() {
 
         {/* Per-category sections: heading + horizontal product scroll + desktop wheel */}
         {filteredMainDeals.length > 0 && (
-          <div id={SECTION_ID_TOP_SALE} className="scroll-mt-4 animate-section-enter" style={{ animationDelay: '0ms' }}>
+          <div id={SECTION_ID_TOP_SALE} className="scroll-mt-4">
             <h2 className="font-bold text-lg mb-3">Top Sale</h2>
             <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
               {filteredMainDeals.map((deal) => (
-                <div key={deal.id} className="scroll-snap-item flex-shrink-0">
-                  <DealCard deal={deal} />
+                <div key={deal.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle">
+                  <DealCard deal={deal} grid />
                 </div>
               ))}
             </HorizontalScrollStrip>
@@ -321,16 +321,14 @@ export default function MenuPage() {
                 <div
                   key={cat.id}
                   id={`section-${cat.id}`}
-                  className="scroll-mt-4 animate-section-enter opacity-0"
-                  style={{ animationDelay: `${sectionIndex * 60}ms` }}
+                  className="scroll-mt-4"
                 >
                   <h2 className="font-bold text-lg mb-3">{cat.name}</h2>
                   <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
-                    {list.map((product, cardIndex) => (
+                    {list.map((product) => (
                       <div
                         key={product.id}
-                        className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item animate-card-appear opacity-0 hover-scale-subtle"
-                        style={{ animationDelay: `${sectionIndex * 60 + cardIndex * 30}ms` }}
+                        className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle"
                       >
                         <ProductCard product={product} />
                       </div>
