@@ -6,6 +6,7 @@ import { useBusinessHours } from '@/hooks/use-business-hours';
 import { ProductCard } from '@/components/customer/ProductCard';
 import { DealCard } from '@/components/customer/DealCard';
 import { FoodImage } from '@/components/customer/FoodImage';
+import { HorizontalScrollStrip } from '@/components/customer/HorizontalScrollStrip';
 import { useCartStore } from '@/store/cart-store';
 import { useFavoritesStore } from '@/store/favorites-store';
 import Link from 'next/link';
@@ -251,10 +252,10 @@ export default function MenuPage() {
           </div>
         )}
 
-        {/* Categories row: image + label (ref 1 style), horizontal scroll */}
+        {/* Categories row: image + label, horizontal scroll + desktop wheel */}
         <div className="w-full min-w-0">
           <h2 className="font-bold text-lg mb-3">Categories</h2>
-          <div className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
+          <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
             {categoryCards.map(({ key, label, imageUrl }) => (
               <button
                 key={key}
@@ -262,9 +263,9 @@ export default function MenuPage() {
                 onClick={() =>
                   scrollToSection(key === TOP_SALE_VIEW ? SECTION_ID_TOP_SALE : `section-${key}`)
                 }
-                className="flex-shrink-0 flex flex-col items-center gap-2 tap-highlight text-left scroll-snap-item"
+                className="flex-shrink-0 flex flex-col items-center gap-2 tap-highlight text-left scroll-snap-item hover-scale-subtle"
               >
-                <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-soft ring-2 ring-transparent focus:ring-primary/30">
+                <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-soft ring-2 ring-transparent focus:ring-primary/30 flex-shrink-0">
                   <FoodImage
                     src={imageUrl}
                     alt={label}
@@ -278,20 +279,20 @@ export default function MenuPage() {
                 </span>
               </button>
             ))}
-          </div>
+          </HorizontalScrollStrip>
         </div>
 
-        {/* Per-category sections: heading + horizontal product scroll (ref 2 style) */}
+        {/* Per-category sections: heading + horizontal product scroll + desktop wheel */}
         {filteredMainDeals.length > 0 && (
-          <div id={SECTION_ID_TOP_SALE} className="scroll-mt-4">
+          <div id={SECTION_ID_TOP_SALE} className="scroll-mt-4 animate-section-enter" style={{ animationDelay: '0ms' }}>
             <h2 className="font-bold text-lg mb-3">Top Sale</h2>
-            <div className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
+            <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
               {filteredMainDeals.map((deal) => (
                 <div key={deal.id} className="scroll-snap-item flex-shrink-0">
                   <DealCard deal={deal} />
                 </div>
               ))}
-            </div>
+            </HorizontalScrollStrip>
           </div>
         )}
 
@@ -313,23 +314,28 @@ export default function MenuPage() {
           </div>
         ) : (
           <>
-            {uniqueCategories.map((cat) => {
+            {uniqueCategories.map((cat, sectionIndex) => {
               const list = filteredProductsByCategory[cat.id] ?? [];
               if (list.length === 0) return null;
               return (
                 <div
                   key={cat.id}
                   id={`section-${cat.id}`}
-                  className="scroll-mt-4"
+                  className="scroll-mt-4 animate-section-enter opacity-0"
+                  style={{ animationDelay: `${sectionIndex * 60}ms` }}
                 >
                   <h2 className="font-bold text-lg mb-3">{cat.name}</h2>
-                  <div className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
-                    {list.map((product) => (
-                      <div key={product.id} className="flex-shrink-0 w-44 scroll-snap-item">
+                  <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
+                    {list.map((product, cardIndex) => (
+                      <div
+                        key={product.id}
+                        className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item animate-card-appear opacity-0 hover-scale-subtle"
+                        style={{ animationDelay: `${sectionIndex * 60 + cardIndex * 30}ms` }}
+                      >
                         <ProductCard product={product} />
                       </div>
                     ))}
-                  </div>
+                  </HorizontalScrollStrip>
                 </div>
               );
             })}

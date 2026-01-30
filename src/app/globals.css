@@ -96,21 +96,23 @@ body {
   display: none;
 }
 
-/* Horizontal scroll strip: premium smooth touch scroll */
+/* Horizontal scroll strip: fast smooth + desktop wheel scroll (use HorizontalScrollStrip wrapper) */
 .horizontal-scroll-strip {
   -webkit-overflow-scrolling: touch;
   overflow-x: auto;
   overflow-y: hidden;
   scroll-behavior: smooth;
-  scroll-snap-type: x proximity;
+  scroll-snap-type: x mandatory;
   scroll-padding-inline: 1rem;
-  /* Smooth momentum, no jank */
   overscroll-behavior-x: contain;
+  /* Snappier, faster feel */
+  scroll-snap-stop: always;
 }
 @media (prefers-reduced-motion: reduce) {
   .horizontal-scroll-strip {
     scroll-behavior: auto;
     scroll-snap-type: none;
+    scroll-snap-stop: normal;
   }
 }
 
@@ -169,4 +171,28 @@ body {
 }
 .animate-slide-up {
   animation: slide-up-soft 0.35s var(--ease-out-expo);
+}
+
+/* Lively: subtle hover scale for cards and category pills */
+.hover-scale-subtle {
+  transition: transform var(--duration-normal) var(--ease-out-expo);
+}
+.hover-scale-subtle:hover {
+  transform: scale(1.02);
+}
+/* Card appear: slight scale-in */
+@keyframes card-appear {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-card-appear {
+  animation: card-appear 0.3s var(--ease-out-expo) forwards;
+}
+/* Section enter */
+@keyframes section-enter {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-section-enter {
+  animation: section-enter 0.4s var(--ease-out-expo) forwards;
 }

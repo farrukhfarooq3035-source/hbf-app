@@ -25,8 +25,8 @@ export function ProductCard({ product }: ProductCardProps) {
   const { add: addToCompare, has: isInCompare } = useCompareStore();
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-soft border border-gray-100 dark:border-gray-700 overflow-hidden hover-lift dark:ring-1 dark:ring-primary/20">
-      <div className="relative">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-soft border border-gray-100 dark:border-gray-700 overflow-hidden hover-lift dark:ring-1 dark:ring-primary/20 h-full flex flex-col">
+      <div className="relative flex-shrink-0 aspect-square w-full">
         <div className="absolute top-2 right-2 z-10 flex gap-1">
           {product.image_url && (
             <button
@@ -55,7 +55,7 @@ export function ProductCard({ product }: ProductCardProps) {
             <Heart className={`w-4 h-4 ${isFav ? 'fill-primary text-primary' : 'text-gray-500'}`} />
           </button>
         </div>
-        <div className="block">
+        <div className="block w-full h-full">
           <FoodImage
             src={product.image_url ?? null}
             alt={product.name}
@@ -67,7 +67,7 @@ export function ProductCard({ product }: ProductCardProps) {
           />
         </div>
       </div>
-      <Link href={`/menu/product/${product.id}`} className="block p-3">
+      <Link href={`/menu/product/${product.id}`} className="block p-3 flex-1 min-h-0">
         <h3 className="font-semibold text-dark dark:text-white text-sm line-clamp-2">
           {product.name}
         </h3>
