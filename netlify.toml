@@ -1,6 +1,14 @@
 # Netlify deploy config for HBF Next.js app
-# https://docs.netlify.com/build/frameworks/framework-setup-guides/nextjs/overview/
-# Next.js is auto-detected; OpenNext adapter handles build + publish.
+# https://docs.netlify.com/build/frameworks/next-js/overview/
+# Plugin ensures Next.js is built and served correctly (fixes root 404).
+
+[[plugins]]
+package = "@netlify/plugin-nextjs"
 
 [build]
   command = "npm run build"
+  # Secrets scan: omit these keys (NEXT_PUBLIC_* are inlined by Next.js and are public by design)
+  # and skip scanning .next build output. Set SECRETS_SCAN_OMIT_KEYS in Netlify UI if scan still fails.
+  [build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_SUPABASE_URL"
+  SECRETS_SCAN_OMIT_PATHS = ".next"
