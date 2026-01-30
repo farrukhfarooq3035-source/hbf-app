@@ -19,7 +19,7 @@ Netlify pe deploy karne ke liye ye steps follow karo. Next.js auto-detect hota h
 4. **Branch to deploy:** `main` (ya jo default branch hai).
 5. **Build settings** Netlify khud set karega (Next.js detect):
    - **Build command:** `npm run build`
-   - **Publish directory:** OpenNext adapter handle karta hai (change mat karo).
+   - **Publish directory:** **khali chhodo** (empty) — Next.js ke liye Netlify khud set karta hai. Agar yahan koi path (e.g. repo root) set ho to 404 aa sakta hai.
 6. **Deploy site** click karo.
 
 ---
@@ -35,10 +35,25 @@ Site deploy hone ke baad:
 |----------|---------|--------|
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://xxx.supabase.co` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJ...` | Supabase anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | `eyJ...` | Server-side use |
+| `SUPABASE_SERVICE_ROLE_KEY` | `eyJ...` | **Zaroori** — Admin product add + Import menu iske bina fail honge |
 | `NEXT_PUBLIC_STORE_PHONE` | `03001234567` | Optional |
 
 3. **Save** karo, phir **Trigger deploy** → **Deploy site** (taaki nayi env vars build mein aayein).
+
+---
+
+## 3.1 If build fails: "Secrets scanning found secrets"
+
+Agar build log mein **"Secret env var NEXT_PUBLIC_SUPABASE_ANON_KEY / NEXT_PUBLIC_SUPABASE_URL's value detected"** aaye, to Netlify in vars ko secret samajh raha hai aur build output (.next) mein inlined values dekh kar fail kar raha hai.
+
+**Fix (Netlify UI):**
+
+1. **Site configuration** → **Environment variables** → **Add a variable** → **Add a single variable**.
+2. **Key:** `SECRETS_SCAN_OMIT_KEYS`  
+   **Value:** `NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_SUPABASE_URL`
+3. **Create variable** → phir **Deploys** → **Trigger deploy** → **Deploy site**.
+
+Ye Netlify ko batata hai ke in do keys ke values build output mein hone ki ijazat hai (NEXT_PUBLIC_* vars Next.js client/server bundles mein intentionally inlined hote hain).
 
 ---
 

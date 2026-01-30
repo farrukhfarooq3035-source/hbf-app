@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Serve logo as favicon so /favicon.ico doesn't 404
+  async redirects() {
+    return [{ source: '/favicon.ico', destination: '/logo.png', permanent: false }];
+  },
   // Unoptimized so Cloudflare deploy works without Images binding (avoids resvg.wasm error on Windows)
   images: {
     unoptimized: true,

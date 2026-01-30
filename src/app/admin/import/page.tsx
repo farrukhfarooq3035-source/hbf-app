@@ -23,7 +23,8 @@ export default function AdminImportPage() {
   const seedMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch('/api/seed', { method: 'POST' });
-      if (!res.ok) throw new Error(await res.text());
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || res.statusText || 'Import failed');
     },
     onSuccess: () => {
       setStep('done');

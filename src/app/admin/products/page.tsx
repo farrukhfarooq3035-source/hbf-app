@@ -34,18 +34,22 @@ export default function AdminProductsPage() {
 
   const createProduct = useMutation({
     mutationFn: async (data: typeof form) => {
-      const { data: row, error } = await supabase
-        .from('products')
-        .insert({
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           name: data.name,
           price: parseFloat(data.price),
           description: data.description || null,
           category_id: data.category_id || null,
-        })
-        .select('id')
-        .single();
-      if (error) throw error;
-      return row.id as string;
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || res.statusText || 'Failed to add product');
+      }
+      const { id } = await res.json();
+      return id as string;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });

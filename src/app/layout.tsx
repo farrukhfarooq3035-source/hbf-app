@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: 'HBF - Haq Bahu Foods | Order Online',
   description: 'Order delicious food from Haq Bahu Foods. Burgers, Pizza, Shawarma & more.',
   manifest: '/manifest.json',
+  icons: { icon: '/logo.png' },
 };
 
 export const viewport: Viewport = {
