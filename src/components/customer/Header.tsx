@@ -32,7 +32,7 @@ export function Header() {
             />
           </Link>
           {isCustomerApp && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2 sm:gap-3">
               <button
                 onClick={toggleTheme}
                 className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 tap-highlight"
@@ -44,29 +44,43 @@ export function Header() {
                 <>
                   <Link
                     href="/orders"
-                    className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 tap-highlight"
+                    className="flex flex-col items-center gap-0.5 p-1.5 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 tap-highlight min-w-[44px]"
                     title="My Orders"
                   >
-                    <ShoppingBag className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                    <ShoppingBag className="w-5 h-5 text-gray-600 dark:text-gray-300 flex-shrink-0" />
+                    <span className="text-[10px] font-medium text-gray-600 dark:text-gray-400">Orders</span>
                   </Link>
                   <Link
                     href="/cart"
-                    className="relative p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 tap-highlight"
+                    className="relative flex flex-col items-center gap-0.5 p-1.5 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 tap-highlight min-w-[44px]"
                     title="Cart"
                   >
-                    <ShoppingCart className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                    {itemCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-primary text-white text-xs font-bold px-1">
-                        {itemCount > 99 ? '99+' : itemCount}
-                      </span>
-                    )}
+                    <span className="relative flex items-center justify-center">
+                      <ShoppingCart className="w-5 h-5 text-gray-600 dark:text-gray-300 flex-shrink-0" />
+                      {itemCount > 0 && (
+                        <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] flex items-center justify-center rounded-full bg-primary text-white text-[10px] font-bold px-0.5">
+                          {itemCount > 99 ? '99+' : itemCount}
+                        </span>
+                      )}
+                    </span>
+                    <span className="text-[10px] font-medium text-gray-600 dark:text-gray-400">Cart</span>
                   </Link>
                   <button
                     onClick={() => setProfileOpen(true)}
-                    className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 tap-highlight"
+                    className="flex flex-col items-center gap-0.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 tap-highlight min-w-[44px]"
                     title={phone ? 'My Profile' : 'Profile'}
                   >
-                    <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                    {(user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture) ? (
+                      <img
+                        src={user.user_metadata.avatar_url ?? user.user_metadata.picture}
+                        alt="Profile"
+                        className="w-6 h-6 rounded-full object-cover flex-shrink-0 ring-1 ring-gray-200 dark:ring-gray-600"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <User className="w-5 h-5 text-gray-600 dark:text-gray-300 flex-shrink-0" />
+                    )}
+                    <span className="text-[10px] font-medium text-gray-600 dark:text-gray-400">Profile</span>
                   </button>
                 </>
               ) : (
@@ -81,15 +95,18 @@ export function Header() {
                   </Link>
                   <Link
                     href="/cart"
-                    className="relative p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 tap-highlight"
+                    className="flex flex-col items-center gap-0.5 p-1.5 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 tap-highlight min-w-[44px] relative"
                     title="Cart"
                   >
-                    <ShoppingCart className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                    {itemCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-primary text-white text-xs font-bold px-1">
-                        {itemCount > 99 ? '99+' : itemCount}
-                      </span>
-                    )}
+                    <span className="relative flex items-center justify-center">
+                      <ShoppingCart className="w-5 h-5 text-gray-600 dark:text-gray-300 flex-shrink-0" />
+                      {itemCount > 0 && (
+                        <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] flex items-center justify-center rounded-full bg-primary text-white text-[10px] font-bold px-0.5">
+                          {itemCount > 99 ? '99+' : itemCount}
+                        </span>
+                      )}
+                    </span>
+                    <span className="text-[10px] font-medium text-gray-600 dark:text-gray-400">Cart</span>
                   </Link>
                 </>
               )}

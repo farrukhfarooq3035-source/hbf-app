@@ -96,6 +96,33 @@ body {
   display: none;
 }
 
+/* Web app: show scrollbar on desktop for category/product strips */
+@media (min-width: 768px) {
+  .scrollbar-visible-md {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+    -ms-overflow-style: auto;
+  }
+  .scrollbar-visible-md::-webkit-scrollbar {
+    display: block;
+    height: 6px;
+  }
+  .scrollbar-visible-md::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 3px;
+  }
+  .scrollbar-visible-md::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+  }
+  .dark .scrollbar-visible-md {
+    scrollbar-color: #4b5563 transparent;
+  }
+  .dark .scrollbar-visible-md::-webkit-scrollbar-thumb {
+    background: #4b5563;
+  }
+}
+
 /* Horizontal scroll strip: fast smooth + desktop wheel scroll (use HorizontalScrollStrip wrapper) */
 .horizontal-scroll-strip {
   -webkit-overflow-scrolling: touch;

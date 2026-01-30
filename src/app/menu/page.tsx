@@ -255,7 +255,7 @@ export default function MenuPage() {
         {/* Categories row: image + label, horizontal scroll + desktop wheel */}
         <div className="w-full min-w-0">
           <h2 className="font-bold text-lg mb-3">Categories</h2>
-          <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
+          <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
             {categoryCards.map(({ key, label, imageUrl }) => (
               <button
                 key={key}
@@ -286,7 +286,7 @@ export default function MenuPage() {
         {filteredMainDeals.length > 0 && (
           <div id={SECTION_ID_TOP_SALE} className="scroll-mt-4 animate-section-enter" style={{ animationDelay: '0ms' }}>
             <h2 className="font-bold text-lg mb-3">Top Sale</h2>
-            <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
+            <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
               {filteredMainDeals.map((deal) => (
                 <div key={deal.id} className="scroll-snap-item flex-shrink-0">
                   <DealCard deal={deal} />
@@ -325,7 +325,7 @@ export default function MenuPage() {
                   style={{ animationDelay: `${sectionIndex * 60}ms` }}
                 >
                   <h2 className="font-bold text-lg mb-3">{cat.name}</h2>
-                  <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
+                  <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
                     {list.map((product, cardIndex) => (
                       <div
                         key={product.id}
