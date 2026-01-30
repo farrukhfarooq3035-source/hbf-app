@@ -125,6 +125,14 @@ export default function MenuPage() {
     return mainDeals.filter((d) => byPrice(d.price));
   }, [mainDeals, minN, maxN]);
 
+  /** All deals filtered (for HBF Deals section) - excludes top sale to avoid duplication */
+  const topSaleIds = useMemo(() => new Set(mainDeals.map((d) => d.id)), [mainDeals]);
+  const filteredAllDeals = useMemo(() => {
+    const allNonTopSale = (deals || []).filter((d) => !topSaleIds.has(d.id));
+    if (minN == null && maxN == null) return allNonTopSale;
+    return allNonTopSale.filter((d) => byPrice(d.price));
+  }, [deals, topSaleIds, minN, maxN]);
+
   const favoriteProducts = useMemo(
     () => (allProducts || []).filter((p) => favProductIds.includes(p.id)),
     [allProducts, favProductIds]
@@ -135,17 +143,18 @@ export default function MenuPage() {
   );
   const hasFavorites = favoriteProducts.length > 0 || favoriteDeals.length > 0;
 
-  /** Category cards for top row: Top Sale + each category (with image + label) */
+  /** Category cards for top row: Top Sale + HBF Deals + each category (with image + label) */
   const categoryCards = useMemo(
     () => [
       { key: TOP_SALE_VIEW, label: 'Top Sale', imageUrl: mainDeals[0]?.image_url ?? null },
+      { key: 'hbf-deals', label: 'HBF Deals', imageUrl: filteredAllDeals[0]?.image_url ?? (deals?.[0]?.image_url ?? null) },
       ...uniqueCategories.map((c) => ({
         key: c.id,
         label: c.name,
         imageUrl: categoryImageMap[c.id] ?? null,
       })),
     ],
-    [uniqueCategories, categoryImageMap, mainDeals]
+    [uniqueCategories, categoryImageMap, mainDeals, filteredAllDeals, deals]
   );
 
   const handleSearchBlur = () => {
@@ -282,12 +291,26 @@ export default function MenuPage() {
           </HorizontalScrollStrip>
         </div>
 
-        {/* Per-category sections: heading + horizontal product scroll + desktop wheel */}
+        {/* Top Sale section */}
         {filteredMainDeals.length > 0 && (
           <div id={SECTION_ID_TOP_SALE} className="scroll-mt-4">
             <h2 className="font-bold text-lg mb-3">Top Sale</h2>
             <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
               {filteredMainDeals.map((deal) => (
+                <div key={deal.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle">
+                  <DealCard deal={deal} grid />
+                </div>
+              ))}
+            </HorizontalScrollStrip>
+          </div>
+        )}
+
+        {/* HBF Deals section - all other deals */}
+        {filteredAllDeals.length > 0 && (
+          <div id="section-hbf-deals" className="scroll-mt-4">
+            <h2 className="font-bold text-lg mb-3">HBF Deals</h2>
+            <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
+              {filteredAllDeals.map((deal) => (
                 <div key={deal.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle">
                   <DealCard deal={deal} grid />
                 </div>
