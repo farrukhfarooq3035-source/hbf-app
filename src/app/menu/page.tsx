@@ -48,8 +48,8 @@ function addRecentSearch(term: string) {
 }
 
 export default function MenuPage() {
-  /** null | 'top_sale' | categoryId — null = all products */
-  const [selectedView, setSelectedView] = useState<string | null>(null);
+  /** 'top_sale' | categoryId — default Top Sale so user sees deals first, not all products */
+  const [selectedView, setSelectedView] = useState<string | null>(TOP_SALE_VIEW);
   const [search, setSearch] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [priceMin, setPriceMin] = useState<string>('');
@@ -120,7 +120,7 @@ export default function MenuPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto overflow-x-hidden">
       <div className="p-4 space-y-4">
         {!isOpen && (
           <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
@@ -221,7 +221,7 @@ export default function MenuPage() {
         {filteredMainDeals.length > 0 && (
           <div>
             <h2 className="font-bold text-lg mb-3">Deals</h2>
-            <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+            <div className="flex gap-4 overflow-x-auto overflow-y-hidden pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x">
               {filteredMainDeals.map((deal) => (
                 <DealCard key={deal.id} deal={deal} />
               ))}
@@ -231,7 +231,7 @@ export default function MenuPage() {
 
         <div>
           <h2 className="font-bold text-lg mb-3">Categories</h2>
-          <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+          <div className="flex gap-2 overflow-x-auto overflow-y-hidden pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x">
             {categoryPills.map(({ key, label }) => (
               <button
                 key={key}

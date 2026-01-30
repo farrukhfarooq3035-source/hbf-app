@@ -1,5 +1,6 @@
 import { Header } from '@/components/customer/Header';
 import { Footer } from '@/components/customer/Footer';
+import { CompareFAB } from '@/components/customer/CompareFAB';
 
 export default function MenuLayout({
   children,
@@ -11,6 +12,7 @@ export default function MenuLayout({
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
+      <CompareFAB />
     </div>
   );
 }

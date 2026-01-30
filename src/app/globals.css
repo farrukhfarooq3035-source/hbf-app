@@ -54,12 +54,26 @@ body {
   background: rgba(17, 24, 39, 0.8);
 }
 
+/* Night mode: food images pop on dark backgrounds */
+.dark [data-food-image] img {
+  filter: saturate(1.08) contrast(1.05);
+}
+
 /* Depth / soft shadows */
 .shadow-soft {
   box-shadow: var(--shadow);
 }
 .shadow-soft-lg {
   box-shadow: var(--shadow-lg);
+}
+
+/* Prevent horizontal scroll from leaking to body; stop scroll chaining on horizontal strips */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 /* Micro-interactions */
