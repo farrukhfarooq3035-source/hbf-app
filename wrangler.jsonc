@@ -16,8 +16,5 @@
       "binding": "WORKER_SELF_REFERENCE",
       "service": "hbf-app"
     }
-  ],
-  "images": {
-    "binding": "IMAGES"
-  }
+  ]
 }

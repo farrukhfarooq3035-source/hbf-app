@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Loader2 } from 'lucide-react';
 
-export default function LoginPage() {
+function LoginContent() {
   const searchParams = useSearchParams();
   const next = searchParams.get('next') || '/menu';
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -87,5 +87,24 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+function LoginFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6 bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-sm w-full text-center">
+        <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto mb-4" />
+        <p className="text-gray-600 dark:text-gray-400 text-sm">Loading...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginFallback />}>
+      <LoginContent />
+    </Suspense>
   );
 }

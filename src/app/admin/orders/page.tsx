@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
@@ -24,7 +24,7 @@ const COLUMNS: { key: OrderStatus; label: string }[] = [
   { key: 'delivered', label: 'Delivered' },
 ];
 
-export default function AdminOrdersPage() {
+function AdminOrdersContent() {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const filterRiderId = searchParams.get('rider_id') ?? null;
@@ -277,5 +277,24 @@ export default function AdminOrdersPage() {
         ))}
       </div>
     </div>
+  );
+}
+
+function AdminOrdersFallback() {
+  return (
+    <div className="p-6">
+      <div className="animate-pulse space-y-4">
+        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3" />
+        <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded" />
+      </div>
+    </div>
+  );
+}
+
+export default function AdminOrdersPage() {
+  return (
+    <Suspense fallback={<AdminOrdersFallback />}>
+      <AdminOrdersContent />
+    </Suspense>
   );
 }

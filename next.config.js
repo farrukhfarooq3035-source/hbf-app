@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Unoptimized so Cloudflare deploy works without Images binding (avoids resvg.wasm error on Windows)
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
