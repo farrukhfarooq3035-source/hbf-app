@@ -7,6 +7,8 @@ package = "@netlify/plugin-nextjs"
 
 [build]
   command = "npm run build"
+  # Must not be repo root (plugin fails if publish = base). Next.js plugin uses .next output.
+  publish = ".next"
   # Secrets scan: omit these keys (NEXT_PUBLIC_* are inlined by Next.js and are public by design)
   # and skip scanning .next build output. Set SECRETS_SCAN_OMIT_KEYS in Netlify UI if scan still fails.
   [build.environment]
