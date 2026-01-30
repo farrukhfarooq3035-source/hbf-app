@@ -60,7 +60,7 @@ export function DealCard({ deal, grid }: DealCardProps) {
             </button>
           </div>
           <FoodImage
-            src={deal.image_url}
+            src={deal.image_url ?? null}
             alt={deal.title}
             aspect="1:1"
             sizes="(max-width: 768px) 50vw, 25vw"
@@ -140,7 +140,7 @@ export function DealCard({ deal, grid }: DealCardProps) {
           </button>
         </div>
         <FoodImage
-          src={deal.image_url}
+          src={deal.image_url ?? null}
           alt={deal.title}
           aspect="4:3"
           sizes="280px"

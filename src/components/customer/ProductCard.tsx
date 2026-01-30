@@ -57,7 +57,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
         <div className="block">
           <FoodImage
-            src={product.image_url}
+            src={product.image_url ?? null}
             alt={product.name}
             aspect="1:1"
             sizes="(max-width: 768px) 50vw, 25vw"
