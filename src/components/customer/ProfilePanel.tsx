@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { X, Package, Star, LogOut } from 'lucide-react';
+import { X, Package, Star, LogOut, HelpCircle } from 'lucide-react';
 import { useCustomerStore } from '@/store/customer-store';
 import { useCustomerOrders } from '@/hooks/use-customer-orders';
 import { supabase } from '@/lib/supabase';
@@ -89,6 +89,14 @@ export function ProfilePanel({
               <p className="text-gray-600 dark:text-gray-400 text-sm">
                 Sign in to view your orders and profile.
               </p>
+              <Link
+                href="/faq"
+                onClick={onClose}
+                className="w-full py-2.5 text-sm font-medium text-primary hover:bg-primary/5 border border-primary/30 rounded-xl flex items-center justify-center gap-2"
+              >
+                <HelpCircle className="w-4 h-4" />
+                FAQ
+              </Link>
             </div>
           ) : (
             <div className="space-y-4">
@@ -194,6 +202,14 @@ export function ProfilePanel({
                 </p>
               )}
 
+              <Link
+                href="/faq"
+                onClick={onClose}
+                className="w-full py-2.5 text-sm font-medium text-primary hover:bg-primary/5 border border-primary/30 rounded-xl flex items-center justify-center gap-2"
+              >
+                <HelpCircle className="w-4 h-4" />
+                FAQ
+              </Link>
               <button
                 onClick={handleLogout}
                 className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-xl"

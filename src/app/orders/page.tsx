@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
-import { Package, ChevronRight, RotateCcw, RefreshCw } from 'lucide-react';
+import { Package, ChevronRight, RotateCcw, RefreshCw, Star } from 'lucide-react';
 import { useCustomerOrders } from '@/hooks/use-customer-orders';
 import { useCartStore } from '@/store/cart-store';
 import { useAuth } from '@/hooks/use-auth';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase';
 import { formatOrderNumber } from '@/lib/order-utils';
 import { StarRatingDisplay } from '@/components/customer/StarRating';
 import type { Order, OrderItem } from '@/types';
@@ -20,11 +22,113 @@ const STATUS_LABELS: Record<string, string> = {
   delivered: 'Delivered',
 };
 
+function OrderCard({
+  order,
+  isFavorite,
+  onToggleFavorite,
+  onOrderAgain,
+}: {
+  order: Order;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
+  onOrderAgain: (e: React.MouseEvent, order: Order) => void;
+}) {
+  return (
+    <div className="block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-soft hover-lift">
+      <div className="flex items-start justify-between gap-2">
+        <Link href={`/order/${order.id}`} className="flex-1 min-w-0">
+          <p className="font-bold text-dark dark:text-white">
+            {formatOrderNumber(order.id)}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+            {order.created_at
+              ? format(new Date(order.created_at), 'MMM d, yyyy · h:mm a')
+              : ''}
+          </p>
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mt-1">
+            Rs {order.total_price}/-
+          </p>
+          <div className="flex items-center gap-2 mt-2 flex-wrap">
+            <span
+              className={`inline-block px-2 py-0.5 rounded-lg text-xs font-medium ${
+                order.status === 'delivered'
+                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                  : 'bg-primary/10 text-primary'
+              }`}
+            >
+              {STATUS_LABELS[order.status] || order.status}
+            </span>
+            {order.rating_stars != null && (
+              <StarRatingDisplay value={order.rating_stars} size="sm" />
+            )}
+          </div>
+        </Link>
+        <button
+          type="button"
+          onClick={(e) => { e.preventDefault(); onToggleFavorite(); }}
+          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 tap-highlight"
+          title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+        >
+          <Star
+            className={`w-5 h-5 ${
+              isFavorite ? 'fill-amber-500 text-amber-500' : 'text-gray-400'
+            }`}
+          />
+        </button>
+        <Link href={`/order/${order.id}`} className="text-gray-400 flex-shrink-0 mt-1">
+          <ChevronRight className="w-5 h-5" />
+        </Link>
+      </div>
+      {(order.order_items?.length ?? 0) > 0 && (
+        <button
+          type="button"
+          onClick={(e) => onOrderAgain(e, order)}
+          className="mt-3 w-full py-2 rounded-xl border border-primary text-primary dark:border-primary dark:text-primary font-medium flex items-center justify-center gap-2 tap-highlight hover:bg-primary/5"
+        >
+          <RotateCcw className="w-4 h-4" />
+          Order again
+        </button>
+      )}
+    </div>
+  );
+}
+
 export default function OrdersPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { user, loading: authLoading } = useAuth();
   const addItem = useCartStore((s) => s.addItem);
   const { data: orders = [], isLoading, refetch } = useCustomerOrders(user?.id ?? null);
+
+  const { data: favoriteOrderIds = [] } = useQuery({
+    queryKey: ['favorite-orders', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase
+        .from('favorite_orders')
+        .select('order_id')
+        .eq('user_id', user.id);
+      if (error) return [];
+      return (data ?? []).map((r) => r.order_id);
+    },
+    enabled: !!user?.id,
+  });
+
+  const toggleFavorite = useMutation({
+    mutationFn: async (orderId: string) => {
+      if (!user?.id) return;
+      const isFav = favoriteOrderIds.includes(orderId);
+      if (isFav) {
+        await supabase.from('favorite_orders').delete().eq('user_id', user.id).eq('order_id', orderId);
+      } else {
+        await supabase.from('favorite_orders').insert({ user_id: user.id, order_id: orderId });
+      }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['favorite-orders', user?.id] }),
+  });
+
+  const favoriteOrders = orders.filter((o) => favoriteOrderIds.includes(o.id));
+  const otherOrders = orders.filter((o) => !favoriteOrderIds.includes(o.id));
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -94,54 +198,42 @@ export default function OrdersPage() {
           </Link>
         </div>
       ) : (
-        <div className="space-y-3">
-          {orders.map((order: Order) => (
-            <div
-              key={order.id}
-              className="block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-soft hover-lift"
-            >
-              <Link href={`/order/${order.id}`} className="flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-dark dark:text-white">
-                    {formatOrderNumber(order.id)}
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                    {order.created_at
-                      ? format(new Date(order.created_at), 'MMM d, yyyy · h:mm a')
-                      : ''}
-                  </p>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mt-1">
-                    Rs {order.total_price}/-
-                  </p>
-                  <div className="flex items-center gap-2 mt-2 flex-wrap">
-                    <span
-                      className={`inline-block px-2 py-0.5 rounded-lg text-xs font-medium ${
-                        order.status === 'delivered'
-                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                          : 'bg-primary/10 text-primary'
-                      }`}
-                    >
-                      {STATUS_LABELS[order.status] || order.status}
-                    </span>
-                    {order.rating_stars != null && (
-                      <StarRatingDisplay value={order.rating_stars} size="sm" />
-                    )}
-                  </div>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" />
-              </Link>
-              {(order.order_items?.length ?? 0) > 0 && (
-                <button
-                  type="button"
-                  onClick={(e) => handleOrderAgain(e, order)}
-                  className="mt-3 w-full py-2 rounded-xl border border-primary text-primary dark:border-primary dark:text-primary font-medium flex items-center justify-center gap-2 tap-highlight hover:bg-primary/5"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                  Order again
-                </button>
-              )}
+        <div className="space-y-6">
+          {favoriteOrders.length > 0 && (
+            <div>
+              <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
+                Favorites
+              </h2>
+              <div className="space-y-3">
+                {favoriteOrders.map((order: Order) => (
+                  <OrderCard
+                    key={order.id}
+                    order={order}
+                    isFavorite
+                    onToggleFavorite={() => toggleFavorite.mutate(order.id)}
+                    onOrderAgain={handleOrderAgain}
+                  />
+                ))}
+              </div>
             </div>
-          ))}
+          )}
+          <div className={favoriteOrders.length > 0 ? '' : ''}>
+            {favoriteOrders.length > 0 && (
+              <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">All orders</h2>
+            )}
+            <div className="space-y-3">
+              {(favoriteOrders.length > 0 ? otherOrders : orders).map((order: Order) => (
+                <OrderCard
+                  key={order.id}
+                  order={order}
+                  isFavorite={favoriteOrderIds.includes(order.id)}
+                  onToggleFavorite={() => toggleFavorite.mutate(order.id)}
+                  onOrderAgain={handleOrderAgain}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>

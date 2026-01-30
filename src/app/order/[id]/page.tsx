@@ -4,8 +4,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { Check, Package, Truck, Phone, Share2, RefreshCw } from 'lucide-react';
+import { Check, Package, Truck, Phone, Share2, RefreshCw, RotateCcw } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { useCartStore } from '@/store/cart-store';
 import { formatOrderNumber } from '@/lib/order-utils';
 import { useNotificationStore } from '@/store/notification-store';
 import { getStorePhone } from '@/lib/store-config';
@@ -13,7 +14,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { StarRating, StarRatingDisplay } from '@/components/customer/StarRating';
 import { RiderMap } from '@/components/RiderMap';
 import { STORE_LAT, STORE_LNG } from '@/lib/geo';
-import type { Order, OrderStatus } from '@/types';
+import type { Order, OrderStatus, OrderItem } from '@/types';
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   new: 'New',
@@ -55,6 +56,8 @@ export default function OrderTrackingPage() {
   const [riderInfo, setRiderInfo] = useState<{ name: string | null; phone: string | null }>({ name: null, phone: null });
   const [refreshingRider, setRefreshingRider] = useState(false);
   const storePhone = getStorePhone();
+  const addItem = useCartStore((s) => s.addItem);
+  const routerForCart = useRouter();
 
   const fetchRiderLocation = useCallback(() => {
     if (order?.status !== 'on_the_way') return;
@@ -292,6 +295,28 @@ export default function OrderTrackingPage() {
           )}
         </div>
         <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+          {(order.order_items?.length ?? 0) > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                const items = (order.order_items || []) as OrderItem[];
+                items.forEach((oi) => {
+                  addItem({
+                    product_id: oi.product_id || undefined,
+                    deal_id: oi.deal_id || undefined,
+                    name: oi.item_name || 'Item',
+                    price: oi.price,
+                    qty: oi.qty,
+                  });
+                });
+                routerForCart.push('/cart');
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white font-medium tap-highlight hover:bg-red-700"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Reorder
+            </button>
+          )}
           {storePhone && (
             <a
               href={`tel:${storePhone.replace(/\D/g, '')}`}

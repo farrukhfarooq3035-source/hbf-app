@@ -1,7 +1,7 @@
 import { Header } from '@/components/customer/Header';
 import { Footer } from '@/components/customer/Footer';
 
-export default function OrdersLayout({
+export default function ReservationsLayout({
   children,
 }: {
   children: React.ReactNode;

@@ -30,9 +30,12 @@ export default function CheckoutPage() {
   const subtotal = getSubtotal();
   const geoDeliveryFee = getDeliveryFee();
   const matchedZone = address.trim() ? zones.find((z) => address.toLowerCase().includes(z.name.toLowerCase())) : null;
-  const deliveryFee = matchedZone
+  const distanceKm = getDistanceKm();
+  const freeDeliveryUnder5Km = distanceKm != null && distanceKm < 5;
+  let deliveryFee = matchedZone
     ? (matchedZone.free_above != null && subtotal >= matchedZone.free_above ? 0 : (matchedZone.delivery_fee ?? 0))
     : geoDeliveryFee;
+  if (freeDeliveryUnder5Km) deliveryFee = 0;
   const minOrder = matchedZone?.min_order ?? 0;
   const discount = appliedPromo?.discount ?? 0;
   const total = Math.max(0, subtotal + deliveryFee - discount);
@@ -166,12 +169,17 @@ export default function CheckoutPage() {
         <p className="text-gray-600 dark:text-gray-400 mb-2">
           {items.length} items • Subtotal Rs {subtotal}/-
         </p>
+        {freeDeliveryUnder5Km && (
+          <p className="text-green-600 dark:text-green-400 text-sm mb-2">
+            Free delivery (within 5 km)
+          </p>
+        )}
         {deliveryFee > 0 && (
           <p className="text-gray-600 dark:text-gray-400 mb-2">
             Delivery fee: Rs {deliveryFee}/-
           </p>
         )}
-        {matchedZone && matchedZone.free_above != null && subtotal < matchedZone.free_above && (
+        {matchedZone && matchedZone.free_above != null && subtotal < matchedZone.free_above && !freeDeliveryUnder5Km && (
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
             Free delivery on orders above Rs {matchedZone.free_above}/-
           </p>

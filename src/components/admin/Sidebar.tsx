@@ -16,6 +16,7 @@ import {
   Users,
   Tag,
   MapPin,
+  CalendarDays,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -31,6 +32,7 @@ const navItems = [
   { href: '/admin/expenses', icon: Receipt, label: 'Expenses' },
   { href: '/admin/promo', icon: Tag, label: 'Promo Codes' },
   { href: '/admin/zones', icon: MapPin, label: 'Delivery Zones' },
+  { href: '/admin/reservations', icon: CalendarDays, label: 'Reservations' },
   { href: '/admin/reports', icon: BarChart3, label: 'Reports' },
   { href: '/admin/settings', icon: Settings, label: 'Settings' },
 ];
