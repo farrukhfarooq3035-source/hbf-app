@@ -179,7 +179,7 @@ export default function AdminReportsPage() {
 
   return (
     <div className="p-6" ref={printRef}>
-      <h1 className="text-2xl font-bold text-dark mb-6">Reports</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Reports</h1>
 
       <div className="flex flex-wrap gap-2 mb-4">
         <button
@@ -242,17 +242,17 @@ export default function AdminReportsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div className="bg-white rounded-2xl shadow-sm border p-6">
-          <p className="text-sm text-gray-500 mb-1">Total Sales</p>
+          <p className="text-sm text-gray-800 mb-1">Total Sales</p>
           <p className="text-2xl font-bold text-primary">Rs {totalSales}/-</p>
         </div>
         <div className="bg-white rounded-2xl shadow-sm border p-6">
-          <p className="text-sm text-gray-500 mb-1">Total Expenses</p>
+          <p className="text-sm text-gray-800 mb-1">Total Expenses</p>
           <p className="text-2xl font-bold text-orange-600">
             Rs {totalExpenses}/-
           </p>
         </div>
         <div className="bg-white rounded-2xl shadow-sm border p-6">
-          <p className="text-sm text-gray-500 mb-1">Profit</p>
+          <p className="text-sm text-gray-800 mb-1">Profit</p>
           <p
             className={`text-2xl font-bold ${
               profit >= 0 ? 'text-green-600' : 'text-red-600'
@@ -265,13 +265,13 @@ export default function AdminReportsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-2xl shadow-sm border p-6">
-          <p className="text-sm text-gray-500 mb-1">Rated Orders</p>
+          <p className="text-sm text-gray-800 mb-1">Rated Orders</p>
           <p className="text-2xl font-bold text-amber-600">
             {ratingsData?.totalRated ?? 0}
           </p>
         </div>
         <div className="bg-white rounded-2xl shadow-sm border p-6">
-          <p className="text-sm text-gray-500 mb-1">Avg. Overall</p>
+          <p className="text-sm text-gray-800 mb-1">Avg. Overall</p>
           <p className="text-2xl font-bold text-amber-600">
             {ratingsData?.totalRated
               ? ratingsData.avgStars.toFixed(1)
@@ -279,7 +279,7 @@ export default function AdminReportsPage() {
           </p>
         </div>
         <div className="bg-white rounded-2xl shadow-sm border p-6">
-          <p className="text-sm text-gray-500 mb-1">Avg. Delivery</p>
+          <p className="text-sm text-gray-800 mb-1">Avg. Delivery</p>
           <p className="text-2xl font-bold text-amber-600">
             {ratingsData?.avgDelivery
               ? ratingsData.avgDelivery.toFixed(1)
@@ -287,7 +287,7 @@ export default function AdminReportsPage() {
           </p>
         </div>
         <div className="bg-white rounded-2xl shadow-sm border p-6">
-          <p className="text-sm text-gray-500 mb-1">Avg. Quality</p>
+          <p className="text-sm text-gray-800 mb-1">Avg. Quality</p>
           <p className="text-2xl font-bold text-amber-600">
             {ratingsData?.avgQuality
               ? ratingsData.avgQuality.toFixed(1)

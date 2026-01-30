@@ -287,9 +287,7 @@ export default function MenuPage() {
             <h2 className="font-bold text-lg mb-3">Top Sale</h2>
             <div className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
               {filteredMainDeals.map((deal) => (
-                <div key={deal.id} className="flex-shrink-0 w-44">
-                  <DealCard deal={deal} />
-                </div>
+                <DealCard key={deal.id} deal={deal} />
               ))}
             </div>
           </div>

@@ -15,7 +15,7 @@ const config: Config = {
         dark: '#1E1E1E',
       },
       fontFamily: {
-        sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-plus-jakarta)', 'system-ui', 'sans-serif'],
       },
     },
   },

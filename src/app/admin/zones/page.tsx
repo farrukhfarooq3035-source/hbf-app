@@ -52,8 +52,8 @@ export default function AdminZonesPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-dark mb-6">Delivery Zones</h1>
-      <p className="text-gray-600 text-sm mb-6">
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Delivery Zones</h1>
+      <p className="text-gray-800 text-sm mb-6">
         Define areas with min order, delivery fee, and free delivery above amount. First matching zone (by name in address or default) is used at checkout.
       </p>
 
@@ -131,7 +131,7 @@ export default function AdminZonesPage() {
           </table>
         </div>
         {(!zones?.length && !isLoading) && (
-          <div className="p-12 text-center text-gray-500">No delivery zones. Add one or use default (geo-based) fee.</div>
+          <div className="p-12 text-center text-gray-800">No delivery zones. Add one or use default (geo-based) fee.</div>
         )}
       </div>
     </div>

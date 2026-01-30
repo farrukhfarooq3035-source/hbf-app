@@ -78,7 +78,7 @@ export default function AdminPromoPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-dark mb-6">Promo Codes</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Promo Codes</h1>
 
       <div className="bg-white rounded-2xl shadow-sm border p-6 mb-6">
         <h2 className="font-semibold mb-4">Add Promo</h2>
@@ -176,7 +176,7 @@ export default function AdminPromoPage() {
                   <td className="p-4">
                     <button
                       onClick={() => toggleActive.mutate({ id: p.id, is_active: !p.is_active })}
-                      className={`px-2 py-1 rounded text-xs font-medium ${p.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}
+                      className={`px-2 py-1 rounded text-xs font-medium ${p.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-800'}`}
                     >
                       {p.is_active ? 'Active' : 'Inactive'}
                     </button>

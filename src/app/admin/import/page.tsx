@@ -49,11 +49,11 @@ export default function AdminImportPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-dark mb-6">Import Menu</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Import Menu</h1>
 
       {step === 'upload' && (
         <div className="bg-white rounded-2xl shadow-sm border p-8 max-w-xl">
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-800 mb-6">
             Import menu from the pre-built seed dataset (extracted from HBF menu
             images). For OCR from custom images, use an external OCR service and
             paste the parsed data.
@@ -90,7 +90,7 @@ export default function AdminImportPage() {
                   </li>
                 ))}
                 {preview.products.length > 30 && (
-                  <li className="text-gray-500">
+                  <li className="text-gray-700">
                     ... and {preview.products.length - 30} more
                   </li>
                 )}
@@ -138,7 +138,7 @@ export default function AdminImportPage() {
             <Check className="w-8 h-8" />
             <span className="font-bold text-lg">Import Complete!</span>
           </div>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-800 mb-6">
             Menu has been imported to Supabase. You can now view products and
             deals in the admin panel.
           </p>

@@ -89,7 +89,7 @@ export default function AdminInventoryPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-dark mb-6">Inventory</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Inventory</h1>
 
       <div className="bg-white rounded-2xl shadow-sm border p-6 mb-6">
         <h2 className="font-semibold mb-4">Add Stock Item</h2>
@@ -201,7 +201,7 @@ export default function AdminInventoryPage() {
         })}
       </div>
       {!items?.length && !isLoading && (
-        <div className="text-center py-12 text-gray-500">No inventory items.</div>
+        <div className="text-center py-12 text-gray-800">No inventory items.</div>
       )}
     </div>
   );

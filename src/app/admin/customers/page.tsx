@@ -66,7 +66,7 @@ export default function AdminCustomersPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-dark mb-6">Customers</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Customers</h1>
       <p className="text-gray-600 text-sm mb-4">
         Unique customers by phone. Regular customers (3+ orders) show a star.
       </p>
@@ -89,7 +89,7 @@ export default function AdminCustomersPage() {
                   <td className="p-4 font-medium">{c.name}</td>
                   <td className="p-4">{c.phone}</td>
                   <td className="p-4">{c.total_orders}</td>
-                  <td className="p-4 text-gray-500">
+                  <td className="p-4 text-gray-800">
                     {format(new Date(c.last_order_at), 'MMM d, yyyy HH:mm')}
                   </td>
                   <td className="p-4">
@@ -101,7 +101,7 @@ export default function AdminCustomersPage() {
                         <Star className="w-4 h-4 fill-amber-500" />
                       </span>
                     ) : (
-                      <span className="text-gray-300">—</span>
+                      <span className="text-gray-600">—</span>
                     )}
                   </td>
                 </tr>
@@ -110,7 +110,7 @@ export default function AdminCustomersPage() {
           </table>
         </div>
         {!customers?.length && (
-          <div className="p-12 text-center text-gray-500">No customers yet.</div>
+          <div className="p-12 text-center text-gray-800">No customers yet.</div>
         )}
       </div>
     </div>

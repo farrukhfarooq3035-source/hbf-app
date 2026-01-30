@@ -120,8 +120,8 @@ export default function AdminRidersPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-dark mb-2">Riders</h1>
-      <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+      <h1 className="text-2xl font-bold text-gray-900 mb-2">Riders</h1>
+      <p className="text-sm text-gray-800 mb-6">
         Set <strong>PIN</strong> for rider app login (<strong>/rider/login</strong>). Track location (map icon) to see rider on map. Rider logs in at <strong>/rider/login</strong> then uses <strong>/rider</strong> for deliveries &amp; location.
       </p>
 
@@ -167,8 +167,8 @@ export default function AdminRidersPage() {
             <tbody>
               {riders?.map((r) => (
                 <tr key={r.id} className="border-t dark:border-gray-700">
-                  <td className="p-4 font-medium text-dark dark:text-white">{r.name}</td>
-                  <td className="p-4 text-gray-600 dark:text-gray-400">{r.phone}</td>
+                  <td className="p-4 font-medium text-gray-900 ">{r.name}</td>
+                  <td className="p-4 text-gray-800">{r.phone}</td>
                   <td className="p-4">
                     <button
                       type="button"
@@ -200,7 +200,7 @@ export default function AdminRidersPage() {
                       className={`px-3 py-1 rounded-lg text-sm ${
                         r.status === 'active'
                           ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                          : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                          : 'bg-gray-100 text-gray-800 '
                       }`}
                     >
                       {r.status}
@@ -227,7 +227,7 @@ export default function AdminRidersPage() {
           </table>
         </div>
         {!riders?.length && !isLoading && (
-          <div className="p-12 text-center text-gray-500">No riders yet.</div>
+          <div className="p-12 text-center text-gray-800">No riders yet.</div>
         )}
       </div>
 
@@ -235,7 +235,7 @@ export default function AdminRidersPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-lg w-full p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-lg text-dark dark:text-white">Rider location</h3>
+              <h3 className="font-bold text-lg text-gray-900 ">Rider location</h3>
               <button
                 type="button"
                 onClick={() => { setTrackRiderId(null); setRiderLocation(null); }}
@@ -253,11 +253,11 @@ export default function AdminRidersPage() {
                 height={280}
               />
             ) : (
-              <p className="text-gray-500 dark:text-gray-400 py-8 text-center">
+              <p className="text-gray-800 py-8 text-center">
                 No location yet. Rider can share location from the Rider page.
               </p>
             )}
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-gray-800 mt-2">
               Rider login: /rider/login → then /rider for deliveries &amp; location
             </p>
           </div>
@@ -267,8 +267,8 @@ export default function AdminRidersPage() {
       {pinRiderId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-sm w-full p-6">
-            <h3 className="font-bold text-lg text-dark dark:text-white mb-4">Rider PIN</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            <h3 className="font-bold text-lg text-gray-900  mb-4">Rider PIN</h3>
+            <p className="text-sm text-gray-800 mb-3">
               PIN is used for rider app login at /rider/login. 4–6 digits recommended.
             </p>
             <input
@@ -277,7 +277,7 @@ export default function AdminRidersPage() {
               placeholder="Enter PIN"
               value={pinValue}
               onChange={(e) => setPinValue(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-dark dark:text-white mb-4"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 mb-4"
               maxLength={8}
             />
             <div className="flex gap-2">
@@ -292,7 +292,7 @@ export default function AdminRidersPage() {
               <button
                 type="button"
                 onClick={() => { setPinRiderId(null); setPinValue(''); }}
-                className="px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="px-4 py-2 border border-gray-200 rounded-xl font-medium text-gray-900 hover:bg-gray-100"
               >
                 Cancel
               </button>

@@ -119,7 +119,7 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-dark mb-6">Dashboard</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-2xl p-6 shadow-sm border">
@@ -128,7 +128,7 @@ export default function AdminDashboardPage() {
               <DollarSign className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Today Sales</p>
+              <p className="text-sm text-gray-800">Today Sales</p>
               <p className="text-2xl font-bold">Rs {todaySales}/-</p>
             </div>
           </div>
@@ -139,7 +139,7 @@ export default function AdminDashboardPage() {
               <ShoppingBag className="w-6 h-6 text-amber-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Today Orders</p>
+              <p className="text-sm text-gray-800">Today Orders</p>
               <p className="text-2xl font-bold">{totalOrders}</p>
             </div>
           </div>
@@ -150,7 +150,7 @@ export default function AdminDashboardPage() {
               <Clock className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Pending Orders</p>
+              <p className="text-sm text-gray-800">Pending Orders</p>
               <p className="text-2xl font-bold">{pendingOrders?.length || 0}</p>
             </div>
           </div>
@@ -161,7 +161,7 @@ export default function AdminDashboardPage() {
               <TrendingUp className="w-6 h-6 text-green-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Status</p>
+              <p className="text-sm text-gray-800">Status</p>
               <p className="text-lg font-bold text-green-600">Live</p>
             </div>
           </div>
@@ -182,7 +182,7 @@ export default function AdminDashboardPage() {
           </div>
           <ul className="space-y-2 max-h-64 overflow-y-auto">
             {(recentOrders || []).length === 0 ? (
-              <li className="text-sm text-gray-500 py-2">No orders yet</li>
+              <li className="text-sm text-gray-800 py-2">No orders yet</li>
             ) : (
               (recentOrders || []).map((o) => (
                 <li key={o.id}>
@@ -191,7 +191,7 @@ export default function AdminDashboardPage() {
                     className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 text-sm"
                   >
                     <span className="font-medium">{formatOrderNumber(o.id)}</span>
-                    <span className="text-gray-500">Rs {o.total_price}/-</span>
+                    <span className="text-gray-800">Rs {o.total_price}/-</span>
                     <span
                       className={`px-2 py-0.5 rounded text-xs font-medium ${
                         o.status === 'delivered'
@@ -220,15 +220,15 @@ export default function AdminDashboardPage() {
               Export CSV
             </button>
           </div>
-          <p className="text-sm text-gray-500 mb-2">
+          <p className="text-sm text-gray-800 mb-2">
             Download today&apos;s orders as CSV for records.
           </p>
           {todayOrders?.length ? (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-800">
               {todayOrders.length} order(s) — click Export CSV to download.
             </p>
           ) : (
-            <p className="text-sm text-gray-500">No orders today yet.</p>
+            <p className="text-sm text-gray-800">No orders today yet.</p>
           )}
         </div>
       </div>

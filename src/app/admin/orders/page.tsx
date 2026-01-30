@@ -113,11 +113,11 @@ function AdminOrdersContent() {
   const filterRider = filterRiderId ? riders?.find((r) => r.id === filterRiderId) : null;
 
   return (
-    <div className="p-6">
+    <div className="p-6 text-gray-900">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <h1 className="text-2xl font-bold text-dark dark:text-white">Orders</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
         {filterRider && (
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-900">
             Filtered by rider: <strong>{filterRider.name}</strong>
             <a href="/admin/orders" className="ml-2 text-primary hover:underline">Clear</a>
           </p>
@@ -128,11 +128,11 @@ function AdminOrdersContent() {
         {COLUMNS.map((col) => (
           <div
             key={col.key}
-            className="flex-shrink-0 w-72 bg-gray-100 rounded-2xl p-4 min-h-[400px]"
+            className="flex-shrink-0 w-72 bg-gray-100 rounded-2xl p-4 min-h-[400px] text-gray-900"
           >
-            <h3 className="font-bold mb-4 flex items-center gap-2">
+            <h3 className="font-bold mb-4 flex items-center gap-2 text-gray-900">
               {col.label}
-              <span className="text-sm font-normal text-gray-500">
+              <span className="text-sm font-normal text-gray-700">
                 ({getOrdersByStatus(col.key).length})
               </span>
             </h3>
@@ -144,9 +144,9 @@ function AdminOrdersContent() {
                 return (
                   <div
                     key={order.id}
-                    className="bg-white rounded-xl p-4 shadow-sm border"
+                    className="bg-white rounded-xl p-4 shadow-sm border text-gray-900"
                   >
-                    <p className="font-semibold text-sm flex items-center gap-1">
+                    <p className="font-semibold text-sm flex items-center gap-1 text-gray-900">
                       {formatOrderNumber(order.id)} • Rs {order.total_price}/-
                       {isRegular && (
                         <span title="Regular customer (3+ orders)">
@@ -154,27 +154,27 @@ function AdminOrdersContent() {
                         </span>
                       )}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-900 mt-1">
                       {order.created_at
                         ? format(new Date(order.created_at), 'MMM d, h:mm a')
                         : ''}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-900 mt-1">
                       {order.customer_name} • {order.phone}
                     </p>
-                    <p className="text-xs text-gray-500 truncate">{order.address}</p>
+                    <p className="text-xs text-gray-900 truncate">{order.address}</p>
                     {assignedRider && (
                       <p className="text-xs text-primary font-medium mt-1">
                         Rider: {assignedRider.name} ({assignedRider.phone})
                       </p>
                     )}
                     {order.notes && (
-                      <p className="text-xs text-gray-600 mt-1 truncate" title={order.notes}>
+                      <p className="text-xs text-gray-900 mt-1 truncate" title={order.notes}>
                         Note: {order.notes}
                       </p>
                     )}
                     {order.distance_km != null && (
-                      <p className="text-xs text-gray-600 mt-1">
+                      <p className="text-xs text-gray-900 mt-1">
                         Distance: {Number(order.distance_km).toFixed(1)} km
                       </p>
                     )}
@@ -205,7 +205,7 @@ function AdminOrdersContent() {
                     )}
                     {order.status === 'ready' && riders?.length && (
                       <div className="mt-2">
-                        <label className="text-xs text-gray-500 block mb-1">Assign rider (for On the way)</label>
+                        <label className="text-xs text-gray-900 block mb-1">Assign rider (for On the way)</label>
                         <select
                           value={selectedRiderByOrderId[order.id] ?? ''}
                           onChange={(e) =>
@@ -214,7 +214,7 @@ function AdminOrdersContent() {
                               [order.id]: e.target.value,
                             }))
                           }
-                          className="w-full text-xs px-2 py-1.5 rounded border border-gray-200"
+                          className="w-full text-xs px-2 py-1.5 rounded border border-gray-200 text-gray-900 bg-white"
                         >
                           <option value="">Select rider</option>
                           {riders.map((r) => (

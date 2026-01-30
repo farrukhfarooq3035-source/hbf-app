@@ -70,7 +70,7 @@ export default function AdminExpensesPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-dark mb-6">Expenses</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Expenses</h1>
 
       <div className="bg-white rounded-2xl shadow-sm border p-6 mb-6">
         <h2 className="font-semibold mb-4">Add Expense</h2>
@@ -139,7 +139,7 @@ export default function AdminExpensesPage() {
                 <tr key={e.id} className="border-t">
                   <td className="p-4">{format(new Date(e.date), 'MMM d, yyyy')}</td>
                   <td className="p-4 font-medium">{e.title}</td>
-                  <td className="p-4 text-gray-500">{e.category}</td>
+                  <td className="p-4 text-gray-800">{e.category}</td>
                   <td className="p-4">Rs {e.amount}/-</td>
                   <td className="p-4">
                     <button
@@ -155,7 +155,7 @@ export default function AdminExpensesPage() {
           </table>
         </div>
         {!expenses?.length && !isLoading && (
-          <div className="p-12 text-center text-gray-500">No expenses yet.</div>
+          <div className="p-12 text-center text-gray-800">No expenses yet.</div>
         )}
       </div>
     </div>

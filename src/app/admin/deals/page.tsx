@@ -46,7 +46,7 @@ export default function AdminDealsPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-dark mb-6">Deals</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Deals</h1>
 
       <div className="bg-white rounded-2xl shadow-sm border p-6 mb-6">
         <h2 className="font-semibold mb-4">Add Deal</h2>
@@ -95,7 +95,7 @@ export default function AdminDealsPage() {
         ))}
       </div>
       {!deals?.length && !isLoading && (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-gray-800">
           No deals. Add some or run Import Menu.
         </div>
       )}

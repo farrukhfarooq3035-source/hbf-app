@@ -45,16 +45,16 @@ export default function AdminSettingsPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-dark mb-6">Settings</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Settings</h1>
 
       <div className="bg-white rounded-2xl shadow-sm border p-6 max-w-xl mb-6">
         <h2 className="font-semibold mb-4">Business Hours</h2>
-        <p className="text-gray-600 text-sm mb-4">
+        <p className="text-gray-800 text-sm mb-4">
           Customer app will show &quot;We&apos;re closed&quot; outside these hours and on closed days.
         </p>
         <div className="flex flex-wrap gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Open</label>
+            <label className="block text-sm font-medium text-gray-900 mb-1">Open</label>
             <input
               type="time"
               value={openTime}
@@ -63,7 +63,7 @@ export default function AdminSettingsPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Close</label>
+            <label className="block text-sm font-medium text-gray-900 mb-1">Close</label>
             <input
               type="time"
               value={closeTime}
@@ -73,7 +73,7 @@ export default function AdminSettingsPage() {
           </div>
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Closed days</label>
+          <label className="block text-sm font-medium text-gray-900 mb-2">Closed days</label>
           <div className="flex flex-wrap gap-2">
             {[0, 1, 2, 3, 4, 5, 6].map((day) => (
               <button
@@ -81,7 +81,7 @@ export default function AdminSettingsPage() {
                 type="button"
                 onClick={() => toggleClosedDay(day)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium ${
-                  closedDays.includes(day) ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
+                  closedDays.includes(day) ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-900'
                 }`}
               >
                 {DAY_NAMES[day]}
@@ -102,7 +102,7 @@ export default function AdminSettingsPage() {
 
       <div className="bg-white rounded-2xl shadow-sm border p-6 max-w-xl">
         <h2 className="font-semibold mb-4">Contact Info</h2>
-        <p className="text-gray-600 text-sm mb-4">
+        <p className="text-gray-800 text-sm mb-4">
           Store phone is used for &quot;Call store&quot; on the customer order tracking page. Set{' '}
           <code className="bg-gray-100 px-1 rounded">NEXT_PUBLIC_STORE_PHONE</code> in .env.local (e.g. 03001234567).
         </p>
@@ -125,7 +125,7 @@ export default function AdminSettingsPage() {
 
       <div className="bg-white rounded-2xl shadow-sm border p-6 max-w-xl mt-6">
         <h2 className="font-semibold mb-4">Environment</h2>
-        <p className="text-gray-600 text-sm">
+        <p className="text-gray-800 text-sm">
           Ensure these are set in .env.local:
         </p>
         <ul className="mt-2 space-y-1 text-sm font-mono">

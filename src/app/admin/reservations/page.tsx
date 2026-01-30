@@ -96,21 +96,21 @@ export default function AdminReservationsPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-dark dark:text-white mb-6 flex items-center gap-2">
+      <h1 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
         <CalendarDays className="w-7 h-7 text-primary" />
         Reservations
       </h1>
 
-      <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl">
+      <div className="mb-6 p-4 bg-gray-50 rounded-2xl">
         <h2 className="font-semibold mb-2">Tables (11 total)</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-gray-800">
           6 tables for 6 persons (family), 5 tables for 4 persons.
         </p>
         <div className="flex flex-wrap gap-2 mt-2">
           {tables.map((t) => (
             <span
               key={t.id}
-              className="px-3 py-1 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-sm"
+              className="px-3 py-1 rounded-lg bg-white border border-gray-200 text-sm"
             >
               {t.name} ({t.capacity} seats)
             </span>
@@ -216,17 +216,17 @@ export default function AdminReservationsPage() {
           {isLoading ? (
             <div className="h-48 bg-gray-100 dark:bg-gray-700 rounded-xl animate-pulse" />
           ) : reservations.length === 0 ? (
-            <p className="text-gray-500 dark:text-gray-400 text-sm">No reservations for this date.</p>
+            <p className="text-gray-800 text-sm">No reservations for this date.</p>
           ) : (
             <div className="space-y-3 max-h-[400px] overflow-y-auto">
               {reservations.map((r) => (
                 <div
                   key={r.id}
-                  className="p-4 rounded-xl border border-gray-200 dark:border-gray-600 flex flex-wrap items-center justify-between gap-2"
+                  className="p-4 rounded-xl border border-gray-200 flex flex-wrap items-center justify-between gap-2"
                 >
                   <div>
                     <p className="font-medium">{r.customer_name} · {r.phone}</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-800">
                       {r.reservation_tables?.name ?? ''} · {r.time_slot} · {r.guest_count} guests
                     </p>
                   </div>

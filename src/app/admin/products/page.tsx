@@ -96,7 +96,7 @@ export default function AdminProductsPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-dark mb-6">Products</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Products</h1>
 
       <div className="bg-white rounded-2xl shadow-sm border p-6 mb-6">
         <h2 className="font-semibold mb-4">Add Product</h2>
@@ -178,7 +178,7 @@ export default function AdminProductsPage() {
                           className="object-cover w-full h-full"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <div className="w-full h-full flex items-center justify-center text-gray-600">
                           —
                         </div>
                       )}

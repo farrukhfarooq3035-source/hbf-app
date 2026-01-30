@@ -1,9 +1,16 @@
 import type { Metadata, Viewport } from 'next';
+import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 import { CartBar } from '@/components/customer/CartBar';
 import { LiveOrderButton } from '@/components/customer/LiveOrderButton';
 import { LocationPermission } from '@/components/customer/LocationPermission';
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-plus-jakarta',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'HBF - Haq Bahu Foods | Order Online',
@@ -22,8 +29,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="font-sans">
-      <body className="min-h-screen antialiased" style={{ backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
+    <html lang="en" className={`font-sans ${plusJakarta.variable}`}>
+      <body className="min-h-screen antialiased font-sans" style={{ backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
         <Providers>
           <LocationPermission />
           {children}
