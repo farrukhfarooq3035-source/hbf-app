@@ -5,17 +5,26 @@ import { useCategories, useProducts, useDeals, useTopSellingDeals } from '@/hook
 import { useBusinessHours } from '@/hooks/use-business-hours';
 import { ProductCard } from '@/components/customer/ProductCard';
 import { DealCard } from '@/components/customer/DealCard';
+import { FoodImage } from '@/components/customer/FoodImage';
 import { useCartStore } from '@/store/cart-store';
 import { useFavoritesStore } from '@/store/favorites-store';
 import Link from 'next/link';
 import { Heart, Clock } from 'lucide-react';
+import type { Product } from '@/types';
 
 const RECENT_SEARCH_KEY = 'hbf-recent-search';
 const RECENT_SEARCH_MAX = 5;
 
-/** Special view key: top_sale = deals in same grid as products */
+/** Special view key: top_sale = deals section */
 const TOP_SALE_VIEW = 'top_sale';
 const MAIN_DEALS_LIMIT = 12;
+
+const SECTION_ID_TOP_SALE = 'section-top-sale';
+
+function scrollToSection(sectionId: string) {
+  const el = document.getElementById(sectionId);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
 /** Dedupe categories by name so same category does not show twice */
 function uniqueCategoriesByName<T extends { id: string; name: string }>(list: T[] | undefined): T[] {
@@ -48,8 +57,6 @@ function addRecentSearch(term: string) {
 }
 
 export default function MenuPage() {
-  /** 'top_sale' | categoryId — default Top Sale so user sees deals first, not all products */
-  const [selectedView, setSelectedView] = useState<string | null>(TOP_SALE_VIEW);
   const [search, setSearch] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [priceMin, setPriceMin] = useState<string>('');
@@ -60,17 +67,11 @@ export default function MenuPage() {
 
   const { data: categories, isLoading: catsLoading } = useCategories();
   const uniqueCategories = useMemo(() => uniqueCategoriesByName(categories), [categories]);
-  const isCategoryId = selectedView && selectedView !== TOP_SALE_VIEW;
-  const { data: products, isLoading: productsLoading } = useProducts(
-    isCategoryId ? selectedView : undefined
-  );
   const { data: deals } = useDeals();
   const { data: allProducts } = useProducts(undefined);
   const { data: topSellingDeals = [] } = useTopSellingDeals(MAIN_DEALS_LIMIT);
-  /** Sirf top 12: by sales jab RPC chal raha ho, warna pehle 12 deals */
   const mainDeals = useMemo(() => {
-    const list =
-      topSellingDeals.length > 0 ? topSellingDeals : (deals || []);
+    const list = topSellingDeals.length > 0 ? topSellingDeals : (deals || []);
     return list.slice(0, MAIN_DEALS_LIMIT);
   }, [topSellingDeals, deals]);
 
@@ -83,13 +84,40 @@ export default function MenuPage() {
   const byPrice = (price: number) =>
     (minN == null || price >= minN) && (maxN == null || price <= maxN);
 
-  const filteredProducts = useMemo(() => {
-    let list = products?.filter(bySearch) ?? [];
-    if (minN != null || maxN != null) {
-      list = list.filter((p) => byPrice(p.size_options?.[0]?.price ?? p.price));
-    }
-    return list;
-  }, [products, search, minN, maxN]);
+  /** Products grouped by category_id for per-category sections */
+  const productsByCategory = useMemo(() => {
+    const map: Record<string, Product[]> = {};
+    (allProducts || []).forEach((p) => {
+      const cid = p.category_id ?? '';
+      if (!map[cid]) map[cid] = [];
+      map[cid].push(p);
+    });
+    return map;
+  }, [allProducts]);
+
+  /** First product image per category (for category card) */
+  const categoryImageMap = useMemo(() => {
+    const map: Record<string, string | null> = {};
+    uniqueCategories.forEach((c) => {
+      const list = productsByCategory[c.id] ?? [];
+      const firstWithImage = list.find((p) => p.image_url);
+      map[c.id] = firstWithImage?.image_url ?? null;
+    });
+    return map;
+  }, [uniqueCategories, productsByCategory]);
+
+  /** Filtered products per category (search + price) */
+  const filteredProductsByCategory = useMemo(() => {
+    const map: Record<string, Product[]> = {};
+    Object.keys(productsByCategory).forEach((cid) => {
+      let list = productsByCategory[cid].filter(bySearch);
+      if (minN != null || maxN != null) {
+        list = list.filter((p) => byPrice(p.size_options?.[0]?.price ?? p.price));
+      }
+      map[cid] = list;
+    });
+    return map;
+  }, [productsByCategory, search, minN, maxN]);
 
   const filteredMainDeals = useMemo(() => {
     if (minN == null && maxN == null) return mainDeals;
@@ -106,13 +134,18 @@ export default function MenuPage() {
   );
   const hasFavorites = favoriteProducts.length > 0 || favoriteDeals.length > 0;
 
-  const showDealsGrid = selectedView === TOP_SALE_VIEW;
-  const showProductsGrid = !showDealsGrid && (isCategoryId || selectedView === null);
-
-  const categoryPills = [
-    { key: TOP_SALE_VIEW, label: 'Top Sale' },
-    ...uniqueCategories.map((c) => ({ key: c.id, label: c.name })),
-  ];
+  /** Category cards for top row: Top Sale + each category (with image + label) */
+  const categoryCards = useMemo(
+    () => [
+      { key: TOP_SALE_VIEW, label: 'Top Sale', imageUrl: mainDeals[0]?.image_url ?? null },
+      ...uniqueCategories.map((c) => ({
+        key: c.id,
+        label: c.name,
+        imageUrl: categoryImageMap[c.id] ?? null,
+      })),
+    ],
+    [uniqueCategories, categoryImageMap, mainDeals]
+  );
 
   const handleSearchBlur = () => {
     if (search.trim()) addRecentSearch(search.trim());
@@ -120,7 +153,7 @@ export default function MenuPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto overflow-x-hidden">
+    <div className="max-w-4xl mx-auto">
       <div className="p-4 space-y-4">
         {!isOpen && (
           <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
@@ -218,74 +251,105 @@ export default function MenuPage() {
           </div>
         )}
 
-        {filteredMainDeals.length > 0 && (
-          <div>
-            <h2 className="font-bold text-lg mb-3">Deals</h2>
-            <div className="flex gap-4 overflow-x-auto overflow-y-hidden pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x">
-              {filteredMainDeals.map((deal) => (
-                <DealCard key={deal.id} deal={deal} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div>
+        {/* Categories row: image + label (ref 1 style), horizontal scroll */}
+        <div className="w-full min-w-0">
           <h2 className="font-bold text-lg mb-3">Categories</h2>
-          <div className="flex gap-2 overflow-x-auto overflow-y-hidden pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x">
-            {categoryPills.map(({ key, label }) => (
+          <div className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
+            {categoryCards.map(({ key, label, imageUrl }) => (
               <button
                 key={key}
-                onClick={() => setSelectedView(key)}
-                className={`flex-shrink-0 px-4 py-2 rounded-full font-medium tap-highlight ${
-                  selectedView === key
-                    ? 'bg-primary text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
+                type="button"
+                onClick={() =>
+                  scrollToSection(key === TOP_SALE_VIEW ? SECTION_ID_TOP_SALE : `section-${key}`)
+                }
+                className="flex-shrink-0 flex flex-col items-center gap-2 tap-highlight text-left"
               >
-                {label}
+                <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-soft ring-2 ring-transparent focus:ring-primary/30">
+                  <FoodImage
+                    src={imageUrl}
+                    alt={label}
+                    aspect="1:1"
+                    sizes="96px"
+                    className="w-full h-full"
+                  />
+                </div>
+                <span className="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 max-w-24 text-center">
+                  {label}
+                </span>
               </button>
             ))}
           </div>
         </div>
 
-        <div>
-          <h2 className="font-bold text-lg mb-3">Menu</h2>
-          {          showDealsGrid ? (
-            filteredMainDeals.length > 0 ? (
-              <div className="grid grid-cols-2 gap-3">
-                {filteredMainDeals.map((deal) => (
-                  <DealCard key={deal.id} deal={deal} grid />
-                ))}
+        {/* Per-category sections: heading + horizontal product scroll (ref 2 style) */}
+        {filteredMainDeals.length > 0 && (
+          <div id={SECTION_ID_TOP_SALE} className="scroll-mt-4">
+            <h2 className="font-bold text-lg mb-3">Top Sale</h2>
+            <div className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
+              {filteredMainDeals.map((deal) => (
+                <div key={deal.id} className="flex-shrink-0 w-44">
+                  <DealCard deal={deal} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {catsLoading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i}>
+                <div className="h-6 w-32 bg-gray-100 dark:bg-gray-700 rounded animate-pulse mb-3" />
+                <div className="flex gap-4 overflow-hidden">
+                  {[1, 2, 3, 4].map((j) => (
+                    <div
+                      key={j}
+                      className="flex-shrink-0 w-44 aspect-[4/3] bg-gray-100 dark:bg-gray-700 rounded-2xl animate-pulse"
+                    />
+                  ))}
+                </div>
               </div>
-            ) : (
-              <div className="text-center py-12 text-gray-500">
-                <p>No deals at the moment.</p>
-              </div>
-            )
-          ) : productsLoading || catsLoading ? (
-            <div className="grid grid-cols-2 gap-3">
-              {[...Array(6)].map((_, i) => (
+            ))}
+          </div>
+        ) : (
+          <>
+            {uniqueCategories.map((cat) => {
+              const list = filteredProductsByCategory[cat.id] ?? [];
+              if (list.length === 0) return null;
+              return (
                 <div
-                  key={i}
-                  className="aspect-square bg-gray-100 rounded-2xl animate-pulse"
-                />
-              ))}
-            </div>
-          ) : filteredProducts && filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 gap-3">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 text-gray-500">
-              <p>No products found.</p>
-              <Link href="/admin" className="hidden md:inline-block text-primary underline mt-2">
-                Go to Admin to add menu
-              </Link>
-            </div>
-          )}
-        </div>
+                  key={cat.id}
+                  id={`section-${cat.id}`}
+                  className="scroll-mt-4"
+                >
+                  <h2 className="font-bold text-lg mb-3">{cat.name}</h2>
+                  <div className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
+                    {list.map((product) => (
+                      <div key={product.id} className="flex-shrink-0 w-44">
+                        <ProductCard product={product} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+            {uniqueCategories.length > 0 &&
+              uniqueCategories.every(
+                (c) => (filteredProductsByCategory[c.id] ?? []).length === 0
+              ) &&
+              filteredMainDeals.length === 0 && (
+                <div className="text-center py-12 text-gray-500">
+                  <p>No products or deals match your filters.</p>
+                  <Link
+                    href="/admin"
+                    className="hidden md:inline-block text-primary underline mt-2"
+                  >
+                    Go to Admin to add menu
+                  </Link>
+                </div>
+              )}
+          </>
+        )}
       </div>
     </div>
   );

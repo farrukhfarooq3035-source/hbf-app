@@ -76,6 +76,13 @@ body {
   display: none;
 }
 
+/* Horizontal scroll strip: smooth touch scroll, all categories visible */
+.horizontal-scroll-strip {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 /* Micro-interactions */
 @layer utilities {
   .safe-area-bottom {
