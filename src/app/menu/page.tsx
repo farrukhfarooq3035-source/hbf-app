@@ -79,40 +79,42 @@ export default function MenuPage() {
   const byPrice = (price: number) =>
     (minN == null || price >= minN) && (maxN == null || price <= maxN);
 
-  /** Products grouped by category_id for per-category sections */
-  const productsByCategory = useMemo(() => {
+  /** Products grouped by category NAME so all "HBF Pizzas" show in one section even if multiple category IDs exist in DB */
+  const productsByCategoryName = useMemo(() => {
     const map: Record<string, Product[]> = {};
+    const catIdToName = new Map<string, string>((categories || []).map((c) => [c.id, c.name ?? '']));
     (allProducts || []).forEach((p) => {
-      const cid = p.category_id ?? '';
-      if (!map[cid]) map[cid] = [];
-      map[cid].push(p);
+      const name = p.category_id ? (catIdToName.get(p.category_id) ?? '').trim() : '';
+      if (!name) return;
+      if (!map[name]) map[name] = [];
+      map[name].push(p);
     });
     return map;
-  }, [allProducts]);
+  }, [allProducts, categories]);
 
   /** First product image per category (for category card) */
   const categoryImageMap = useMemo(() => {
     const map: Record<string, string | null> = {};
     uniqueCategories.forEach((c) => {
-      const list = productsByCategory[c.id] ?? [];
+      const list = productsByCategoryName[c.name] ?? [];
       const firstWithImage = list.find((p) => p.image_url);
       map[c.id] = firstWithImage?.image_url ?? null;
     });
     return map;
-  }, [uniqueCategories, productsByCategory]);
+  }, [uniqueCategories, productsByCategoryName]);
 
-  /** Filtered products per category (search + price) */
+  /** Filtered products per category (by name), keyed by category id for section lookup */
   const filteredProductsByCategory = useMemo(() => {
     const map: Record<string, Product[]> = {};
-    Object.keys(productsByCategory).forEach((cid) => {
-      let list = productsByCategory[cid].filter(bySearchProduct);
+    uniqueCategories.forEach((c) => {
+      let list = (productsByCategoryName[c.name] ?? []).filter(bySearchProduct);
       if (minN != null || maxN != null) {
         list = list.filter((p) => byPrice(p.size_options?.[0]?.price ?? p.price));
       }
-      map[cid] = list;
+      map[c.id] = list;
     });
     return map;
-  }, [productsByCategory, search, minN, maxN]);
+  }, [uniqueCategories, productsByCategoryName, search, minN, maxN]);
 
   const favoriteProducts = useMemo(
     () => (allProducts || []).filter((p) => favProductIds.includes(p.id)),
