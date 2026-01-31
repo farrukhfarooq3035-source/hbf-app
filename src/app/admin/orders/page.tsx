@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
@@ -29,6 +29,7 @@ function AdminOrdersContent() {
   const searchParams = useSearchParams();
   const filterRiderId = searchParams.get('rider_id') ?? null;
   const [selectedRiderByOrderId, setSelectedRiderByOrderId] = useState<Record<string, string>>({});
+  const [orderDate, setOrderDate] = useState<string>(() => format(new Date(), 'yyyy-MM-dd'));
 
   const { data: riders } = useQuery({
     queryKey: ['riders'],
@@ -55,9 +56,20 @@ function AdminOrdersContent() {
     },
   });
 
-  const filteredOrders = filterRiderId
-    ? orders?.filter((o) => o.rider_id === filterRiderId) ?? []
-    : orders ?? [];
+  const filteredOrders = useMemo(() => {
+    let list = orders ?? [];
+    if (orderDate) {
+      list = list.filter((o) => {
+        if (!o.created_at) return false;
+        const orderLocalDate = format(new Date(o.created_at), 'yyyy-MM-dd');
+        return orderLocalDate === orderDate;
+      });
+    }
+    if (filterRiderId) {
+      list = list.filter((o) => o.rider_id === filterRiderId);
+    }
+    return list;
+  }, [orders, orderDate, filterRiderId]);
 
   const orderCountByPhone = (() => {
     const map = new Map<string, number>();
@@ -116,12 +128,21 @@ function AdminOrdersContent() {
     <div className="p-6 text-gray-900">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
-        {filterRider && (
-          <p className="text-sm text-gray-900">
-            Filtered by rider: <strong>{filterRider.name}</strong>
-            <a href="/admin/orders" className="ml-2 text-primary hover:underline">Clear</a>
-          </p>
-        )}
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="text-sm font-medium text-gray-700">Date:</label>
+          <input
+            type="date"
+            value={orderDate}
+            onChange={(e) => setOrderDate(e.target.value)}
+            className="px-3 py-2 rounded-xl border border-gray-300 bg-white text-gray-900 text-sm"
+          />
+          {filterRider && (
+            <p className="text-sm text-gray-900">
+              Rider: <strong>{filterRider.name}</strong>
+              <a href="/admin/orders" className="ml-2 text-primary hover:underline">Clear</a>
+            </p>
+          )}
+        </div>
       </div>
 
       <div className="flex gap-4 overflow-x-auto pb-4">

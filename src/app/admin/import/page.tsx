@@ -55,8 +55,8 @@ export default function AdminImportPage() {
         <div className="bg-white rounded-2xl shadow-sm border p-8 max-w-xl">
           <p className="text-gray-800 mb-6">
             Import menu from the pre-built seed dataset (extracted from HBF menu
-            images). For OCR from custom images, use an external OCR service and
-            paste the parsed data.
+            images). Includes all HBF Pizzas (16 flavours). Agar app mein kam pizzas
+            dikhen to pehle Products se purani HBF Pizzas delete karein, phir Import run karein.
           </p>
           <button
             onClick={handleLoadSeed}

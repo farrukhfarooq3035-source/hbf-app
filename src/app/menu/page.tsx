@@ -159,7 +159,7 @@ export default function MenuPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto flex-1 min-h-0 menu-scroll-root">
       <div className="p-4 space-y-4">
         {!isOpen && (
           <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">

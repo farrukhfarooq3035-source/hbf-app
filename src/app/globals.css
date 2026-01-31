@@ -137,15 +137,28 @@ body {
   touch-action: manipulation;
 }
 
-/* Image: vertical scroll only = instant scroll over images (Facebook/Instagram level) */
+/* Image: vertical scroll only = instant scroll over images */
 [data-food-image] {
   touch-action: pan-y !important;
   -webkit-user-select: none;
   user-select: none;
 }
-/* Link wrapping image: don't block scroll */
 a [data-food-image] {
   touch-action: pan-y !important;
+}
+
+/* Menu: dedicated scroll area for smoother mobile scroll */
+.menu-scroll-root {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+  min-height: 0;
+}
+/* Reduce paint for off-screen cards */
+.scroll-strip-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 304px;
 }
 
 /* Card in strip: allow both so strip scroll works when touching card edge */
