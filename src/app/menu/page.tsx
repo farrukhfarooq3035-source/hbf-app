@@ -74,6 +74,8 @@ export default function MenuPage() {
   const maxN = priceMax === '' ? null : Number(priceMax);
   const bySearchProduct = (p: { name: string }) =>
     !search.trim() || p.name.toLowerCase().includes(search.toLowerCase());
+  const bySearchDeal = (d: { title: string }) =>
+    !search.trim() || d.title.toLowerCase().includes(search.toLowerCase());
   const byPrice = (price: number) =>
     (minN == null || price >= minN) && (maxN == null || price <= maxN);
 
@@ -122,15 +124,33 @@ export default function MenuPage() {
   );
   const hasFavorites = favoriteProducts.length > 0 || favoriteDeals.length > 0;
 
-  /** Category cards for top row: each category only (Top Sale & HBF Deals removed) */
+  /** HBF Deals: all active deals, filtered by search + price */
+  const filteredAllDeals = useMemo(() => {
+    const seen = new Set<string>();
+    return (deals || [])
+      .filter((d) => d.is_active !== false)
+      .filter((d) => {
+        if (seen.has(d.id)) return false;
+        seen.add(d.id);
+        if (!bySearchDeal(d)) return false;
+        if (minN != null || maxN != null) return byPrice(d.price);
+        return true;
+      });
+  }, [deals, search, minN, maxN]);
+
+  /** Category cards: HBF Deals + each category */
   const categoryCards = useMemo(
-    () =>
-      uniqueCategories.map((c) => ({
+    () => [
+      ...(filteredAllDeals.length > 0
+        ? [{ key: 'hbf-deals' as const, label: 'HBF Deals', imageUrl: filteredAllDeals[0]?.image_url ?? null }]
+        : []),
+      ...uniqueCategories.map((c) => ({
         key: c.id,
         label: c.name,
         imageUrl: categoryImageMap[c.id] ?? null,
       })),
-    [uniqueCategories, categoryImageMap]
+    ],
+    [uniqueCategories, categoryImageMap, filteredAllDeals]
   );
 
   const handleSearchBlur = () => {
@@ -245,8 +265,10 @@ export default function MenuPage() {
               <button
                 key={key}
                 type="button"
-                onClick={() => scrollToSection(`section-${key}`)}
-                className="flex-shrink-0 flex flex-col items-center gap-2 tap-highlight text-left scroll-snap-item hover-scale-subtle"
+                onClick={() =>
+                  scrollToSection(key === 'hbf-deals' ? 'section-hbf-deals' : `section-${key}`)
+                }
+                className="flex-shrink-0 flex flex-col items-center gap-2 tap-highlight text-left scroll-snap-item hover-scale-subtle scroll-strip-card"
               >
                 <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-soft ring-2 ring-transparent focus:ring-primary/30 flex-shrink-0">
                   <FoodImage
@@ -264,6 +286,20 @@ export default function MenuPage() {
             ))}
           </HorizontalScrollStrip>
         </div>
+
+        {/* HBF Deals section - below Categories */}
+        {filteredAllDeals.length > 0 && (
+          <div id="section-hbf-deals" className="scroll-mt-4">
+            <h2 className="font-bold text-lg mb-3">HBF Deals</h2>
+            <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+              {filteredAllDeals.map((deal) => (
+                <div key={deal.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card">
+                  <DealCard deal={deal} grid />
+                </div>
+              ))}
+            </HorizontalScrollStrip>
+          </div>
+        )}
 
         {catsLoading ? (
           <div className="space-y-4">
@@ -297,7 +333,7 @@ export default function MenuPage() {
                     {list.map((product) => (
                       <div
                         key={product.id}
-                        className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle"
+                        className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card"
                       >
                         <ProductCard product={product} />
                       </div>

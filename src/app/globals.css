@@ -57,7 +57,7 @@ body {
   /* Reduce scroll jank, GPU-friendly */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Allow scroll over images; remove 300ms tap delay */
+  /* Allow scroll over images; remove 300ms tap delay; smooth scroll */
   touch-action: manipulation;
   -webkit-overflow-scrolling: touch;
 }
@@ -128,19 +128,19 @@ body {
   }
 }
 
-/* Horizontal scroll strip: vertical scroll passes through to page (Facebook-like) */
+/* Horizontal scroll strip: allow both scrolls - browser uses gesture direction */
 .horizontal-scroll-strip {
   -webkit-overflow-scrolling: touch;
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
-  /* Vertical swipe on strip → page scrolls; horizontal → strip scrolls */
-  touch-action: pan-x;
+  touch-action: pan-x pan-y;
 }
 
-/* Images: vertical scroll works smoothly when touching (Facebook-like) */
-[data-food-image] {
-  touch-action: pan-y;
+/* Images & cards: allow both - fixes scroll over images (pan-x+pan-y intersection) */
+[data-food-image],
+.scroll-strip-card {
+  touch-action: pan-x pan-y;
 }
 
 /* Cards in strips - no scroll-snap for smoother scrolling */

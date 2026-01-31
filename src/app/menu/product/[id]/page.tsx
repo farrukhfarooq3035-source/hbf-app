@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -16,6 +16,14 @@ export default function ProductDetailPage() {
   const [qty, setQty] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
+
+  useEffect(() => {
+    if (product?.size_options?.length) {
+      setSelectedSize(product.size_options[0].name);
+    } else {
+      setSelectedSize(null);
+    }
+  }, [product?.id]);
 
   if (isLoading || !product) {
     return (
@@ -53,27 +61,31 @@ export default function ProductDetailPage() {
         )}
       </div>
       <div className="px-4 -mt-6 relative z-10">
-        <div className="bg-white rounded-2xl shadow-lg p-4">
-          <h1 className="text-xl font-bold text-dark">{product.name}</h1>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4">
+          <h1 className="text-xl font-bold text-dark dark:text-white">{product.name}</h1>
+
           {product.description && (
-            <p className="text-gray-600 text-sm mt-1">{product.description}</p>
+            <div className="mt-4">
+              <h2 className="font-semibold text-dark dark:text-white text-sm mb-1">Details</h2>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">{product.description}</p>
+            </div>
           )}
 
           {sizeOptions.length > 0 && (
             <div className="mt-4">
-              <p className="font-medium text-sm text-gray-700 mb-2">Size</p>
+              <h2 className="font-semibold text-dark dark:text-white text-sm mb-2">Size & Price</h2>
               <div className="flex gap-2 flex-wrap">
                 {sizeOptions.map((s) => (
                   <button
                     key={s.name}
                     onClick={() => setSelectedSize(s.name)}
-                    className={`px-4 py-2 rounded-xl font-medium ${
+                    className={`px-4 py-2 rounded-xl font-medium text-sm ${
                       selectedSize === s.name
                         ? 'bg-primary text-white'
-                        : 'bg-gray-100 text-gray-700'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                     }`}
                   >
-                    {s.name} - Rs {s.price}/-
+                    {s.name} | Rs {s.price}/-
                   </button>
                 ))}
               </div>
@@ -81,13 +93,13 @@ export default function ProductDetailPage() {
           )}
 
           <div className="mt-4">
-            <p className="font-medium text-sm text-gray-700 mb-2">Notes (optional)</p>
+            <p className="font-medium text-sm text-gray-700 dark:text-gray-400 mb-2">Notes (optional)</p>
             <input
               type="text"
               placeholder="e.g. No onions"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl border border-gray-200"
+              className="w-full px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
           </div>
 

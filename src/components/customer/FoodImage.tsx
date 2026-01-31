@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 
 const BLUR_DATA =
@@ -32,41 +32,6 @@ export function FoodImage({
   className = '',
 }: FoodImageProps) {
   const [loaded, setLoaded] = useState(false);
-  const lastTap = useRef(0);
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const handleDoubleTap = useCallback(() => {
-    if (Date.now() - lastTap.current < 350) {
-      onDoubleTap?.();
-      lastTap.current = 0;
-    } else {
-      lastTap.current = Date.now();
-    }
-  }, [onDoubleTap]);
-
-  const startY = useRef(0);
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    startY.current = e.clientY;
-    longPressTimer.current = setTimeout(() => {
-      longPressTimer.current = null;
-      onLongPress?.();
-    }, 400);
-  }, [onLongPress]);
-
-  const handlePointerUp = useCallback(() => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  }, []);
-
-  const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (longPressTimer.current && Math.abs(e.clientY - startY.current) > 8) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  }, []);
-
   const aspectClass = aspect === '1:1' ? 'aspect-square' : 'aspect-[4/3]';
 
   if (!src) {
@@ -86,12 +51,8 @@ export function FoodImage({
       onClick={() => onClick?.()}
       onDoubleClick={(e) => {
         e.preventDefault();
-        handleDoubleTap();
+        onDoubleTap?.();
       }}
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
-      onPointerMove={handlePointerMove}
-      onPointerLeave={handlePointerUp}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
     >
