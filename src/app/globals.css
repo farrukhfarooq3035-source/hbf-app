@@ -38,9 +38,11 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.2);
 }
 
-/* Premium smooth scroll: native feel like high-end apps */
+/* Premium smooth scroll: Facebook-like native feel */
 html {
   scroll-behavior: smooth;
+  /* iOS momentum scrolling */
+  -webkit-overflow-scrolling: touch;
 }
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -57,6 +59,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   /* Allow scroll over images; remove 300ms tap delay */
   touch-action: manipulation;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Typography scale */
@@ -125,12 +128,19 @@ body {
   }
 }
 
-/* Horizontal scroll strip: simple smooth scroll */
+/* Horizontal scroll strip: vertical scroll passes through to page (Facebook-like) */
 .horizontal-scroll-strip {
   -webkit-overflow-scrolling: touch;
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
+  /* Vertical swipe on strip → page scrolls; horizontal → strip scrolls */
+  touch-action: pan-x;
+}
+
+/* Images: vertical scroll works smoothly when touching (Facebook-like) */
+[data-food-image] {
+  touch-action: pan-y;
 }
 
 /* Cards in strips - no scroll-snap for smoother scrolling */

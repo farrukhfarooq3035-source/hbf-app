@@ -82,7 +82,7 @@ export function FoodImage({
   return (
     <div
       data-food-image
-      className={`${aspectClass} bg-gray-100 dark:bg-gray-700 relative overflow-hidden touch-manipulation ${className}`}
+      className={`${aspectClass} bg-gray-100 dark:bg-gray-700 relative overflow-hidden ${className}`}
       onClick={() => onClick?.()}
       onDoubleClick={(e) => {
         e.preventDefault();
