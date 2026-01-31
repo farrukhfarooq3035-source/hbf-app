@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Plus, Heart, GitCompare } from 'lucide-react';
 import { useCartStore } from '@/store/cart-store';
@@ -16,7 +15,6 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const router = useRouter();
   const addItem = useCartStore((s) => s.addItem);
   const { isProductFavorite, toggleProduct } = useFavoritesStore();
   const isFav = isProductFavorite(product.id);
@@ -55,17 +53,14 @@ export function ProductCard({ product }: ProductCardProps) {
             <Heart className={`w-4 h-4 ${isFav ? 'fill-primary text-primary' : 'text-gray-500'}`} />
           </button>
         </div>
-        <div className="block w-full h-full">
+        <Link href={`/menu/product/${product.id}`} className="block w-full h-full">
           <FoodImage
             src={product.image_url ?? null}
             alt={product.name}
             aspect="1:1"
             sizes="(max-width: 768px) 50vw, 25vw"
-            onDoubleTap={() => toggleProduct(product.id)}
-            onLongPress={() => product.image_url && setQuickPeekOpen(true)}
-            onClick={() => router.push(`/menu/product/${product.id}`)}
           />
-        </div>
+        </Link>
       </div>
       <Link href={`/menu/product/${product.id}`} className="block p-3 flex-1 min-h-0">
         <h3 className="font-semibold text-dark dark:text-white text-sm line-clamp-2">

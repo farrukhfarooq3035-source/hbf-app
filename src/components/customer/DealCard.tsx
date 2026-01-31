@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Plus, Heart, GitCompare } from 'lucide-react';
 import { useCartStore } from '@/store/cart-store';
@@ -20,7 +19,6 @@ const cardBase =
   'bg-white dark:bg-gray-800 rounded-2xl shadow-soft border border-gray-100 dark:border-gray-700 overflow-hidden hover-lift dark:ring-1 dark:ring-primary/20';
 
 export function DealCard({ deal, grid }: DealCardProps) {
-  const router = useRouter();
   const addItem = useCartStore((s) => s.addItem);
   const { isDealFavorite, toggleDeal } = useFavoritesStore();
   const isFav = isDealFavorite(deal.id);
@@ -59,15 +57,14 @@ export function DealCard({ deal, grid }: DealCardProps) {
               <Heart className={`w-4 h-4 ${isFav ? 'fill-primary text-primary' : 'text-gray-500'}`} />
             </button>
           </div>
-          <FoodImage
-            src={deal.image_url ?? null}
-            alt={deal.title}
-            aspect="1:1"
-            sizes="(max-width: 768px) 50vw, 25vw"
-            onDoubleTap={() => toggleDeal(deal.id)}
-            onLongPress={() => deal.image_url && setQuickPeekOpen(true)}
-            onClick={() => router.push(`/menu/deal/${deal.id}`)}
-          />
+          <Link href={`/menu/deal/${deal.id}`} className="block">
+            <FoodImage
+              src={deal.image_url ?? null}
+              alt={deal.title}
+              aspect="1:1"
+              sizes="(max-width: 768px) 50vw, 25vw"
+            />
+          </Link>
         </div>
         <Link href={`/menu/deal/${deal.id}`} className="block p-3">
           <h3 className="font-semibold text-dark dark:text-white text-sm line-clamp-2">
@@ -131,15 +128,14 @@ export function DealCard({ deal, grid }: DealCardProps) {
             <Heart className={`w-4 h-4 ${isFav ? 'fill-primary text-primary' : 'text-gray-500'}`} />
           </button>
         </div>
-        <FoodImage
-          src={deal.image_url ?? null}
-          alt={deal.title}
-          aspect="4:3"
-          sizes="280px"
-          onDoubleTap={() => toggleDeal(deal.id)}
-          onLongPress={() => deal.image_url && setQuickPeekOpen(true)}
-          onClick={() => router.push(`/menu/deal/${deal.id}`)}
-        />
+        <Link href={`/menu/deal/${deal.id}`} className="block">
+          <FoodImage
+            src={deal.image_url ?? null}
+            alt={deal.title}
+            aspect="4:3"
+            sizes="280px"
+          />
+        </Link>
       </div>
       <Link href={`/menu/deal/${deal.id}`} className="block p-3">
         <h3 className="font-bold text-dark dark:text-white">{deal.title}</h3>

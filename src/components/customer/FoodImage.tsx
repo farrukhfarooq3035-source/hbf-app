@@ -48,11 +48,15 @@ export function FoodImage({
     <div
       data-food-image
       className={`${aspectClass} bg-gray-100 dark:bg-gray-700 relative overflow-hidden ${className}`}
-      onClick={() => onClick?.()}
-      onDoubleClick={(e) => {
-        e.preventDefault();
-        onDoubleTap?.();
-      }}
+      onClick={onClick ? () => onClick() : undefined}
+      onDoubleClick={
+        onDoubleTap
+          ? (e) => {
+              e.preventDefault();
+              onDoubleTap();
+            }
+          : undefined
+      }
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
     >

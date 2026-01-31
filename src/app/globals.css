@@ -38,11 +38,11 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.2);
 }
 
-/* Premium smooth scroll: Facebook-like native feel */
+/* Premium scroll: Facebook/Instagram-level smooth (native feel) */
 html {
   scroll-behavior: smooth;
-  /* iOS momentum scrolling */
   -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
 }
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -128,19 +128,29 @@ body {
   }
 }
 
-/* Horizontal scroll strip: allow both scrolls - browser uses gesture direction */
+/* Horizontal strip: manipulation = both pans; gesture direction decides (Instagram-like) */
 .horizontal-scroll-strip {
   -webkit-overflow-scrolling: touch;
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
-  touch-action: pan-x pan-y;
+  touch-action: manipulation;
 }
 
-/* Images & cards: allow both - fixes scroll over images (pan-x+pan-y intersection) */
-[data-food-image],
+/* Image: vertical scroll only = instant scroll over images (Facebook/Instagram level) */
+[data-food-image] {
+  touch-action: pan-y !important;
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* Link wrapping image: don't block scroll */
+a [data-food-image] {
+  touch-action: pan-y !important;
+}
+
+/* Card in strip: allow both so strip scroll works when touching card edge */
 .scroll-strip-card {
-  touch-action: pan-x pan-y;
+  touch-action: manipulation;
 }
 
 /* Cards in strips - no scroll-snap for smoother scrolling */
