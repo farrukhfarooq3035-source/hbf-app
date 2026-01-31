@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Plus, Heart, GitCompare } from 'lucide-react';
 import { useCartStore } from '@/store/cart-store';
 import { useFavoritesStore } from '@/store/favorites-store';
 import { useCompareStore } from '@/store/compare-store';
 import { FoodImage } from '@/components/customer/FoodImage';
-import { ImageModal } from '@/components/customer/ImageModal';
 import { QuickPeek } from '@/components/customer/QuickPeek';
 import type { Product } from '@/types';
 
@@ -16,11 +16,11 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const router = useRouter();
   const addItem = useCartStore((s) => s.addItem);
   const { isProductFavorite, toggleProduct } = useFavoritesStore();
   const isFav = isProductFavorite(product.id);
   const price = product.size_options?.[0]?.price ?? product.price;
-  const [modalOpen, setModalOpen] = useState(false);
   const [quickPeekOpen, setQuickPeekOpen] = useState(false);
   const { add: addToCompare, has: isInCompare } = useCompareStore();
 
@@ -63,7 +63,7 @@ export function ProductCard({ product }: ProductCardProps) {
             sizes="(max-width: 768px) 50vw, 25vw"
             onDoubleTap={() => toggleProduct(product.id)}
             onLongPress={() => product.image_url && setQuickPeekOpen(true)}
-            onClick={() => product.image_url && setModalOpen(true)}
+            onClick={() => router.push(`/menu/product/${product.id}`)}
           />
         </div>
       </div>
@@ -97,14 +97,6 @@ export function ProductCard({ product }: ProductCardProps) {
           imageUrl={product.image_url}
           alt={product.name}
           onClose={() => setQuickPeekOpen(false)}
-        />
-      )}
-      {modalOpen && product.image_url && (
-        <ImageModal
-          imageUrl={product.image_url}
-          alt={product.name}
-          title={product.name}
-          onClose={() => setModalOpen(false)}
         />
       )}
     </div>

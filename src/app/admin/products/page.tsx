@@ -9,6 +9,7 @@ import { useCategories } from '@/hooks/use-menu';
 
 export default function AdminProductsPage() {
   const queryClient = useQueryClient();
+  const [search, setSearch] = useState('');
   const [form, setForm] = useState({
     name: '',
     price: '',
@@ -76,6 +77,12 @@ export default function AdminProductsPage() {
 
   const handleAddProduct = async () => {
     if (!form.name || !form.price) return;
+    const nameLower = form.name.trim().toLowerCase();
+    const exists = products?.some((p) => p.name?.toLowerCase() === nameLower);
+    if (exists) {
+      alert(`Product "${form.name}" already exists. Use a different name.`);
+      return;
+    }
     try {
       const productId = await createProduct.mutateAsync(form);
       if (addProductImage) {
@@ -153,6 +160,15 @@ export default function AdminProductsPage() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
+        <div className="p-4 border-b">
+          <input
+            type="search"
+            placeholder="Search products by name..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full max-w-md px-4 py-2 rounded-xl border text-gray-900"
+          />
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
@@ -165,7 +181,13 @@ export default function AdminProductsPage() {
               </tr>
             </thead>
             <tbody>
-              {products?.map((p) => (
+              {products
+                ?.filter((p) =>
+                  !search.trim()
+                    ? true
+                    : p.name?.toLowerCase().includes(search.trim().toLowerCase())
+                )
+                .map((p) => (
                 <tr key={p.id} className="border-t">
                   <td className="p-4">
                     <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden">

@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Plus, Heart, GitCompare } from 'lucide-react';
 import { useCartStore } from '@/store/cart-store';
 import { useFavoritesStore } from '@/store/favorites-store';
 import { useCompareStore } from '@/store/compare-store';
 import { FoodImage } from '@/components/customer/FoodImage';
-import { ImageModal } from '@/components/customer/ImageModal';
 import { QuickPeek } from '@/components/customer/QuickPeek';
 import type { Deal } from '@/types';
 
@@ -20,10 +20,10 @@ const cardBase =
   'bg-white dark:bg-gray-800 rounded-2xl shadow-soft border border-gray-100 dark:border-gray-700 overflow-hidden hover-lift dark:ring-1 dark:ring-primary/20';
 
 export function DealCard({ deal, grid }: DealCardProps) {
+  const router = useRouter();
   const addItem = useCartStore((s) => s.addItem);
   const { isDealFavorite, toggleDeal } = useFavoritesStore();
   const isFav = isDealFavorite(deal.id);
-  const [modalOpen, setModalOpen] = useState(false);
   const [quickPeekOpen, setQuickPeekOpen] = useState(false);
   const { add: addToCompare, has: isInCompare } = useCompareStore();
 
@@ -66,7 +66,7 @@ export function DealCard({ deal, grid }: DealCardProps) {
             sizes="(max-width: 768px) 50vw, 25vw"
             onDoubleTap={() => toggleDeal(deal.id)}
             onLongPress={() => deal.image_url && setQuickPeekOpen(true)}
-            onClick={() => deal.image_url && setModalOpen(true)}
+            onClick={() => router.push(`/menu/deal/${deal.id}`)}
           />
         </div>
         <Link href={`/menu/deal/${deal.id}`} className="block p-3">
@@ -95,14 +95,6 @@ export function DealCard({ deal, grid }: DealCardProps) {
         </div>
         {quickPeekOpen && deal.image_url && (
           <QuickPeek imageUrl={deal.image_url} alt={deal.title} onClose={() => setQuickPeekOpen(false)} />
-        )}
-        {modalOpen && deal.image_url && (
-          <ImageModal
-            imageUrl={deal.image_url}
-            alt={deal.title}
-            title={deal.title}
-            onClose={() => setModalOpen(false)}
-          />
         )}
       </div>
     );
@@ -146,7 +138,7 @@ export function DealCard({ deal, grid }: DealCardProps) {
           sizes="280px"
           onDoubleTap={() => toggleDeal(deal.id)}
           onLongPress={() => deal.image_url && setQuickPeekOpen(true)}
-          onClick={() => deal.image_url && setModalOpen(true)}
+          onClick={() => router.push(`/menu/deal/${deal.id}`)}
         />
       </div>
       <Link href={`/menu/deal/${deal.id}`} className="block p-3">
@@ -173,14 +165,6 @@ export function DealCard({ deal, grid }: DealCardProps) {
       </div>
       {quickPeekOpen && deal.image_url && (
         <QuickPeek imageUrl={deal.image_url} alt={deal.title} onClose={() => setQuickPeekOpen(false)} />
-      )}
-      {modalOpen && deal.image_url && (
-        <ImageModal
-          imageUrl={deal.image_url}
-          alt={deal.title}
-          title={deal.title}
-          onClose={() => setModalOpen(false)}
-        />
       )}
     </div>
   );

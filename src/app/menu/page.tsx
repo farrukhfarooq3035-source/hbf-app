@@ -71,17 +71,22 @@ export default function MenuPage() {
   const { data: deals } = useDeals();
   const { data: allProducts } = useProducts(undefined);
   const { data: topSellingDeals = [] } = useTopSellingDeals(MAIN_DEALS_LIMIT);
+  /** Top Sale: top selling deals (or first 12). Enrich with full deal data from useDeals. */
   const mainDeals = useMemo(() => {
-    const list = topSellingDeals.length > 0 ? topSellingDeals : (deals || []);
-    return list.slice(0, MAIN_DEALS_LIMIT);
+    const raw = topSellingDeals.length > 0 ? topSellingDeals : (deals || []);
+    const limited = raw.slice(0, MAIN_DEALS_LIMIT);
+    const dealsMap = new Map((deals || []).map((d) => [d.id, d]));
+    return limited.map((d) => dealsMap.get(d.id) ?? d).filter((d) => d.is_active !== false);
   }, [topSellingDeals, deals]);
 
   useEffect(() => setRecentSearches(getRecentSearches()), []);
 
   const minN = priceMin === '' ? null : Number(priceMin);
   const maxN = priceMax === '' ? null : Number(priceMax);
-  const bySearch = (p: { name: string }) =>
-    p.name.toLowerCase().includes(search.toLowerCase());
+  const bySearchProduct = (p: { name: string }) =>
+    !search.trim() || p.name.toLowerCase().includes(search.toLowerCase());
+  const bySearchDeal = (d: { title: string }) =>
+    !search.trim() || d.title.toLowerCase().includes(search.toLowerCase());
   const byPrice = (price: number) =>
     (minN == null || price >= minN) && (maxN == null || price <= maxN);
 
@@ -111,7 +116,7 @@ export default function MenuPage() {
   const filteredProductsByCategory = useMemo(() => {
     const map: Record<string, Product[]> = {};
     Object.keys(productsByCategory).forEach((cid) => {
-      let list = productsByCategory[cid].filter(bySearch);
+      let list = productsByCategory[cid].filter(bySearchProduct);
       if (minN != null || maxN != null) {
         list = list.filter((p) => byPrice(p.size_options?.[0]?.price ?? p.price));
       }
@@ -120,18 +125,33 @@ export default function MenuPage() {
     return map;
   }, [productsByCategory, search, minN, maxN]);
 
+  /** Top Sale: top selling deals, deduplicated by id, filtered by search + price */
   const filteredMainDeals = useMemo(() => {
-    if (minN == null && maxN == null) return mainDeals;
-    return mainDeals.filter((d) => byPrice(d.price));
-  }, [mainDeals, minN, maxN]);
+    const seen = new Set<string>();
+    const list = mainDeals.filter((d) => {
+      if (seen.has(d.id)) return false;
+      seen.add(d.id);
+      if (!bySearchDeal(d)) return false;
+      if (minN != null || maxN != null) return byPrice(d.price);
+      return true;
+    });
+    return list;
+  }, [mainDeals, search, minN, maxN]);
 
-  /** All deals filtered (for HBF Deals section) - excludes top sale to avoid duplication */
+  /** HBF Deals: all deals NOT in Top Sale, deduplicated, filtered by search + price */
   const topSaleIds = useMemo(() => new Set(mainDeals.map((d) => d.id)), [mainDeals]);
   const filteredAllDeals = useMemo(() => {
-    const allNonTopSale = (deals || []).filter((d) => !topSaleIds.has(d.id));
-    if (minN == null && maxN == null) return allNonTopSale;
-    return allNonTopSale.filter((d) => byPrice(d.price));
-  }, [deals, topSaleIds, minN, maxN]);
+    const seen = new Set<string>();
+    const allNonTopSale = (deals || []).filter((d) => {
+      if (topSaleIds.has(d.id)) return false;
+      if (seen.has(d.id)) return false;
+      seen.add(d.id);
+      if (!bySearchDeal(d)) return false;
+      if (minN != null || maxN != null) return byPrice(d.price);
+      return true;
+    });
+    return allNonTopSale;
+  }, [deals, topSaleIds, search, minN, maxN]);
 
   const favoriteProducts = useMemo(
     () => (allProducts || []).filter((p) => favProductIds.includes(p.id)),

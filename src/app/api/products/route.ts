@@ -22,10 +22,24 @@ export async function POST(req: Request) {
       );
     }
 
+    const nameTrimmed = String(name).trim();
+    const { data: existing } = await supabaseAdmin
+      .from('products')
+      .select('id')
+      .ilike('name', nameTrimmed)
+      .limit(1)
+      .maybeSingle();
+    if (existing) {
+      return NextResponse.json(
+        { error: `Product "${nameTrimmed}" already exists. Use a different name.` },
+        { status: 409 }
+      );
+    }
+
     const { data, error } = await supabaseAdmin
       .from('products')
       .insert({
-        name: String(name).trim(),
+        name: nameTrimmed,
         price: Number(price),
         description: description ? String(description).trim() || null : null,
         category_id: category_id && String(category_id).trim() ? String(category_id).trim() : null,
