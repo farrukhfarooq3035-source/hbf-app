@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
@@ -21,6 +21,16 @@ export default function AdminProductsPage() {
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const { data: categories } = useCategories();
+  const uniqueCategories = useMemo(() => {
+    if (!categories?.length) return [];
+    const seen = new Set<string>();
+    return categories.filter((c) => {
+      const key = (c.name ?? '').trim().toLowerCase();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [categories]);
   const { data: products, isLoading } = useQuery({
     queryKey: ['admin-products'],
     queryFn: async () => {
@@ -129,7 +139,7 @@ export default function AdminProductsPage() {
             className="px-4 py-2 rounded-xl border"
           >
             <option value="">Select category</option>
-            {categories?.map((c) => (
+            {uniqueCategories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
               </option>
