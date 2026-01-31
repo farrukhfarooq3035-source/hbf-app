@@ -71,10 +71,10 @@ export default function MenuPage() {
   const { data: deals } = useDeals();
   const { data: allProducts } = useProducts(undefined);
   const { data: topSellingDeals = [] } = useTopSellingDeals(MAIN_DEALS_LIMIT);
-  /** Top Sale: top selling deals (or first 12). Enrich with full deal data from useDeals. */
+  /** Top Sale: real top-selling deals by quantity sold (from order_items). No fallback when no sales. */
   const mainDeals = useMemo(() => {
-    const raw = topSellingDeals.length > 0 ? topSellingDeals : (deals || []);
-    const limited = raw.slice(0, MAIN_DEALS_LIMIT);
+    if (!topSellingDeals?.length) return [];
+    const limited = topSellingDeals.slice(0, MAIN_DEALS_LIMIT);
     const dealsMap = new Map((deals || []).map((d) => [d.id, d]));
     return limited.map((d) => dealsMap.get(d.id) ?? d).filter((d) => d.is_active !== false);
   }, [topSellingDeals, deals]);
@@ -163,18 +163,17 @@ export default function MenuPage() {
   );
   const hasFavorites = favoriteProducts.length > 0 || favoriteDeals.length > 0;
 
-  /** Category cards for top row: Top Sale + HBF Deals + each category (with image + label) */
+  /** Category cards for top row: Top Sale + each category (HBF Deals removed from pills) */
   const categoryCards = useMemo(
     () => [
       { key: TOP_SALE_VIEW, label: 'Top Sale', imageUrl: mainDeals[0]?.image_url ?? null },
-      { key: 'hbf-deals', label: 'HBF Deals', imageUrl: filteredAllDeals[0]?.image_url ?? (deals?.[0]?.image_url ?? null) },
       ...uniqueCategories.map((c) => ({
         key: c.id,
         label: c.name,
         imageUrl: categoryImageMap[c.id] ?? null,
       })),
     ],
-    [uniqueCategories, categoryImageMap, mainDeals, filteredAllDeals, deals]
+    [uniqueCategories, categoryImageMap, mainDeals]
   );
 
   const handleSearchBlur = () => {
@@ -284,7 +283,7 @@ export default function MenuPage() {
         {/* Categories row: image + label, horizontal scroll + desktop wheel */}
         <div className="w-full min-w-0">
           <h2 className="font-bold text-lg mb-3">Categories</h2>
-          <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
+          <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
             {categoryCards.map(({ key, label, imageUrl }) => (
               <button
                 key={key}
@@ -315,7 +314,7 @@ export default function MenuPage() {
         {filteredMainDeals.length > 0 && (
           <div id={SECTION_ID_TOP_SALE} className="scroll-mt-4">
             <h2 className="font-bold text-lg mb-3">Top Sale</h2>
-            <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
+            <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
               {filteredMainDeals.map((deal) => (
                 <div key={deal.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle">
                   <DealCard deal={deal} grid />
@@ -329,7 +328,7 @@ export default function MenuPage() {
         {filteredAllDeals.length > 0 && (
           <div id="section-hbf-deals" className="scroll-mt-4">
             <h2 className="font-bold text-lg mb-3">HBF Deals</h2>
-            <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
+            <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
               {filteredAllDeals.map((deal) => (
                 <div key={deal.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle">
                   <DealCard deal={deal} grid />
@@ -367,7 +366,7 @@ export default function MenuPage() {
                   className="scroll-mt-4"
                 >
                   <h2 className="font-bold text-lg mb-3">{cat.name}</h2>
-                  <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain touch-pan-x min-w-0 w-full horizontal-scroll-strip">
+                  <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
                     {list.map((product) => (
                       <div
                         key={product.id}
