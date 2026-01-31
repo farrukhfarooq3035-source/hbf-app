@@ -130,24 +130,120 @@ export const SEED_PRODUCTS: (SeedProduct & { category: string })[] = [
   { category: 'DRINKS & Extras', name: 'KIDS DEAL 2', price: 390, description: '5 Nuggets, Drink 250 ML' },
 ];
 
-// HBF Pizzas - with size options S/M/L
+// HBF Pizzas - with size options S/M/L (data from official menu)
 export const SEED_PIZZAS: (SeedProduct & { category: string })[] = [
-  { category: 'HBF Pizzas', name: 'Chicken Tikka Pizza', price: 650, description: 'Tikka Boti, Tomatoes, Black Olives, Cheese', size_options: [{ name: 'S-7"', price: 650 }, { name: 'M-10"', price: 1080 }, { name: 'L-14"', price: 1390 }] },
-  { category: 'HBF Pizzas', name: 'Chicken Fajita Pizza', price: 650, description: 'Fajita Chicken, Tomatoes, Capsicum, Cheese', size_options: [{ name: 'S-7"', price: 650 }, { name: 'M-10"', price: 1080 }, { name: 'L-14"', price: 1390 }] },
-  { category: 'HBF Pizzas', name: 'Midway Supreme Pizza', price: 650, description: 'Smokey Chicken, Black Olives, Capsicum, Sweet Corns, Cheese', size_options: [{ name: 'S-7"', price: 650 }, { name: 'M-10"', price: 1080 }, { name: 'L-14"', price: 1390 }] },
-  { category: 'HBF Pizzas', name: 'Pickle Acahri Pizza', price: 650, description: 'Chicken Achari, Tomatoes, Black Olives, Cheese', size_options: [{ name: 'S-7"', price: 650 }, { name: 'M-10"', price: 1080 }, { name: 'L-14"', price: 1390 }] },
-  { category: 'HBF Pizzas', name: 'Shahi Pizza', price: 750, description: 'Chicken, Almonds, Cashew Nuts, Mushrooms, Black Olives, Sausages, Tomatoes, Cheese', size_options: [{ name: 'S-7"', price: 750 }, { name: 'M-10"', price: 1180 }, { name: 'L-14"', price: 1590 }] },
-  { category: 'HBF Pizzas', name: 'Pepperoni Pizza', price: 750, description: 'Pepperoni, Tomatoes, Bell Pepper', size_options: [{ name: 'S-7"', price: 750 }, { name: 'M-10"', price: 1180 }, { name: 'L-14"', price: 1590 }] },
-  { category: 'HBF Pizzas', name: 'HBF Special Pizza', price: 750, description: 'Minced Chicken, Lasagna Sauce, Black Olives, Sausages, Tomatoes, Capsicum, Jalapeno', size_options: [{ name: 'S-7"', price: 750 }, { name: 'M-10"', price: 1180 }, { name: 'L-14"', price: 1590 }] },
-  { category: 'HBF Pizzas', name: 'Peri Peri Pizza', price: 750, description: 'Chicken, Cheese, Jalapeno & Peri Peri Sauce', size_options: [{ name: 'S-7"', price: 750 }, { name: 'M-10"', price: 1180 }, { name: 'L-14"', price: 1590 }] },
-  { category: 'HBF Pizzas', name: 'Lasagna Pizza', price: 750, description: 'Minced Chicken, Lasagna Sauce, Black Olives, Tomatoes, Capsicum', size_options: [{ name: 'S-7"', price: 750 }, { name: 'M-10"', price: 1180 }, { name: 'L-14"', price: 1590 }] },
-  { category: 'HBF Pizzas', name: 'Malai Boti Pizza', price: 750, description: 'Chicken Malai Boti, Capsicum, Cheese, Mushrooms', size_options: [{ name: 'S-7"', price: 750 }, { name: 'M-10"', price: 1180 }, { name: 'L-14"', price: 1590 }] },
-  { category: 'HBF Pizzas', name: 'Seekh Kebab Pizza', price: 750, description: 'Chicken Seekh Kebab, HBF Special Topping', size_options: [{ name: 'S-7"', price: 750 }, { name: 'M-10"', price: 1180 }, { name: 'L-14"', price: 1590 }] },
-  { category: 'HBF Pizzas', name: 'Veggie Deluxe Pizza', price: 600, description: 'Combination of Fresh Vegetables, Spring Onions, Tomatoes, Black Olives, Mushrooms, Sweet Corns, Bell Pepper, Jalapeno', size_options: [{ name: 'S-7"', price: 600 }, { name: 'M-10"', price: 990 }, { name: 'L-14"', price: 1200 }] },
-  { category: 'HBF Pizzas', name: 'Cheese Lovers Pizza', price: 600, description: 'Loads of Cheddar & Mozzarella Cheese', size_options: [{ name: 'S-7"', price: 600 }, { name: 'M-10"', price: 990 }, { name: 'L-14"', price: 1200 }] },
-  { category: 'HBF Pizzas', name: 'Crown Crust Pizza', price: 1350, description: 'Chicken, Black Olives, Mushrooms, Cheese, Kabab', size_options: [{ name: 'M-10"', price: 1350 }, { name: 'L-14"', price: 1700 }] },
-  { category: 'HBF Pizzas', name: 'Stuffed Crust Pizza', price: 800, description: 'Crust Filled With Seekh Kebabs, Malai Boti on Top & HBF Special Topping', size_options: [{ name: 'S-7"', price: 800 }, { name: 'M-10"', price: 1350 }, { name: 'L-14"', price: 1700 }] },
-  { category: 'HBF Pizzas', name: 'Extra Topping', price: 150, description: 'Add extra topping to your pizza', size_options: [{ name: 'S-7"', price: 150 }, { name: 'M-10"', price: 200 }, { name: 'L-14"', price: 250 }] },
+  { 
+    category: 'HBF Pizzas', 
+    name: 'Chicken Tikka Pizza', 
+    price: 650, 
+    description: 'Tikka Boti, Tomatoes, Black Olives, Cheese', 
+    size_options: [{ name: 'S-7"', price: 650 }, { name: 'M-10"', price: 1080 }, { name: 'L-14"', price: 1390 }] 
+  },
+  { 
+    category: 'HBF Pizzas', 
+    name: 'Chicken Fajita Pizza', 
+    price: 650, 
+    description: 'Fajita Chicken, Tomatoes, Capsicum, Cheese', 
+    size_options: [{ name: 'S-7"', price: 650 }, { name: 'M-10"', price: 1080 }, { name: 'L-14"', price: 1390 }] 
+  },
+  { 
+    category: 'HBF Pizzas', 
+    name: 'Midway Supreme Pizza', 
+    price: 650, 
+    description: 'Smokey Chicken, Black Olives, Capsicum, Sweet Corns, Cheese', 
+    size_options: [{ name: 'S-7"', price: 650 }, { name: 'M-10"', price: 1080 }, { name: 'L-14"', price: 1390 }] 
+  },
+  { 
+    category: 'HBF Pizzas', 
+    name: 'Pickle Acahri Pizza', 
+    price: 650, 
+    description: 'Chicken Achari, Tomatoes, Black Olives, Cheese', 
+    size_options: [{ name: 'S-7"', price: 650 }, { name: 'M-10"', price: 1080 }, { name: 'L-14"', price: 1390 }] 
+  },
+  { 
+    category: 'HBF Pizzas', 
+    name: 'Shahi Pizza', 
+    price: 750, 
+    description: 'Chicken, Almonds, Cashew Nuts, Mushrooms, Black Olives, Sausages, Tomatoes, Cheese', 
+    size_options: [{ name: 'S-7"', price: 750 }, { name: 'M-10"', price: 1180 }, { name: 'L-14"', price: 1590 }] 
+  },
+  { 
+    category: 'HBF Pizzas', 
+    name: 'Pepperoni Pizza', 
+    price: 750, 
+    description: 'Pepperoni, Tomatoes, Bell Pepper', 
+    size_options: [{ name: 'S-7"', price: 750 }, { name: 'M-10"', price: 1180 }, { name: 'L-14"', price: 1590 }] 
+  },
+  { 
+    category: 'HBF Pizzas', 
+    name: 'HBF Special Pizza', 
+    price: 750, 
+    description: 'Minced Chicken, Lazzania Sauce, Black Olives, Sausages, Tomatoes, Capsicum, Jalapeno', 
+    size_options: [{ name: 'S-7"', price: 750 }, { name: 'M-10"', price: 1180 }, { name: 'L-14"', price: 1590 }] 
+  },
+  { 
+    category: 'HBF Pizzas', 
+    name: 'Peri Peri Pizza', 
+    price: 750, 
+    description: 'Chicken, Cheese, Jalapeno & Peri Peri Sauce', 
+    size_options: [{ name: 'S-7"', price: 750 }, { name: 'M-10"', price: 1180 }, { name: 'L-14"', price: 1590 }] 
+  },
+  { 
+    category: 'HBF Pizzas', 
+    name: 'Lasagna Pizza', 
+    price: 750, 
+    description: 'Minced Chicken, Lasagna Sauce, Black Olives, Tomatoes, Capsicum', 
+    size_options: [{ name: 'S-7"', price: 750 }, { name: 'M-10"', price: 1180 }, { name: 'L-14"', price: 1590 }] 
+  },
+  { 
+    category: 'HBF Pizzas', 
+    name: 'Malai Boti Pizza', 
+    price: 750, 
+    description: 'Chicken Malai Boti, Capsicum, Cheese, Mushrooms', 
+    size_options: [{ name: 'S-7"', price: 750 }, { name: 'M-10"', price: 1180 }, { name: 'L-14"', price: 1590 }] 
+  },
+  { 
+    category: 'HBF Pizzas', 
+    name: 'Seekh Kebab Pizza', 
+    price: 750, 
+    description: 'Chicken Seekh Kebab, HBF Special Topping', 
+    size_options: [{ name: 'S-7"', price: 750 }, { name: 'M-10"', price: 1180 }, { name: 'L-14"', price: 1590 }] 
+  },
+  { 
+    category: 'HBF Pizzas', 
+    name: 'Veggie Duluxe Pizza', 
+    price: 600, 
+    description: 'Combination of Fresh Vegetables, Spring Onions, Tomatoes, Black Olives, Mushrooms, Sweet Corns, Bell Pepper, Jalapeno', 
+    size_options: [{ name: 'S-7"', price: 600 }, { name: 'M-10"', price: 990 }, { name: 'L-14"', price: 1200 }] 
+  },
+  { 
+    category: 'HBF Pizzas', 
+    name: 'Cheese Lovers Pizza', 
+    price: 600, 
+    description: 'Loads of Cheddar & Mozzarella Cheese', 
+    size_options: [{ name: 'S-7"', price: 600 }, { name: 'M-10"', price: 990 }, { name: 'L-14"', price: 1200 }] 
+  },
+  { 
+    category: 'HBF Pizzas', 
+    name: 'Crown Crust Pizza', 
+    price: 1350, 
+    description: 'Chicken, Black Olives, Mushrooms, Cheese, Kabab', 
+    size_options: [{ name: 'M-10"', price: 1350 }, { name: 'L-14"', price: 1700 }] 
+  },
+  { 
+    category: 'HBF Pizzas', 
+    name: 'Stuffed Crust Pizza', 
+    price: 800, 
+    description: 'Crust Filled With Seekh Kebabs, Malai Boti on Top & HBF Special Topping', 
+    size_options: [{ name: 'S-7"', price: 800 }, { name: 'M-10"', price: 1350 }, { name: 'L-14"', price: 1700 }] 
+  },
+  { 
+    category: 'HBF Pizzas', 
+    name: 'Extra Topping', 
+    price: 150, 
+    description: 'Add extra topping to your pizza', 
+    size_options: [{ name: 'S-7"', price: 150 }, { name: 'M-10"', price: 200 }, { name: 'L-14"', price: 250 }] 
+  },
 ];
 
 // HBF Deals - combo deals
