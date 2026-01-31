@@ -44,7 +44,9 @@ export function FoodImage({
     }
   }, [onDoubleTap]);
 
-  const handlePointerDown = useCallback(() => {
+  const startY = useRef(0);
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    startY.current = e.clientY;
     longPressTimer.current = setTimeout(() => {
       longPressTimer.current = null;
       onLongPress?.();
@@ -53,6 +55,13 @@ export function FoodImage({
 
   const handlePointerUp = useCallback(() => {
     if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  }, []);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (longPressTimer.current && Math.abs(e.clientY - startY.current) > 8) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
@@ -73,7 +82,7 @@ export function FoodImage({
   return (
     <div
       data-food-image
-      className={`${aspectClass} bg-gray-100 dark:bg-gray-700 relative overflow-hidden ${className}`}
+      className={`${aspectClass} bg-gray-100 dark:bg-gray-700 relative overflow-hidden touch-manipulation ${className}`}
       onClick={() => onClick?.()}
       onDoubleClick={(e) => {
         e.preventDefault();
@@ -81,6 +90,7 @@ export function FoodImage({
       }}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
+      onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerUp}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
@@ -97,7 +107,7 @@ export function FoodImage({
         alt={alt}
         fill
         sizes={sizes}
-        className={`object-cover transition-opacity duration-200 ${
+        className={`object-cover transition-opacity duration-200 pointer-events-none ${
           loaded ? 'opacity-100' : 'opacity-0'
         }`}
         onLoad={() => setLoaded(true)}

@@ -57,6 +57,14 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
+### 6. Deploy (Vercel)
+
+See [DEPLOY.md](DEPLOY.md) for full steps. Quick deploy:
+
+1. Push code to GitHub
+2. [vercel.com/new](https://vercel.com/new) → Import repo → Add env vars → Deploy
+3. Add Vercel URL to Supabase Auth (Site URL, Redirect URLs) and Google OAuth
+
 ## Features
 
 ### Customer PWA (Mobile)

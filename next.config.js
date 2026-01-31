@@ -4,7 +4,7 @@ const nextConfig = {
   async redirects() {
     return [{ source: '/favicon.ico', destination: '/logo.png', permanent: false }];
   },
-  // Unoptimized so Cloudflare deploy works without Images binding (avoids resvg.wasm error on Windows)
+  // Unoptimized for simpler deployment (Vercel/Netlify compatible)
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -16,13 +16,5 @@ const nextConfig = {
     ],
   },
 };
-
-// Cloudflare local dev integration (optional)
-try {
-  const { initOpenNextCloudflareForDev } = require('@opennextjs/cloudflare');
-  initOpenNextCloudflareForDev();
-} catch (_) {
-  // @opennextjs/cloudflare not installed or not in dev
-}
 
 module.exports = nextConfig;

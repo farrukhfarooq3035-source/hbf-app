@@ -1,4 +1,4 @@
-# Vercel par HBF deploy (Live)
+# HBF Deploy – Vercel (Primary / Recommended)
 
 ## 1. Vercel account
 

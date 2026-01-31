@@ -55,6 +55,8 @@ body {
   /* Reduce scroll jank, GPU-friendly */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Allow scroll over images; remove 300ms tap delay */
+  touch-action: manipulation;
 }
 
 /* Typography scale */
