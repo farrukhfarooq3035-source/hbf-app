@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-/** Server-side: categories for menu (HBF Deals & Top Sale excluded) */
+/** Server-side: categories for menu (Top Sale excluded; HBF Deals included) */
 export async function GET() {
   const { data, error } = await supabase
     .from('categories')
@@ -15,7 +15,6 @@ export async function GET() {
   const exclude = (name: string) => {
     const n = (name ?? '').trim().toLowerCase();
     if (n.includes('top sale')) return true;
-    if ((n.includes('hbf') && n.includes('deal')) || n === 'deals') return true;
     return false;
   };
 

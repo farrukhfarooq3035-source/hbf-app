@@ -16,6 +16,21 @@ import type { Product } from '@/types';
 const RECENT_SEARCH_KEY = 'hbf-recent-search';
 const RECENT_SEARCH_MAX = 5;
 
+/** Fixed category order for main page */
+const CATEGORY_ORDER = [
+  'HBF Deals',
+  'HBF Burgers',
+  'GRILLED Burgers',
+  'HBF Pizzas',
+  'HBF Injected Broast',
+  'HBF Shawarma',
+  'WINGS | Sandwiches | PASTA',
+  'BBQ & Fish',
+  'FRIES & Nuggets',
+  'PIZZA Burgers',
+  'DRINKS & Extras',
+];
+
 function scrollToSection(sectionId: string) {
   const el = document.getElementById(sectionId);
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -77,16 +92,16 @@ export default function MenuPage() {
     return map;
   }, [allProducts, categories]);
 
-  /** Categories: already filtered by API (no HBF Deals / Top Sale); sorted by min price low → high */
+  /** Categories: filtered by API; sorted by CATEGORY_ORDER */
   const uniqueCategories = useMemo(() => {
     const list = uniqueCategoriesByName(categories);
-    const getMinPrice = (catName: string) => {
-      const prods = productsByCategoryName[catName] ?? [];
-      if (prods.length === 0) return Infinity;
-      return Math.min(...prods.map((p) => p.size_options?.[0]?.price ?? p.price));
-    };
-    return [...list].sort((a, b) => getMinPrice(a.name) - getMinPrice(b.name));
-  }, [categories, productsByCategoryName]);
+    const orderMap = new Map(CATEGORY_ORDER.map((n, i) => [n, i]));
+    return [...list].sort((a, b) => {
+      const ia = orderMap.get(a.name) ?? 999;
+      const ib = orderMap.get(b.name) ?? 999;
+      return ia - ib;
+    });
+  }, [categories]);
 
   useEffect(() => setRecentSearches(getRecentSearches()), []);
 
@@ -149,16 +164,15 @@ export default function MenuPage() {
       });
   }, [deals, search, minN, maxN]);
 
-  /** Category cards: only product categories (no HBF Deals / Top Sales pills) */
-  const categoryCards = useMemo(
-    () =>
-      uniqueCategories.map((c) => ({
-        key: c.id,
-        label: c.name,
-        imageUrl: categoryImageMap[c.id] ?? null,
-      })),
-    [uniqueCategories, categoryImageMap]
-  );
+  /** Category cards: HBF Deals scrolls to section-hbf-deals */
+  const categoryCards = useMemo(() => {
+    const isHbfDeals = (n: string) => (n ?? '').toLowerCase().includes('hbf') && (n ?? '').toLowerCase().includes('deal');
+    return uniqueCategories.map((c) => ({
+      key: isHbfDeals(c.name) ? 'hbf-deals' : c.id,
+      label: c.name,
+      imageUrl: isHbfDeals(c.name) ? (filteredAllDeals[0]?.image_url ?? null) : (categoryImageMap[c.id] ?? null),
+    }));
+  }, [uniqueCategories, categoryImageMap, filteredAllDeals]);
 
   const handleSearchBlur = () => {
     if (search.trim()) addRecentSearch(search.trim());
