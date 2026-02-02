@@ -5,20 +5,11 @@ import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Loader2 } from 'lucide-react';
 
-/** Unregister service workers + cache-busting redirect to avoid stale content after login */
-async function clearStaleCacheAndRedirect(next: string) {
+/** Redirect to dedicated continue page which clears all cache and redirects to target */
+function redirectToContinuePage(next: string) {
   if (typeof window === 'undefined') return;
-  try {
-    if ('serviceWorker' in navigator) {
-      const regs = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(regs.map((r) => r.unregister()));
-    }
-  } catch {
-    /* ignore */
-  }
-  const sep = next.includes('?') ? '&' : '?';
-  const url = `${next}${sep}_=${Date.now()}`;
-  window.location.replace(url);
+  const continueUrl = `/auth/continue?next=${encodeURIComponent(next)}&_=${Date.now()}`;
+  window.location.replace(continueUrl);
 }
 
 function AuthCallbackContent() {
@@ -39,7 +30,7 @@ function AuthCallbackContent() {
           setError(err.message);
           return;
         }
-        await clearStaleCacheAndRedirect(next);
+        redirectToContinuePage(next);
         return;
       }
       if (accessToken && refreshToken) {
@@ -48,7 +39,7 @@ function AuthCallbackContent() {
           setError(err.message);
           return;
         }
-        await clearStaleCacheAndRedirect(next);
+        redirectToContinuePage(next);
         return;
       }
       setError('Invalid link or expired. Try signing in again.');

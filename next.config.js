@@ -14,6 +14,10 @@ const nextConfig = {
         source: '/auth/callback',
         headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
       },
+      {
+        source: '/auth/continue',
+        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+      },
     ];
   },
   // Unoptimized for simpler deployment (Vercel/Netlify compatible)

@@ -17,7 +17,7 @@ function LoginContent() {
     setGoogleLoading(true);
     try {
       const origin = typeof window !== 'undefined' ? window.location.origin : '';
-      const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(next)}`;
+      const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(next)}&_=${Date.now()}`;
       const { error: err } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo },
