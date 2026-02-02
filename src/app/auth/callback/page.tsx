@@ -5,6 +5,22 @@ import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Loader2 } from 'lucide-react';
 
+/** Unregister service workers + cache-busting redirect to avoid stale content after login */
+async function clearStaleCacheAndRedirect(next: string) {
+  if (typeof window === 'undefined') return;
+  try {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map((r) => r.unregister()));
+    }
+  } catch {
+    /* ignore */
+  }
+  const sep = next.includes('?') ? '&' : '?';
+  const url = `${next}${sep}_=${Date.now()}`;
+  window.location.replace(url);
+}
+
 function AuthCallbackContent() {
   const searchParams = useSearchParams();
   const [error, setError] = useState('');
@@ -23,8 +39,7 @@ function AuthCallbackContent() {
           setError(err.message);
           return;
         }
-        // Full page load to avoid serving cached/stale content (PWA/browser cache)
-        window.location.replace(next);
+        await clearStaleCacheAndRedirect(next);
         return;
       }
       if (accessToken && refreshToken) {
@@ -33,8 +48,7 @@ function AuthCallbackContent() {
           setError(err.message);
           return;
         }
-        // Full page load to avoid serving cached/stale content (PWA/browser cache)
-        window.location.replace(next);
+        await clearStaleCacheAndRedirect(next);
         return;
       }
       setError('Invalid link or expired. Try signing in again.');
