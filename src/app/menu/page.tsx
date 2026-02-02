@@ -7,7 +7,6 @@ import { ProductCard } from '@/components/customer/ProductCard';
 import { DealCard } from '@/components/customer/DealCard';
 import { FoodImage } from '@/components/customer/FoodImage';
 import { HorizontalScrollStrip } from '@/components/customer/HorizontalScrollStrip';
-import { ShareOnWhatsApp } from '@/components/customer/ShareOnWhatsApp';
 import { useCartStore } from '@/store/cart-store';
 import { useFavoritesStore } from '@/store/favorites-store';
 import Link from 'next/link';
@@ -200,8 +199,8 @@ export default function MenuPage() {
   const hasBestsellers = (topDeals?.length ?? 0) > 0 || (topProducts?.length ?? 0) > 0;
 
   return (
-    <div className="max-w-4xl mx-auto flex-1 min-h-0 menu-scroll-root w-full">
-      <div className="p-4 sm:p-5 space-y-4">
+    <div className="max-w-4xl mx-auto flex-1 min-h-0 menu-scroll-root w-full min-w-0 overflow-x-hidden px-4 sm:px-5">
+      <div className="space-y-4 pb-4">
         {/* Open/Closed + Happy Hour Banner */}
         <div
           className={`flex items-center gap-3 p-4 rounded-2xl ${
@@ -256,19 +255,14 @@ export default function MenuPage() {
           </div>
         </div>
 
-        {/* Share on WhatsApp */}
-        <div className="flex justify-end">
-          <ShareOnWhatsApp label="Share Menu" />
-        </div>
-
         {/* Bestsellers / Top Sale */}
         {hasBestsellers && (
-          <div id="section-bestsellers" className="scroll-mt-4">
+          <div id="section-bestsellers" className="scroll-mt-4 -mx-1">
             <h2 className="font-bold text-lg mb-3 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-primary" />
               Bestsellers / Top Sale
             </h2>
-            <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+            <HorizontalScrollStrip className="flex gap-4 pb-2 px-1 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
               {topDeals?.map((deal) => (
                 <div key={deal.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card">
                   <DealCard deal={deal} grid />
@@ -348,9 +342,9 @@ export default function MenuPage() {
         )}
 
         {/* Categories row: image + label, horizontal scroll + desktop wheel */}
-        <div className="w-full min-w-0">
+        <div className="w-full min-w-0 -mx-1">
           <h2 className="font-bold text-lg mb-3">Categories</h2>
-          <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+          <HorizontalScrollStrip className="flex gap-4 pb-2 px-1 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
             {categoryCards.map(({ key, label, imageUrl }) => (
               <button
                 key={key}
@@ -377,9 +371,9 @@ export default function MenuPage() {
 
         {/* HBF Deals: products (category HBF Deals) + deals from deals table, right after Categories */}
         {(hbfDealsProducts.length > 0 || filteredAllDeals.length > 0) && (
-          <div id="section-hbf-deals" className="scroll-mt-4">
+          <div id="section-hbf-deals" className="scroll-mt-4 -mx-1">
             <h2 className="font-bold text-lg mb-3">HBF Deals</h2>
-            <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+            <HorizontalScrollStrip className="flex gap-4 pb-2 px-1 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
               {hbfDealsProducts.map((product) => (
                 <div key={product.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card">
                   <ProductCard product={product} />
@@ -419,7 +413,15 @@ export default function MenuPage() {
                   {list.length > 0 && (
                     <div id={`section-${cat.id}`} className="scroll-mt-4">
                       <h2 className="font-bold text-lg mb-3">{cat.name}</h2>
-                      <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+                      {/* Mobile: 2-col grid fills width. Desktop: horizontal scroll */}
+                      <div className="grid grid-cols-2 gap-3 sm:hidden">
+                        {list.map((product) => (
+                          <div key={product.id} className="min-h-0">
+                            <ProductCard product={product} />
+                          </div>
+                        ))}
+                      </div>
+                      <HorizontalScrollStrip className="hidden sm:flex gap-4 pb-2 px-1 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
                         {list.map((product) => (
                           <div
                             key={product.id}

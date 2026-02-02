@@ -10,9 +10,9 @@ export default function MenuLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen pb-24 flex flex-col">
+    <div className="min-h-screen pb-24 flex flex-col w-full max-w-full overflow-x-hidden">
       <Header />
-      <main className="flex-1 min-h-0 flex flex-col">{children}</main>
+      <main className="flex-1 min-h-0 flex flex-col w-full min-w-0">{children}</main>
       <Footer />
       <CompareFAB />
     </div>
