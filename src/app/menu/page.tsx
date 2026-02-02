@@ -77,12 +77,13 @@ export default function MenuPage() {
     return map;
   }, [allProducts, categories]);
 
-  /** Categories: no HBF Deals / Top Sales in strip; sorted by min product price low → high */
+  /** Categories: no HBF Deals / Top Sale in strip; sorted by min product price low → high */
   const uniqueCategories = useMemo(() => {
-    const exclude = new Set(['hbf deals', 'top sales', 'top sale']);
     const list = uniqueCategoriesByName(categories).filter((c) => {
       const n = (c.name ?? '').trim().toLowerCase();
-      return !exclude.has(n);
+      if (n.includes('top sale')) return false;
+      if ((n.includes('hbf') && n.includes('deal')) || n === 'deals') return false;
+      return true;
     });
     const getMinPrice = (catName: string) => {
       const prods = productsByCategoryName[catName] ?? [];
