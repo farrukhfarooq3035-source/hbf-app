@@ -18,6 +18,18 @@ export function useCategories() {
   });
 }
 
+/** Menu page: categories with HBF Deals & Top Sale excluded (server-side filter) */
+export function useMenuCategories() {
+  return useQuery({
+    queryKey: ['menu-categories'],
+    queryFn: async () => {
+      const res = await fetch('/api/menu/categories');
+      if (!res.ok) throw new Error(await res.text());
+      return (await res.json()) as Category[];
+    },
+  });
+}
+
 export function useProducts(categoryId?: string) {
   return useQuery({
     queryKey: ['products', categoryId],

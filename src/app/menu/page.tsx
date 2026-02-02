@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { useCategories, useProducts, useDeals } from '@/hooks/use-menu';
+import { useMenuCategories, useProducts, useDeals } from '@/hooks/use-menu';
 import { useBusinessHours } from '@/hooks/use-business-hours';
 import { ProductCard } from '@/components/customer/ProductCard';
 import { DealCard } from '@/components/customer/DealCard';
@@ -60,7 +60,7 @@ export default function MenuPage() {
   const { productIds: favProductIds, dealIds: favDealIds } = useFavoritesStore();
   const { isOpen, openTime, closeTime } = useBusinessHours();
 
-  const { data: categories, isLoading: catsLoading } = useCategories();
+  const { data: categories, isLoading: catsLoading } = useMenuCategories();
   const { data: deals } = useDeals();
   const { data: allProducts } = useProducts(undefined);
 
@@ -77,14 +77,9 @@ export default function MenuPage() {
     return map;
   }, [allProducts, categories]);
 
-  /** Categories: no HBF Deals / Top Sale in strip; sorted by min product price low → high */
+  /** Categories: already filtered by API (no HBF Deals / Top Sale); sorted by min price low → high */
   const uniqueCategories = useMemo(() => {
-    const list = uniqueCategoriesByName(categories).filter((c) => {
-      const n = (c.name ?? '').trim().toLowerCase();
-      if (n.includes('top sale')) return false;
-      if ((n.includes('hbf') && n.includes('deal')) || n === 'deals') return false;
-      return true;
-    });
+    const list = uniqueCategoriesByName(categories);
     const getMinPrice = (catName: string) => {
       const prods = productsByCategoryName[catName] ?? [];
       if (prods.length === 0) return Infinity;
