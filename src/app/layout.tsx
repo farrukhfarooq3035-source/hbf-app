@@ -23,13 +23,15 @@ export const viewport: Viewport = {
   themeColor: '#E50914',
 };
 
+const BUILD_ID = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || 'local';
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`font-sans ${plusJakarta.variable}`}>
+    <html lang="en" className={`font-sans ${plusJakarta.variable}`} data-build={BUILD_ID}>
       <body className="min-h-screen antialiased font-sans" style={{ backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
         <Providers>
           <LocationPermission />

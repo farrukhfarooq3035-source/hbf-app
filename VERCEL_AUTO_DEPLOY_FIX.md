@@ -1,6 +1,23 @@
 # Vercel Auto-Deploy Fix — Commits pe deploy kyun nahi ho raha?
 
-Agar push ke baad Vercel pe automatic deployment nahi ho rahi, yeh steps check karo:
+Agar push ke baad Vercel pe automatic deployment nahi ho rahi, yeh steps check karo.
+
+---
+
+## ⚠️ IMPORTANT: Local sahi hai, Vercel purana dikha raha hai?
+
+Agar **local pe latest updates** (Top Sale removed, HBF Deals section, etc.) dikh rahe hain lekin **Vercel pe purana** — matlab Vercel purane build se serve kar raha hai.
+
+### Fix: Fresh deployment from latest commit
+
+1. **Vercel Dashboard** → **hbf-app** → **Deployments**
+2. Har deployment ke saamne **Git commit** dikhta hai (e.g. `104fbae`, `adbbdf4`)
+3. **Latest commit** (GitHub pe jo sabse upar hai) wala deployment dhoondo
+4. Agar **koi bhi deployment latest commit se nahi hai** → Naya deployment trigger karo:
+   - **Deploy Hook** use karo (Settings → Git → Deploy Hooks) — URL pe POST request bhejo
+   - Ya **Vercel CLI**: `vercel login` → `vercel --prod --force`
+5. **"Redeploy"** pe mat jao agar wo purane deployment ka ho — wo same purana code hi deploy karega
+6. **Verify**: Page pe right-click → Inspect → `<html>` tag mein `data-build="104fbae"` jaisa dikhna chahiye (latest commit ke first 7 chars)
 
 ---
 
@@ -90,6 +107,18 @@ Agar upar wale steps ke baad bhi auto-deploy nahi ho rahi, **Deploy Hook** use k
 
 ### Step C: GitHub Action add karo
 `.github/workflows/deploy.yml` file banao (agar nahi hai) — next step mein code diya hai.
+
+---
+
+## 8. Force Clean Build (Cache issue ho to)
+
+Agar deployment ho rahi hai lekin purana code aa raha hai:
+
+1. **Vercel** → **hbf-app** → **Settings** → **Environment Variables**
+2. Add: `VERCEL_FORCE_NO_BUILD_CACHE` = `1`
+3. Phir naya deploy trigger karo
+
+Ya **Redeploy** karte waqt: **"Use existing Build Cache"** UNCHECK karo.
 
 ---
 
