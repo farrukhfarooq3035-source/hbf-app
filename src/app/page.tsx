@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ActiveOrderCard } from '@/components/customer/ActiveOrderCard';
+import { ReviewsSection } from '@/components/customer/ReviewsSection';
 import { useBusinessHours } from '@/hooks/use-business-hours';
 import { useCartStore } from '@/store/cart-store';
 import { Truck, Store, Clock, CheckCircle2, XCircle } from 'lucide-react';
@@ -82,6 +83,8 @@ export default function HomePage() {
         </div>
 
         <ActiveOrderCard />
+
+        <ReviewsSection />
 
         <div className="flex flex-col gap-3 w-full max-w-sm">
           <Link

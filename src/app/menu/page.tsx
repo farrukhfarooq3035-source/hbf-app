@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { useMenuCategories, useProducts, useDeals } from '@/hooks/use-menu';
+import { useMenuCategories, useProducts, useDeals, useHappyHourProductIds } from '@/hooks/use-menu';
 import { useBusinessHours } from '@/hooks/use-business-hours';
 import { ProductCard } from '@/components/customer/ProductCard';
 import { DealCard } from '@/components/customer/DealCard';
+import { ReviewsSection } from '@/components/customer/ReviewsSection';
 import { FoodImage } from '@/components/customer/FoodImage';
 import { HorizontalScrollStrip } from '@/components/customer/HorizontalScrollStrip';
 import { useCartStore } from '@/store/cart-store';
@@ -77,16 +78,14 @@ export default function MenuPage() {
   const { data: categories, isLoading: catsLoading } = useMenuCategories();
   const { data: deals } = useDeals();
   const { data: allProducts } = useProducts(undefined);
+  const { data: happyHourProductIds = [] } = useHappyHourProductIds();
 
-  /** Happy Hour products: 8 Hot Wings Piece, B.B.Q Grilled Chicken Burger, Broast Full - 10% off during 3-5pm or after midnight */
-  const HAPPY_HOUR_PRODUCT_KEYS = ['hot wings', 'wings piece', 'b.b.q grilled', 'grilled chicken burger', 'broast full', 'broast'];
+  /** Happy Hour products: from admin selection, 10% off during 3-5pm or after midnight */
   const happyHourProducts = useMemo(() => {
-    if (!allProducts?.length || !showHappyHourDeals) return [];
-    return allProducts.filter((p) => {
-      const name = (p.name || '').toLowerCase();
-      return HAPPY_HOUR_PRODUCT_KEYS.some((key) => name.includes(key));
-    });
-  }, [allProducts, showHappyHourDeals]);
+    if (!allProducts?.length || !showHappyHourDeals || !happyHourProductIds.length) return [];
+    const idSet = new Set(happyHourProductIds);
+    return allProducts.filter((p) => idSet.has(p.id));
+  }, [allProducts, showHappyHourDeals, happyHourProductIds]);
 
   /** Products grouped by category NAME (needed before sorting categories by price) */
   const productsByCategoryName = useMemo(() => {
@@ -266,12 +265,12 @@ export default function MenuPage() {
           <div id="section-happy-hour" className="scroll-mt-4">
             <h2 className="font-bold text-lg mb-1">Happy Hour Deals</h2>
             <p className="text-xs text-amber-600 dark:text-amber-400 mb-3 font-medium">
-              {isHappyHour ? `3–5pm: 10% off` : isAfterMidnight ? 'After midnight: 10% off' : ''} on selected items
+              {isHappyHour ? `${happyHourStart}–${happyHourEnd}: ${happyHourDiscount}% off` : isAfterMidnight ? `After midnight: ${happyHourDiscount}% off` : ''} on selected items
             </p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {happyHourProducts.map((product) => (
                 <div key={product.id} className="min-h-0">
-                  <ProductCard product={product} discountPercent={10} />
+                  <ProductCard product={product} discountPercent={happyHourDiscount} />
                 </div>
               ))}
             </div>
@@ -490,6 +489,8 @@ export default function MenuPage() {
               )}
           </>
         )}
+
+        <ReviewsSection />
       </div>
     </div>
   );

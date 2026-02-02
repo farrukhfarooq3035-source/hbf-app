@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { MessageCircle, CalendarDays } from 'lucide-react';
+import { MessageCircle, CalendarDays, Star } from 'lucide-react';
 
 const FACEBOOK_URL = 'https://www.facebook.com'; // Replace with actual HBF Facebook page
 const INSTAGRAM_URL = 'https://www.instagram.com'; // Replace with actual HBF Instagram
@@ -14,6 +14,10 @@ export function Footer() {
           Haq Bahu Foods <span className="text-primary">(HBF)</span>
         </p>
         <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
+          <Link href="/#reviews" className="inline-flex items-center gap-2 font-medium text-primary hover:underline">
+            <Star className="w-4 h-4" />
+            Reviews
+          </Link>
           <Link href="/faq" className="inline-flex items-center gap-2 font-medium text-primary hover:underline">
             <MessageCircle className="w-4 h-4" />
             Support / FAQ

@@ -16,6 +16,8 @@ import {
   Tag,
   MapPin,
   CalendarDays,
+  Sparkles,
+  Star,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -29,6 +31,8 @@ const navItems = [
   { href: '/admin/inventory', icon: Boxes, label: 'Inventory' },
   { href: '/admin/expenses', icon: Receipt, label: 'Expenses' },
   { href: '/admin/promo', icon: Tag, label: 'Promo Codes' },
+  { href: '/admin/happy-hour', icon: Sparkles, label: 'Happy Hour' },
+  { href: '/admin/reviews', icon: Star, label: 'Reviews' },
   { href: '/admin/zones', icon: MapPin, label: 'Delivery Zones' },
   { href: '/admin/reservations', icon: CalendarDays, label: 'Reservations' },
   { href: '/admin/reports', icon: BarChart3, label: 'Reports' },

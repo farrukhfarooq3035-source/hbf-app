@@ -3,11 +3,11 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-/** Deals page removed - redirect to admin */
+/** Deals page → Happy Hour */
 export default function AdminDealsPage() {
   const router = useRouter();
   useEffect(() => {
-    router.replace('/admin');
+    router.replace('/admin/happy-hour');
   }, [router]);
   return (
     <div className="p-6">

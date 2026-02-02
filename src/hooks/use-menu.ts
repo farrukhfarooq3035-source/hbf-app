@@ -99,6 +99,19 @@ export function useTopSellingProducts(limit = 5) {
   });
 }
 
+/** Happy Hour product IDs from admin selection */
+export function useHappyHourProductIds() {
+  return useQuery({
+    queryKey: ['happy-hour-products'],
+    queryFn: async () => {
+      const res = await fetch('/api/happy-hour', { cache: 'no-store' });
+      if (!res.ok) return [] as string[];
+      const data = await res.json();
+      return Array.isArray(data.productIds) ? data.productIds : [];
+    },
+  });
+}
+
 /** Top N deals by quantity sold (from order_items). Returns [] if RPC missing or no sales — no throw, no retry. */
 export function useTopSellingDeals(limit = 12) {
   return useQuery({

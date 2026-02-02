@@ -23,6 +23,7 @@ npm install
    - Copy and run `supabase/migrations/001_initial_schema.sql`
    - Then `supabase/migrations/002_order_ratings.sql` (order ratings)
    - Then `supabase/migrations/003_order_timestamps_distance.sql` (ready_at, delivered_at, distance_km)
+   - ... through `012_happy_hour_products_reviews.sql` (Happy Hour products, customer reviews)
 3. Create storage buckets: Supabase Dashboard → Storage → New bucket → create `posters` (for AI posters) and `products` (for product images), both set to Public
 4. Enable Realtime on the `orders` table (included in migration)
 
