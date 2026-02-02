@@ -150,7 +150,7 @@ export default function MenuPage() {
   );
   const hasFavorites = favoriteProducts.length > 0 || favoriteDeals.length > 0;
 
-  /** HBF Deals: all active deals, filtered by search + price */
+  /** HBF Deals: all active deals from deals table, filtered by search + price */
   const filteredAllDeals = useMemo(() => {
     const seen = new Set<string>();
     return (deals || [])
@@ -163,6 +163,20 @@ export default function MenuPage() {
         return true;
       });
   }, [deals, search, minN, maxN]);
+
+  /** HBF Deals products: from products table (category "HBF Deals"), filtered by search + price */
+  const hbfDealsProducts = useMemo(() => {
+    const getPrice = (p: Product) => p.size_options?.[0]?.price ?? p.price;
+    const hbfDealsKey = Object.keys(productsByCategoryName).find(
+      (k) => (k ?? '').toLowerCase().includes('hbf') && (k ?? '').toLowerCase().includes('deal')
+    );
+    if (!hbfDealsKey) return [];
+    let list = (productsByCategoryName[hbfDealsKey] ?? []).filter(bySearchProduct);
+    if (minN != null || maxN != null) {
+      list = list.filter((p) => byPrice(getPrice(p)));
+    }
+    return [...list].sort((a, b) => getPrice(a) - getPrice(b));
+  }, [productsByCategoryName, search, minN, maxN]);
 
   /** Category cards: product categories only (HBF Deals has its own section below) */
   const categoryCards = useMemo(
@@ -307,11 +321,16 @@ export default function MenuPage() {
           </HorizontalScrollStrip>
         </div>
 
-        {/* HBF Deals: always visible when we have deals, right after Categories */}
-        {filteredAllDeals.length > 0 && (
+        {/* HBF Deals: products (category HBF Deals) + deals from deals table, right after Categories */}
+        {(hbfDealsProducts.length > 0 || filteredAllDeals.length > 0) && (
           <div id="section-hbf-deals" className="scroll-mt-4">
             <h2 className="font-bold text-lg mb-3">HBF Deals</h2>
             <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+              {hbfDealsProducts.map((product) => (
+                <div key={product.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card">
+                  <ProductCard product={product} />
+                </div>
+              ))}
               {filteredAllDeals.map((deal) => (
                 <div key={deal.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card">
                   <DealCard deal={deal} grid />
@@ -365,6 +384,7 @@ export default function MenuPage() {
               uniqueCategories.every(
                 (c) => (filteredProductsByCategory[c.id] ?? []).length === 0
               ) &&
+              hbfDealsProducts.length === 0 &&
               filteredAllDeals.length === 0 && (
                 <div className="text-center py-12 text-gray-500">
                   <p>No products or deals match your filters.</p>
