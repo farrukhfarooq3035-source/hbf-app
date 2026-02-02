@@ -307,6 +307,20 @@ export default function MenuPage() {
           </HorizontalScrollStrip>
         </div>
 
+        {/* HBF Deals: always visible when we have deals, right after Categories */}
+        {filteredAllDeals.length > 0 && (
+          <div id="section-hbf-deals" className="scroll-mt-4">
+            <h2 className="font-bold text-lg mb-3">HBF Deals</h2>
+            <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+              {filteredAllDeals.map((deal) => (
+                <div key={deal.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card">
+                  <DealCard deal={deal} grid />
+                </div>
+              ))}
+            </HorizontalScrollStrip>
+          </div>
+        )}
+
         {catsLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
@@ -325,9 +339,8 @@ export default function MenuPage() {
           </div>
         ) : (
           <>
-            {uniqueCategories.map((cat, idx) => {
+            {uniqueCategories.map((cat) => {
               const list = filteredProductsByCategory[cat.id] ?? [];
-              const isFirst = idx === 0;
               return (
                 <div key={cat.id}>
                   {list.length > 0 && (
@@ -345,25 +358,14 @@ export default function MenuPage() {
                       </HorizontalScrollStrip>
                     </div>
                   )}
-                  {isFirst && filteredAllDeals.length > 0 && (
-                    <div id="section-hbf-deals" className="scroll-mt-4 mt-4">
-                      <h2 className="font-bold text-lg mb-3">HBF Deals</h2>
-                      <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
-                        {filteredAllDeals.map((deal) => (
-                          <div key={deal.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card">
-                            <DealCard deal={deal} grid />
-                          </div>
-                        ))}
-                      </HorizontalScrollStrip>
-                    </div>
-                  )}
                 </div>
               );
             })}
             {uniqueCategories.length > 0 &&
               uniqueCategories.every(
                 (c) => (filteredProductsByCategory[c.id] ?? []).length === 0
-              ) && (
+              ) &&
+              filteredAllDeals.length === 0 && (
                 <div className="text-center py-12 text-gray-500">
                   <p>No products or deals match your filters.</p>
                   <Link
