@@ -128,41 +128,42 @@ body {
   }
 }
 
-/* Horizontal strip: manipulation = both pans; gesture direction decides (Instagram-like) */
+/* Horizontal strip: smooth scroll, both pans for gesture-based direction */
 .horizontal-scroll-strip {
   -webkit-overflow-scrolling: touch;
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
+  overscroll-behavior-y: none;
+  touch-action: pan-y pan-x;
+  scroll-behavior: smooth;
+}
+
+/* Image: manipulation = no 300ms delay, scroll passes through (Facebook-like) */
+[data-food-image] {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Link wrapping image: allow scroll, no tap delay */
+a [data-food-image] {
   touch-action: manipulation;
 }
 
-/* Image: vertical scroll only = instant scroll over images */
-[data-food-image] {
-  touch-action: pan-y !important;
-  -webkit-user-select: none;
-  user-select: none;
-}
-a [data-food-image] {
-  touch-action: pan-y !important;
-}
-
-/* Menu: dedicated scroll area for smoother mobile scroll */
+/* Menu: dedicated scroll area - instant response (Facebook-like) */
 .menu-scroll-root {
   -webkit-overflow-scrolling: touch;
   overflow-y: auto;
   overflow-x: hidden;
   height: 100%;
   min-height: 0;
+  scroll-behavior: smooth;
 }
 /* Reduce paint for off-screen cards */
 .scroll-strip-card {
   content-visibility: auto;
   contain-intrinsic-size: auto 304px;
-}
-
-/* Card in strip: allow both so strip scroll works when touching card edge */
-.scroll-strip-card {
   touch-action: manipulation;
 }
 

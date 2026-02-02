@@ -164,13 +164,14 @@ export default function MenuPage() {
       });
   }, [deals, search, minN, maxN]);
 
-  /** Category cards: HBF Deals scrolls to section-hbf-deals */
+  /** Category cards: HBF Deals uses first deal's image, scrolls to section-hbf-deals */
   const categoryCards = useMemo(() => {
     const isHbfDeals = (n: string) => (n ?? '').toLowerCase().includes('hbf') && (n ?? '').toLowerCase().includes('deal');
+    const hbfDealsImage = filteredAllDeals.find((d) => d.image_url)?.image_url ?? filteredAllDeals[0]?.image_url ?? null;
     return uniqueCategories.map((c) => ({
       key: isHbfDeals(c.name) ? 'hbf-deals' : c.id,
       label: c.name,
-      imageUrl: isHbfDeals(c.name) ? (filteredAllDeals[0]?.image_url ?? null) : (categoryImageMap[c.id] ?? null),
+      imageUrl: isHbfDeals(c.name) ? hbfDealsImage : (categoryImageMap[c.id] ?? null),
     }));
   }, [uniqueCategories, categoryImageMap, filteredAllDeals]);
 
