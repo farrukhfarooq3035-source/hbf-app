@@ -1,12 +1,11 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Loader2 } from 'lucide-react';
 
 function AuthCallbackContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState('');
 
@@ -24,7 +23,8 @@ function AuthCallbackContent() {
           setError(err.message);
           return;
         }
-        router.replace(next);
+        // Full page load to avoid serving cached/stale content (PWA/browser cache)
+        window.location.replace(next);
         return;
       }
       if (accessToken && refreshToken) {
@@ -33,13 +33,14 @@ function AuthCallbackContent() {
           setError(err.message);
           return;
         }
-        router.replace(next);
+        // Full page load to avoid serving cached/stale content (PWA/browser cache)
+        window.location.replace(next);
         return;
       }
       setError('Invalid link or expired. Try signing in again.');
     };
     run();
-  }, [router, searchParams]);
+  }, [searchParams]);
 
   if (error) {
     return (
