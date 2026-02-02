@@ -29,7 +29,10 @@ function AdminOrdersContent() {
   const searchParams = useSearchParams();
   const filterRiderId = searchParams.get('rider_id') ?? null;
   const [selectedRiderByOrderId, setSelectedRiderByOrderId] = useState<Record<string, string>>({});
-  const [orderDate, setOrderDate] = useState<string>(() => format(new Date(), 'yyyy-MM-dd'));
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const yesterday = format(new Date(Date.now() - 864e5), 'yyyy-MM-dd');
+  const [datePreset, setDatePreset] = useState<'today' | 'yesterday' | 'last7' | 'custom'>('today');
+  const [customDate, setCustomDate] = useState<string>(today);
 
   const { data: riders } = useQuery({
     queryKey: ['riders'],
@@ -58,18 +61,34 @@ function AdminOrdersContent() {
 
   const filteredOrders = useMemo(() => {
     let list = orders ?? [];
-    if (orderDate) {
+    if (datePreset === 'today') {
       list = list.filter((o) => {
         if (!o.created_at) return false;
-        const orderLocalDate = format(new Date(o.created_at), 'yyyy-MM-dd');
-        return orderLocalDate === orderDate;
+        return format(new Date(o.created_at), 'yyyy-MM-dd') === today;
+      });
+    } else if (datePreset === 'yesterday') {
+      list = list.filter((o) => {
+        if (!o.created_at) return false;
+        return format(new Date(o.created_at), 'yyyy-MM-dd') === yesterday;
+      });
+    } else if (datePreset === 'last7') {
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - 7);
+      list = list.filter((o) => {
+        if (!o.created_at) return false;
+        return new Date(o.created_at) >= cutoff;
+      });
+    } else {
+      list = list.filter((o) => {
+        if (!o.created_at) return false;
+        return format(new Date(o.created_at), 'yyyy-MM-dd') === customDate;
       });
     }
     if (filterRiderId) {
       list = list.filter((o) => o.rider_id === filterRiderId);
     }
     return list;
-  }, [orders, orderDate, filterRiderId]);
+  }, [orders, datePreset, today, yesterday, customDate, filterRiderId]);
 
   const orderCountByPhone = (() => {
     const map = new Map<string, number>();
@@ -130,12 +149,24 @@ function AdminOrdersContent() {
         <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
         <div className="flex flex-wrap items-center gap-3">
           <label className="text-sm font-medium text-gray-700">Date:</label>
-          <input
-            type="date"
-            value={orderDate}
-            onChange={(e) => setOrderDate(e.target.value)}
+          <select
+            value={datePreset}
+            onChange={(e) => setDatePreset(e.target.value as 'today' | 'yesterday' | 'last7' | 'custom')}
             className="px-3 py-2 rounded-xl border border-gray-300 bg-white text-gray-900 text-sm"
-          />
+          >
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="last7">Last 7 days</option>
+            <option value="custom">Custom date</option>
+          </select>
+          {datePreset === 'custom' && (
+            <input
+              type="date"
+              value={customDate}
+              onChange={(e) => setCustomDate(e.target.value)}
+              className="px-3 py-2 rounded-xl border border-gray-300 bg-white text-gray-900 text-sm"
+            />
+          )}
           {filterRider && (
             <p className="text-sm text-gray-900">
               Rider: <strong>{filterRider.name}</strong>

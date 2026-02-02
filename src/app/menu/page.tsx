@@ -79,9 +79,11 @@ export default function MenuPage() {
 
   /** Categories: no HBF Deals / Top Sales in strip; sorted by min product price low → high */
   const uniqueCategories = useMemo(() => {
-    const list = uniqueCategoriesByName(categories).filter(
-      (c) => c.name !== 'HBF Deals' && c.name !== 'Top Sales' && c.name !== 'Top Sale'
-    );
+    const exclude = new Set(['hbf deals', 'top sales', 'top sale']);
+    const list = uniqueCategoriesByName(categories).filter((c) => {
+      const n = (c.name ?? '').trim().toLowerCase();
+      return !exclude.has(n);
+    });
     const getMinPrice = (catName: string) => {
       const prods = productsByCategoryName[catName] ?? [];
       if (prods.length === 0) return Infinity;
@@ -112,7 +114,7 @@ export default function MenuPage() {
     return map;
   }, [uniqueCategories, productsByCategoryName]);
 
-  /** Filtered products per category (by name), keyed by category id for section lookup */
+  /** Filtered products per category (by name), sorted by price low → high */
   const filteredProductsByCategory = useMemo(() => {
     const map: Record<string, Product[]> = {};
     uniqueCategories.forEach((c) => {
@@ -120,6 +122,8 @@ export default function MenuPage() {
       if (minN != null || maxN != null) {
         list = list.filter((p) => byPrice(p.size_options?.[0]?.price ?? p.price));
       }
+      const getPrice = (p: Product) => p.size_options?.[0]?.price ?? p.price;
+      list = [...list].sort((a, b) => getPrice(a) - getPrice(b));
       map[c.id] = list;
     });
     return map;
