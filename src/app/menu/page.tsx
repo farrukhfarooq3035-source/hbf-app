@@ -113,12 +113,12 @@ export default function MenuPage() {
   /** Filtered products per category (by name), sorted by price low → high */
   const filteredProductsByCategory = useMemo(() => {
     const map: Record<string, Product[]> = {};
+    const getPrice = (p: Product) => p.size_options?.[0]?.price ?? p.price;
     uniqueCategories.forEach((c) => {
       let list = (productsByCategoryName[c.name] ?? []).filter(bySearchProduct);
       if (minN != null || maxN != null) {
-        list = list.filter((p) => byPrice(p.size_options?.[0]?.price ?? p.price));
+        list = list.filter((p) => byPrice(getPrice(p)));
       }
-      const getPrice = (p: Product) => p.size_options?.[0]?.price ?? p.price;
       list = [...list].sort((a, b) => getPrice(a) - getPrice(b));
       map[c.id] = list;
     });

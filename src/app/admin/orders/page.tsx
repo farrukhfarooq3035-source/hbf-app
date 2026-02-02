@@ -148,14 +148,14 @@ function AdminOrdersContent() {
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
         <div className="flex flex-wrap items-center gap-3">
-          <label className="text-sm font-medium text-gray-700">Date:</label>
+          <span className="text-sm font-semibold text-gray-800">Filter by date:</span>
           <select
             value={datePreset}
             onChange={(e) => setDatePreset(e.target.value as 'today' | 'yesterday' | 'last7' | 'custom')}
-            className="px-3 py-2 rounded-xl border border-gray-300 bg-white text-gray-900 text-sm"
+            className="px-4 py-2.5 rounded-xl border-2 border-gray-300 bg-white text-gray-900 text-sm font-medium"
           >
-            <option value="today">Today</option>
-            <option value="yesterday">Yesterday</option>
+            <option value="today">Today ({today})</option>
+            <option value="yesterday">Yesterday ({yesterday})</option>
             <option value="last7">Last 7 days</option>
             <option value="custom">Custom date</option>
           </select>
@@ -164,9 +164,10 @@ function AdminOrdersContent() {
               type="date"
               value={customDate}
               onChange={(e) => setCustomDate(e.target.value)}
-              className="px-3 py-2 rounded-xl border border-gray-300 bg-white text-gray-900 text-sm"
+              className="px-4 py-2.5 rounded-xl border-2 border-gray-300 bg-white text-gray-900 text-sm font-medium"
             />
           )}
+          <span className="text-sm text-gray-600">({filteredOrders.length} orders)</span>
           {filterRider && (
             <p className="text-sm text-gray-900">
               Rider: <strong>{filterRider.name}</strong>

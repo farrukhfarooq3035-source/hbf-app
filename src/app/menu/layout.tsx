@@ -1,4 +1,6 @@
 import { Header } from '@/components/customer/Header';
+
+export const dynamic = 'force-dynamic';
 import { Footer } from '@/components/customer/Footer';
 import { CompareFAB } from '@/components/customer/CompareFAB';
 

@@ -23,7 +23,7 @@ export function useMenuCategories() {
   return useQuery({
     queryKey: ['menu-categories'],
     queryFn: async () => {
-      const res = await fetch('/api/menu/categories');
+      const res = await fetch('/api/menu/categories', { cache: 'no-store', headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' } });
       if (!res.ok) throw new Error(await res.text());
       return (await res.json()) as Category[];
     },

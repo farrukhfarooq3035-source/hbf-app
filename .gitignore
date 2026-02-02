@@ -31,9 +31,10 @@ yarn-error.log*
 # Railway
 .railway
 
-# IDE
+# IDE / Debug
 .idea
 .vscode
+.cursor
 *.swp
 *.swo
 
