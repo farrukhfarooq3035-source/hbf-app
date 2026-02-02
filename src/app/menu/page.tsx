@@ -61,25 +61,10 @@ export default function MenuPage() {
   const { isOpen, openTime, closeTime } = useBusinessHours();
 
   const { data: categories, isLoading: catsLoading } = useCategories();
-  const uniqueCategories = useMemo(() => {
-    const list = uniqueCategoriesByName(categories);
-    return list.filter((c) => c.name !== 'HBF Deals');
-  }, [categories]);
   const { data: deals } = useDeals();
   const { data: allProducts } = useProducts(undefined);
 
-  useEffect(() => setRecentSearches(getRecentSearches()), []);
-
-  const minN = priceMin === '' ? null : Number(priceMin);
-  const maxN = priceMax === '' ? null : Number(priceMax);
-  const bySearchProduct = (p: { name: string }) =>
-    !search.trim() || p.name.toLowerCase().includes(search.toLowerCase());
-  const bySearchDeal = (d: { title: string }) =>
-    !search.trim() || d.title.toLowerCase().includes(search.toLowerCase());
-  const byPrice = (price: number) =>
-    (minN == null || price >= minN) && (maxN == null || price <= maxN);
-
-  /** Products grouped by category NAME so all "HBF Pizzas" show in one section even if multiple category IDs exist in DB */
+  /** Products grouped by category NAME (needed before sorting categories by price) */
   const productsByCategoryName = useMemo(() => {
     const map: Record<string, Product[]> = {};
     const catIdToName = new Map<string, string>((categories || []).map((c) => [c.id, c.name ?? '']));
@@ -91,6 +76,30 @@ export default function MenuPage() {
     });
     return map;
   }, [allProducts, categories]);
+
+  /** Categories: no HBF Deals / Top Sales in strip; sorted by min product price low → high */
+  const uniqueCategories = useMemo(() => {
+    const list = uniqueCategoriesByName(categories).filter(
+      (c) => c.name !== 'HBF Deals' && c.name !== 'Top Sales' && c.name !== 'Top Sale'
+    );
+    const getMinPrice = (catName: string) => {
+      const prods = productsByCategoryName[catName] ?? [];
+      if (prods.length === 0) return Infinity;
+      return Math.min(...prods.map((p) => p.size_options?.[0]?.price ?? p.price));
+    };
+    return [...list].sort((a, b) => getMinPrice(a.name) - getMinPrice(b.name));
+  }, [categories, productsByCategoryName]);
+
+  useEffect(() => setRecentSearches(getRecentSearches()), []);
+
+  const minN = priceMin === '' ? null : Number(priceMin);
+  const maxN = priceMax === '' ? null : Number(priceMax);
+  const bySearchProduct = (p: { name: string }) =>
+    !search.trim() || p.name.toLowerCase().includes(search.toLowerCase());
+  const bySearchDeal = (d: { title: string }) =>
+    !search.trim() || d.title.toLowerCase().includes(search.toLowerCase());
+  const byPrice = (price: number) =>
+    (minN == null || price >= minN) && (maxN == null || price <= maxN);
 
   /** First product image per category (for category card) */
   const categoryImageMap = useMemo(() => {
@@ -140,19 +149,15 @@ export default function MenuPage() {
       });
   }, [deals, search, minN, maxN]);
 
-  /** Category cards: HBF Deals + each category */
+  /** Category cards: only product categories (no HBF Deals / Top Sales pills) */
   const categoryCards = useMemo(
-    () => [
-      ...(filteredAllDeals.length > 0
-        ? [{ key: 'hbf-deals' as const, label: 'HBF Deals', imageUrl: filteredAllDeals[0]?.image_url ?? null }]
-        : []),
-      ...uniqueCategories.map((c) => ({
+    () =>
+      uniqueCategories.map((c) => ({
         key: c.id,
         label: c.name,
         imageUrl: categoryImageMap[c.id] ?? null,
       })),
-    ],
-    [uniqueCategories, categoryImageMap, filteredAllDeals]
+    [uniqueCategories, categoryImageMap]
   );
 
   const handleSearchBlur = () => {
@@ -267,9 +272,7 @@ export default function MenuPage() {
               <button
                 key={key}
                 type="button"
-                onClick={() =>
-                  scrollToSection(key === 'hbf-deals' ? 'section-hbf-deals' : `section-${key}`)
-                }
+                onClick={() => scrollToSection(`section-${key}`)}
                 className="flex-shrink-0 flex flex-col items-center gap-2 tap-highlight text-left scroll-snap-item hover-scale-subtle scroll-strip-card"
               >
                 <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-soft ring-2 ring-transparent focus:ring-primary/30 flex-shrink-0">
