@@ -16,9 +16,8 @@ import type { Product } from '@/types';
 const RECENT_SEARCH_KEY = 'hbf-recent-search';
 const RECENT_SEARCH_MAX = 5;
 
-/** Fixed category order for main page */
+/** Fixed category order for main page (HBF Deals excluded from pills - has its own section) */
 const CATEGORY_ORDER = [
-  'HBF Deals',
   'HBF Burgers',
   'GRILLED Burgers',
   'HBF Pizzas',
@@ -92,9 +91,10 @@ export default function MenuPage() {
     return map;
   }, [allProducts, categories]);
 
-  /** Categories: filtered by API; sorted by CATEGORY_ORDER */
+  /** Categories: filtered by API; sorted by CATEGORY_ORDER; HBF Deals excluded from pills */
   const uniqueCategories = useMemo(() => {
-    const list = uniqueCategoriesByName(categories);
+    const isHbfDeals = (n: string) => (n ?? '').toLowerCase().includes('hbf') && (n ?? '').toLowerCase().includes('deal');
+    const list = uniqueCategoriesByName(categories).filter((c) => !isHbfDeals(c.name));
     const orderMap = new Map(CATEGORY_ORDER.map((n, i) => [n, i]));
     return [...list].sort((a, b) => {
       const ia = orderMap.get(a.name) ?? 999;
@@ -164,16 +164,16 @@ export default function MenuPage() {
       });
   }, [deals, search, minN, maxN]);
 
-  /** Category cards: HBF Deals uses first deal's image, scrolls to section-hbf-deals */
-  const categoryCards = useMemo(() => {
-    const isHbfDeals = (n: string) => (n ?? '').toLowerCase().includes('hbf') && (n ?? '').toLowerCase().includes('deal');
-    const hbfDealsImage = filteredAllDeals.find((d) => d.image_url)?.image_url ?? filteredAllDeals[0]?.image_url ?? null;
-    return uniqueCategories.map((c) => ({
-      key: isHbfDeals(c.name) ? 'hbf-deals' : c.id,
-      label: c.name,
-      imageUrl: isHbfDeals(c.name) ? hbfDealsImage : (categoryImageMap[c.id] ?? null),
-    }));
-  }, [uniqueCategories, categoryImageMap, filteredAllDeals]);
+  /** Category cards: product categories only (HBF Deals has its own section below) */
+  const categoryCards = useMemo(
+    () =>
+      uniqueCategories.map((c) => ({
+        key: c.id,
+        label: c.name,
+        imageUrl: categoryImageMap[c.id] ?? null,
+      })),
+    [uniqueCategories, categoryImageMap]
+  );
 
   const handleSearchBlur = () => {
     if (search.trim()) addRecentSearch(search.trim());
