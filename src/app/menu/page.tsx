@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { useMenuCategories, useProducts, useDeals, useTopSellingDeals, useTopSellingProducts } from '@/hooks/use-menu';
+import { useMenuCategories, useProducts, useDeals } from '@/hooks/use-menu';
 import { useBusinessHours } from '@/hooks/use-business-hours';
 import { ProductCard } from '@/components/customer/ProductCard';
 import { DealCard } from '@/components/customer/DealCard';
@@ -10,7 +10,7 @@ import { HorizontalScrollStrip } from '@/components/customer/HorizontalScrollStr
 import { useCartStore } from '@/store/cart-store';
 import { useFavoritesStore } from '@/store/favorites-store';
 import Link from 'next/link';
-import { Heart, Clock, TrendingUp, CheckCircle2, XCircle } from 'lucide-react';
+import { Heart, Clock, CheckCircle2, XCircle } from 'lucide-react';
 import type { Product } from '@/types';
 
 const RECENT_SEARCH_KEY = 'hbf-recent-search';
@@ -72,13 +72,21 @@ export default function MenuPage() {
   const [priceMax, setPriceMax] = useState<string>('');
   const { deliveryMode, setDeliveryMode } = useCartStore();
   const { productIds: favProductIds, dealIds: favDealIds } = useFavoritesStore();
-  const { isOpen, openTime, closeTime, isHappyHour, happyHourStart, happyHourEnd, happyHourDiscount } = useBusinessHours();
+  const { isOpen, openTime, closeTime, isHappyHour, isAfterMidnight, showHappyHourDeals, happyHourStart, happyHourEnd, happyHourDiscount } = useBusinessHours();
 
   const { data: categories, isLoading: catsLoading } = useMenuCategories();
   const { data: deals } = useDeals();
   const { data: allProducts } = useProducts(undefined);
-  const { data: topDeals } = useTopSellingDeals(6);
-  const { data: topProducts } = useTopSellingProducts(6);
+
+  /** Happy Hour products: 8 Hot Wings Piece, B.B.Q Grilled Chicken Burger, Broast Full - 10% off during 3-5pm or after midnight */
+  const HAPPY_HOUR_PRODUCT_KEYS = ['hot wings', 'wings piece', 'b.b.q grilled', 'grilled chicken burger', 'broast full', 'broast'];
+  const happyHourProducts = useMemo(() => {
+    if (!allProducts?.length || !showHappyHourDeals) return [];
+    return allProducts.filter((p) => {
+      const name = (p.name || '').toLowerCase();
+      return HAPPY_HOUR_PRODUCT_KEYS.some((key) => name.includes(key));
+    });
+  }, [allProducts, showHappyHourDeals]);
 
   /** Products grouped by category NAME (needed before sorting categories by price) */
   const productsByCategoryName = useMemo(() => {
@@ -196,10 +204,8 @@ export default function MenuPage() {
     setRecentSearches(getRecentSearches());
   };
 
-  const hasBestsellers = (topDeals?.length ?? 0) > 0 || (topProducts?.length ?? 0) > 0;
-
   return (
-    <div className="max-w-4xl mx-auto flex-1 min-h-0 menu-scroll-root w-full min-w-0 overflow-x-hidden px-4 sm:px-5">
+    <div className="max-w-4xl mx-auto flex-1 min-h-0 menu-scroll-root w-full min-w-0 overflow-x-hidden px-3 sm:px-5">
       <div className="space-y-4 pb-4">
         {/* Open/Closed + Happy Hour Banner */}
         <div
@@ -255,38 +261,20 @@ export default function MenuPage() {
           </div>
         </div>
 
-        {/* Bestsellers / Top Sale - mobile: grid (touch scroll works), desktop: horizontal scroll */}
-        {hasBestsellers && (
-          <div id="section-bestsellers" className="scroll-mt-4">
-            <h2 className="font-bold text-lg mb-1 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-primary" />
-              Bestsellers / Top Sale
-            </h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Based on actual order history — most sold items</p>
-            <div className="grid grid-cols-2 gap-3 sm:hidden">
-              {topDeals?.map((deal) => (
-                <div key={deal.id} className="min-h-0">
-                  <DealCard deal={deal} grid />
-                </div>
-              ))}
-              {topProducts?.map((product) => (
+        {/* Happy Hour Deals: 3-5pm 10% off, after midnight 10% on Hot Wings, B.B.Q Grilled Burger, Broast Full */}
+        {showHappyHourDeals && happyHourProducts.length > 0 && (
+          <div id="section-happy-hour" className="scroll-mt-4">
+            <h2 className="font-bold text-lg mb-1">Happy Hour Deals</h2>
+            <p className="text-xs text-amber-600 dark:text-amber-400 mb-3 font-medium">
+              {isHappyHour ? `3–5pm: 10% off` : isAfterMidnight ? 'After midnight: 10% off' : ''} on selected items
+            </p>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {happyHourProducts.map((product) => (
                 <div key={product.id} className="min-h-0">
-                  <ProductCard product={product} />
+                  <ProductCard product={product} discountPercent={10} />
                 </div>
               ))}
             </div>
-            <HorizontalScrollStrip className="hidden sm:flex gap-4 pb-2 px-1 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
-              {topDeals?.map((deal) => (
-                <div key={deal.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card">
-                  <DealCard deal={deal} grid />
-                </div>
-              ))}
-              {topProducts?.map((product) => (
-                <div key={product.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card">
-                  <ProductCard product={product} />
-                </div>
-              ))}
-            </HorizontalScrollStrip>
           </div>
         )}
 
@@ -365,7 +353,7 @@ export default function MenuPage() {
                 onClick={() => scrollToSection(`section-${key}`)}
                 className="flex flex-col items-center gap-2 tap-highlight text-left w-20"
               >
-                <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-soft flex-shrink-0">
+                <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-premium flex-shrink-0 image-pop">
                   <FoodImage
                     src={imageUrl}
                     alt={label}
@@ -388,7 +376,7 @@ export default function MenuPage() {
                 onClick={() => scrollToSection(`section-${key}`)}
                 className="flex-shrink-0 flex flex-col items-center gap-2 tap-highlight text-left scroll-snap-item hover-scale-subtle scroll-strip-card"
               >
-                <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-soft ring-2 ring-transparent focus:ring-primary/30 flex-shrink-0">
+                <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-premium ring-2 ring-transparent focus:ring-primary/30 flex-shrink-0 image-pop">
                   <FoodImage
                     src={imageUrl}
                     alt={label}

@@ -12,18 +12,23 @@ import type { Product } from '@/types';
 
 interface ProductCardProps {
   product: Product;
+  /** Optional discount % (e.g. 10 for Happy Hour) - shows original struck through, discounted price */
+  discountPercent?: number;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, discountPercent }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
   const { isProductFavorite, toggleProduct } = useFavoritesStore();
   const isFav = isProductFavorite(product.id);
-  const price = product.size_options?.[0]?.price ?? product.price;
+  const originalPrice = product.size_options?.[0]?.price ?? product.price;
+  const price = discountPercent
+    ? Math.round(originalPrice * (1 - discountPercent / 100))
+    : originalPrice;
   const [quickPeekOpen, setQuickPeekOpen] = useState(false);
   const { add: addToCompare, has: isInCompare } = useCompareStore();
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-soft border border-gray-100 dark:border-gray-700 overflow-hidden hover-lift dark:ring-1 dark:ring-primary/20 h-full flex flex-col">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-premium border border-gray-100 dark:border-gray-700 overflow-hidden hover-lift dark:ring-1 dark:ring-primary/20 h-full flex flex-col image-pop">
       <div className="relative flex-shrink-0 aspect-square w-full">
         <div className="absolute top-2 right-2 z-10 flex gap-1">
           {product.image_url && (
@@ -66,9 +71,17 @@ export function ProductCard({ product }: ProductCardProps) {
         <h3 className="font-semibold text-dark dark:text-white text-sm line-clamp-2">
           {product.name}
         </h3>
-        <p className="text-primary font-bold text-lg mt-1">
-          Rs {price}/-
-        </p>
+        <div className="mt-1 flex items-baseline gap-2">
+          {discountPercent ? (
+            <>
+              <span className="text-gray-500 dark:text-gray-400 line-through text-sm">Rs {originalPrice}/-</span>
+              <span className="text-primary font-bold text-lg">Rs {price}/-</span>
+              <span className="text-xs font-medium text-green-600 dark:text-green-400">{discountPercent}% off</span>
+            </>
+          ) : (
+            <p className="text-primary font-bold text-lg">Rs {price}/-</p>
+          )}
+        </div>
       </Link>
       <div className="px-3 pb-3">
         <button

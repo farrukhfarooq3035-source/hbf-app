@@ -44,6 +44,8 @@ export function useBusinessHours() {
   const isHappyHour = data?.happy_hour_start && data?.happy_hour_end
     ? isBetween(now, data.happy_hour_start, data.happy_hour_end)
     : false;
+  const isAfterMidnight = now.getHours() >= 0 && now.getHours() < 6;
+  const showHappyHourDeals = isHappyHour || isAfterMidnight;
   return {
     ...q,
     openTime: data?.open_time ?? '11:00',
@@ -51,8 +53,10 @@ export function useBusinessHours() {
     closedDays: data?.closed_days ?? [],
     isOpen,
     isHappyHour,
+    isAfterMidnight,
+    showHappyHourDeals,
     happyHourStart: data?.happy_hour_start ?? '15:00',
     happyHourEnd: data?.happy_hour_end ?? '17:00',
-    happyHourDiscount: data?.happy_hour_discount ?? 20,
+    happyHourDiscount: data?.happy_hour_discount ?? 10,
   };
 }

@@ -102,6 +102,29 @@ body {
   box-shadow: var(--shadow-lg);
 }
 
+/* Premium: drop shadow + pop for high-end look */
+.shadow-premium {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+.dark .shadow-premium {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+.image-pop {
+  transition: transform 0.2s var(--ease-out-expo), box-shadow 0.2s var(--ease-smooth);
+}
+.image-pop:active {
+  transform: scale(0.98);
+}
+@media (hover: hover) {
+  .image-pop:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
+  }
+  .dark .image-pop:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
 /* Prevent horizontal scroll from leaking to body; stop scroll chaining on horizontal strips */
 .scrollbar-hide {
   -ms-overflow-style: none;
@@ -186,6 +209,11 @@ body {
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  border-radius: inherit;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+.dark [data-food-image] {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 /* Link wrapping image: allow scroll, no tap delay */
 a [data-food-image] {
