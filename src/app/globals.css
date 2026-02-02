@@ -169,14 +169,14 @@ body {
   }
 }
 
-/* Horizontal strip: smooth scroll, both pans for gesture-based direction */
+/* Horizontal strip: smooth scroll. On touch, allow vertical scroll to pass through to parent */
 .horizontal-scroll-strip {
   -webkit-overflow-scrolling: touch;
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
-  overscroll-behavior-y: none;
-  touch-action: pan-y pan-x;
+  overscroll-behavior-y: auto;
+  touch-action: pan-x;
   scroll-behavior: smooth;
 }
 

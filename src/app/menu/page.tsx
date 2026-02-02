@@ -255,14 +255,27 @@ export default function MenuPage() {
           </div>
         </div>
 
-        {/* Bestsellers / Top Sale */}
+        {/* Bestsellers / Top Sale - mobile: grid (touch scroll works), desktop: horizontal scroll */}
         {hasBestsellers && (
-          <div id="section-bestsellers" className="scroll-mt-4 -mx-1">
-            <h2 className="font-bold text-lg mb-3 flex items-center gap-2">
+          <div id="section-bestsellers" className="scroll-mt-4">
+            <h2 className="font-bold text-lg mb-1 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-primary" />
               Bestsellers / Top Sale
             </h2>
-            <HorizontalScrollStrip className="flex gap-4 pb-2 px-1 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Based on actual order history — most sold items</p>
+            <div className="grid grid-cols-2 gap-3 sm:hidden">
+              {topDeals?.map((deal) => (
+                <div key={deal.id} className="min-h-0">
+                  <DealCard deal={deal} grid />
+                </div>
+              ))}
+              {topProducts?.map((product) => (
+                <div key={product.id} className="min-h-0">
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+            <HorizontalScrollStrip className="hidden sm:flex gap-4 pb-2 px-1 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
               {topDeals?.map((deal) => (
                 <div key={deal.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card">
                   <DealCard deal={deal} grid />
@@ -341,10 +354,33 @@ export default function MenuPage() {
           </div>
         )}
 
-        {/* Categories row: image + label, horizontal scroll + desktop wheel */}
-        <div className="w-full min-w-0 -mx-1">
+        {/* Categories: mobile flex-wrap (touch scroll works), desktop horizontal scroll */}
+        <div className="w-full min-w-0">
           <h2 className="font-bold text-lg mb-3">Categories</h2>
-          <HorizontalScrollStrip className="flex gap-4 pb-2 px-1 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+          <div className="flex flex-wrap gap-3 sm:hidden">
+            {categoryCards.map(({ key, label, imageUrl }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => scrollToSection(`section-${key}`)}
+                className="flex flex-col items-center gap-2 tap-highlight text-left w-20"
+              >
+                <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-soft flex-shrink-0">
+                  <FoodImage
+                    src={imageUrl}
+                    alt={label}
+                    aspect="1:1"
+                    sizes="80px"
+                    className="w-full h-full"
+                  />
+                </div>
+                <span className="text-xs font-medium text-gray-800 dark:text-gray-200 line-clamp-2 text-center">
+                  {label}
+                </span>
+              </button>
+            ))}
+          </div>
+          <HorizontalScrollStrip className="hidden sm:flex gap-4 pb-2 px-1 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
             {categoryCards.map(({ key, label, imageUrl }) => (
               <button
                 key={key}
@@ -369,11 +405,23 @@ export default function MenuPage() {
           </HorizontalScrollStrip>
         </div>
 
-        {/* HBF Deals: products (category HBF Deals) + deals from deals table, right after Categories */}
+        {/* HBF Deals: mobile grid (touch scroll works), desktop horizontal scroll */}
         {(hbfDealsProducts.length > 0 || filteredAllDeals.length > 0) && (
-          <div id="section-hbf-deals" className="scroll-mt-4 -mx-1">
+          <div id="section-hbf-deals" className="scroll-mt-4">
             <h2 className="font-bold text-lg mb-3">HBF Deals</h2>
-            <HorizontalScrollStrip className="flex gap-4 pb-2 px-1 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+            <div className="grid grid-cols-2 gap-3 sm:hidden">
+              {hbfDealsProducts.map((product) => (
+                <div key={product.id} className="min-h-0">
+                  <ProductCard product={product} />
+                </div>
+              ))}
+              {filteredAllDeals.map((deal) => (
+                <div key={deal.id} className="min-h-0">
+                  <DealCard deal={deal} grid />
+                </div>
+              ))}
+            </div>
+            <HorizontalScrollStrip className="hidden sm:flex gap-4 pb-2 px-1 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
               {hbfDealsProducts.map((product) => (
                 <div key={product.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card">
                   <ProductCard product={product} />
