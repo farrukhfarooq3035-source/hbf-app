@@ -307,20 +307,6 @@ export default function MenuPage() {
           </HorizontalScrollStrip>
         </div>
 
-        {/* HBF Deals section - below Categories */}
-        {filteredAllDeals.length > 0 && (
-          <div id="section-hbf-deals" className="scroll-mt-4">
-            <h2 className="font-bold text-lg mb-3">HBF Deals</h2>
-            <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
-              {filteredAllDeals.map((deal) => (
-                <div key={deal.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card">
-                  <DealCard deal={deal} grid />
-                </div>
-              ))}
-            </HorizontalScrollStrip>
-          </div>
-        )}
-
         {catsLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
@@ -339,26 +325,38 @@ export default function MenuPage() {
           </div>
         ) : (
           <>
-            {uniqueCategories.map((cat, sectionIndex) => {
+            {uniqueCategories.map((cat) => {
               const list = filteredProductsByCategory[cat.id] ?? [];
-              if (list.length === 0) return null;
+              const isHbfBurgers = (cat.name ?? '').trim() === 'HBF Burgers';
               return (
-                <div
-                  key={cat.id}
-                  id={`section-${cat.id}`}
-                  className="scroll-mt-4"
-                >
-                  <h2 className="font-bold text-lg mb-3">{cat.name}</h2>
-                  <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
-                    {list.map((product) => (
-                      <div
-                        key={product.id}
-                        className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card"
-                      >
-                        <ProductCard product={product} />
-                      </div>
-                    ))}
-                  </HorizontalScrollStrip>
+                <div key={cat.id}>
+                  {list.length > 0 && (
+                    <div id={`section-${cat.id}`} className="scroll-mt-4">
+                      <h2 className="font-bold text-lg mb-3">{cat.name}</h2>
+                      <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+                        {list.map((product) => (
+                          <div
+                            key={product.id}
+                            className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card"
+                          >
+                            <ProductCard product={product} />
+                          </div>
+                        ))}
+                      </HorizontalScrollStrip>
+                    </div>
+                  )}
+                  {isHbfBurgers && filteredAllDeals.length > 0 && (
+                    <div id="section-hbf-deals" className="scroll-mt-4 mt-4">
+                      <h2 className="font-bold text-lg mb-3">HBF Deals</h2>
+                      <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+                        {filteredAllDeals.map((deal) => (
+                          <div key={deal.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card">
+                            <DealCard deal={deal} grid />
+                          </div>
+                        ))}
+                      </HorizontalScrollStrip>
+                    </div>
+                  )}
                 </div>
               );
             })}
