@@ -15,7 +15,7 @@ const config: Config = {
         dark: '#1E1E1E',
       },
       fontFamily: {
-        sans: ['var(--font-plus-jakarta)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-outfit)', 'system-ui', 'sans-serif'],
       },
       transitionDuration: {
         '250': '250ms',

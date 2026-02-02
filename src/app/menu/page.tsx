@@ -263,7 +263,7 @@ export default function MenuPage() {
         {/* Happy Hour Deals: 3-5pm 10% off, after midnight 10% on Hot Wings, B.B.Q Grilled Burger, Broast Full */}
         {showHappyHourDeals && happyHourProducts.length > 0 && (
           <div id="section-happy-hour" className="scroll-mt-4">
-            <h2 className="font-bold text-lg mb-1">Happy Hour Deals</h2>
+            <h2 className="font-bold text-lg mb-1 text-slate-800 dark:text-slate-100 tracking-tight">Happy Hour Deals</h2>
             <p className="text-xs text-amber-600 dark:text-amber-400 mb-3 font-medium">
               {isHappyHour ? `${happyHourStart}–${happyHourEnd}: ${happyHourDiscount}% off` : isAfterMidnight ? `After midnight: ${happyHourDiscount}% off` : ''} on selected items
             </p>
@@ -326,7 +326,7 @@ export default function MenuPage() {
 
         {hasFavorites && (
           <div>
-            <h2 className="font-bold text-lg mb-3 flex items-center gap-2">
+            <h2 className="font-bold text-lg mb-3 flex items-center gap-2 text-slate-800 dark:text-slate-100 tracking-tight">
               <Heart className="w-5 h-5 fill-primary text-primary" />
               Favorites
             </h2>
@@ -343,39 +343,16 @@ export default function MenuPage() {
 
         {/* Categories: mobile flex-wrap (touch scroll works), desktop horizontal scroll */}
         <div className="w-full min-w-0">
-          <h2 className="font-bold text-lg mb-3">Categories</h2>
-          <div className="flex flex-wrap gap-3 sm:hidden">
+          <h2 className="font-bold text-lg mb-4 text-slate-800 dark:text-slate-100 tracking-tight">Categories</h2>
+          <div className="flex flex-wrap gap-4 sm:gap-5 sm:hidden justify-center">
             {categoryCards.map(({ key, label, imageUrl }) => (
               <button
                 key={key}
                 type="button"
                 onClick={() => scrollToSection(`section-${key}`)}
-                className="flex flex-col items-center gap-2 tap-highlight text-left w-20"
+                className="flex flex-col items-center gap-3 tap-highlight text-left w-24"
               >
-                <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-premium flex-shrink-0 image-pop">
-                  <FoodImage
-                    src={imageUrl}
-                    alt={label}
-                    aspect="1:1"
-                    sizes="80px"
-                    className="w-full h-full"
-                  />
-                </div>
-                <span className="text-xs font-medium text-gray-800 dark:text-gray-200 line-clamp-2 text-center">
-                  {label}
-                </span>
-              </button>
-            ))}
-          </div>
-          <HorizontalScrollStrip className="hidden sm:flex gap-4 pb-2 px-1 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
-            {categoryCards.map(({ key, label, imageUrl }) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => scrollToSection(`section-${key}`)}
-                className="flex-shrink-0 flex flex-col items-center gap-2 tap-highlight text-left scroll-snap-item hover-scale-subtle scroll-strip-card"
-              >
-                <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-premium ring-2 ring-transparent focus:ring-primary/30 flex-shrink-0 image-pop">
+                <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-category-pop flex-shrink-0 image-pop ring-1 ring-slate-200/50 dark:ring-slate-600/50">
                   <FoodImage
                     src={imageUrl}
                     alt={label}
@@ -384,7 +361,30 @@ export default function MenuPage() {
                     className="w-full h-full"
                   />
                 </div>
-                <span className="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-2 max-w-24 text-center">
+                <span className="category-label-pill text-xs font-semibold px-3 py-1.5 rounded-full line-clamp-2 text-center max-w-full">
+                  {label}
+                </span>
+              </button>
+            ))}
+          </div>
+          <HorizontalScrollStrip className="hidden sm:flex gap-5 pb-2 px-1 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+            {categoryCards.map(({ key, label, imageUrl }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => scrollToSection(`section-${key}`)}
+                className="flex-shrink-0 flex flex-col items-center gap-3 tap-highlight text-left scroll-snap-item hover-scale-subtle scroll-strip-card"
+              >
+                <div className="w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-category-pop ring-1 ring-slate-200/50 dark:ring-slate-600/50 focus:ring-primary/30 flex-shrink-0 image-pop">
+                  <FoodImage
+                    src={imageUrl}
+                    alt={label}
+                    aspect="1:1"
+                    sizes="112px"
+                    className="w-full h-full"
+                  />
+                </div>
+                <span className="category-label-pill text-xs font-semibold px-3 py-1.5 rounded-full line-clamp-2 text-center max-w-[7rem]">
                   {label}
                 </span>
               </button>
@@ -395,7 +395,7 @@ export default function MenuPage() {
         {/* HBF Deals: mobile grid (touch scroll works), desktop horizontal scroll */}
         {(hbfDealsProducts.length > 0 || filteredAllDeals.length > 0) && (
           <div id="section-hbf-deals" className="scroll-mt-4">
-            <h2 className="font-bold text-lg mb-3">HBF Deals</h2>
+            <h2 className="font-bold text-lg mb-3 text-slate-800 dark:text-slate-100 tracking-tight">HBF Deals</h2>
             <div className="grid grid-cols-2 gap-3 sm:hidden">
               {hbfDealsProducts.map((product) => (
                 <div key={product.id} className="min-h-0">
@@ -447,7 +447,11 @@ export default function MenuPage() {
                 <div key={cat.id}>
                   {list.length > 0 && (
                     <div id={`section-${cat.id}`} className="scroll-mt-4">
-                      <h2 className="font-bold text-lg mb-3">{cat.name}</h2>
+                      <h2 className="font-bold text-lg mb-3">
+                        <span className="category-label-pill inline-block px-4 py-2 rounded-xl font-semibold text-base">
+                          {cat.name}
+                        </span>
+                      </h2>
                       {/* Mobile: 2-col grid fills width. Desktop: horizontal scroll */}
                       <div className="grid grid-cols-2 gap-3 sm:hidden">
                         {list.map((product) => (

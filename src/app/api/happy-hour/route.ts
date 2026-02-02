@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
     const productIds = Array.isArray(body.productIds) ? body.productIds : [];
-    const ids = productIds.filter((id): id is string => typeof id === 'string' && id.length > 0);
+    const ids = productIds.filter((id: unknown): id is string => typeof id === 'string' && id.length > 0);
 
     const { data: existing } = await supabaseAdmin.from('happy_hour_products').select('id');
     if (existing?.length) {
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, productIds: [] });
     }
 
-    const rows = ids.map((product_id, i) => ({ product_id, sort_order: i }));
+    const rows = ids.map((product_id: string, i: number) => ({ product_id, sort_order: i }));
     const { error: insError } = await supabaseAdmin
       .from('happy_hour_products')
       .insert(rows);
