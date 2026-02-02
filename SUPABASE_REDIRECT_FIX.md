@@ -1,8 +1,8 @@
 # Sign-in ke baad galat deployment — Fix
 
-**Issue:** Sign-in se pehle `hbf-fkcvls1jh-farrukhs-projects-e4480561.vercel.app` (updated) dikh raha hai, lekin sign-in ke baad `hbf-1ydsvjq1q-farrukhs-projects-86ed0370.vercel.app` (purana) open ho jata hai.
+**Issue:** Sign-in se pehle e4480561 (updated) dikh raha hai, lekin sign-in ke baad 86ed0370 (purana) open ho jata hai.
 
-**Reason:** Supabase **Site URL** aur **Redirect URLs** mein 86ed0370 wala URL set hai. OAuth ke baad Supabase user ko wahi bhej raha hai.
+**Fix applied:** Code mein redirect add kiya — jab bhi user 86ed0370 pe land kare, turant e4480561 pe redirect ho jayega.
 
 ---
 
@@ -40,25 +40,17 @@
 
 ---
 
-## Kaunsi deployment production hai?
+## Code Fix (Applied)
 
-- **e4480561** = updated (HBF Deals, etc.)
-- **86ed0370** = purani
+- **RedirectToProduction** component: Jab user 86ed0370 pe land kare, turant e4480561 pe redirect
+- **Project link:** Ab deployments e4480561 team pe jayengi (`vercel link` + `git push`)
 
-Agar e4480561 production hai, to Supabase Site URL aur Redirect URLs dono mein e4480561 wala URL hona chahiye.
+## NEXT_PUBLIC_APP_URL (Agar redirect sahi URL pe na jaye)
 
----
-
-## Code Fix: NEXT_PUBLIC_APP_URL (Optional)
-
-Dono Vercel projects (e4480561 aur 86ed0370) mein ye env var add karo:
-
-**Vercel** → **hbf-app** → **Settings** → **Environment Variables**
+**Vercel** → **hbf-app** (e4480561) → **Settings** → **Environment Variables**
 
 | Name | Value |
 |------|-------|
-| `NEXT_PUBLIC_APP_URL` | `https://YOUR-PRODUCTION-URL.vercel.app` (e4480561 wala) |
+| `NEXT_PUBLIC_APP_URL` | `https://hbf-app-farrukhs-projects-e4480561.vercel.app` |
 
-(ya jo bhi tumhara production URL hai)
-
-Isse sign-in ke baad redirect hamesha isi URL pe jayega, chahe user kisi bhi deployment pe ho.
+(Agar production URL alag hai to woh daalo — Vercel dashboard → Domains se check karo)

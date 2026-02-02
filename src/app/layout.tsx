@@ -5,6 +5,7 @@ import { Providers } from './providers';
 import { CartBar } from '@/components/customer/CartBar';
 import { LiveOrderButton } from '@/components/customer/LiveOrderButton';
 import { LocationPermission } from '@/components/customer/LocationPermission';
+import { RedirectToProduction } from '@/components/RedirectToProduction';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -33,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`font-sans ${plusJakarta.variable}`} data-build={BUILD_ID}>
       <body className="min-h-screen antialiased font-sans" style={{ backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
+        <RedirectToProduction />
         <Providers>
           <LocationPermission />
           {children}
