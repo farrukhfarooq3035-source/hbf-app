@@ -22,6 +22,10 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: '#E50914',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 const BUILD_ID = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || 'local';

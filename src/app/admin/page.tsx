@@ -11,7 +11,9 @@ import {
   TrendingUp,
   Download,
   ChevronRight,
+  Star,
 } from 'lucide-react';
+import { useTopSellingProducts } from '@/hooks/use-menu';
 import {
   BarChart,
   Bar,
@@ -90,6 +92,7 @@ export default function AdminDashboardPage() {
 
   const todaySales = todayOrders?.reduce((s, o) => s + (o.total_price || 0), 0) || 0;
   const totalOrders = todayOrders?.length || 0;
+  const { data: topProducts } = useTopSellingProducts(5);
 
   const exportTodayCSV = () => {
     const rows = todayOrders || [];
@@ -167,6 +170,26 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Top 5 Bestsellers */}
+      {topProducts && topProducts.length > 0 && (
+        <div className="bg-white rounded-2xl p-6 shadow-sm border mb-8">
+          <h2 className="font-bold text-lg mb-4 flex items-center gap-2">
+            <Star className="w-5 h-5 text-amber-500" />
+            Top 5 Bestsellers
+          </h2>
+          <ul className="space-y-2">
+            {topProducts.map((p, i) => (
+              <li key={p.id} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50">
+                <span className="font-medium text-gray-900">
+                  {i + 1}. {p.name}
+                </span>
+                <span className="text-sm text-gray-600">Rs {(p.size_options?.[0]?.price ?? p.price)}/-</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="bg-white rounded-2xl p-6 shadow-sm border">

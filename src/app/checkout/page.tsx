@@ -14,7 +14,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { items, getSubtotal, getDeliveryFee, getGrandTotal, getDistanceKm, getEstimatedDeliveryMinutes, clearCart } = useCartStore();
-  const { isOpen, openTime, closeTime } = useBusinessHours();
+  const { isOpen, openTime, closeTime, isHappyHour, happyHourDiscount } = useBusinessHours();
   const estMins = getEstimatedDeliveryMinutes();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -22,6 +22,7 @@ export default function CheckoutPage() {
   const [notes, setNotes] = useState('');
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromo, setAppliedPromo] = useState<{ id: string; code: string; discount: number } | null>(null);
+  const [firstOrderDiscount, setFirstOrderDiscount] = useState<{ discount: number; message: string } | null>(null);
   const [promoError, setPromoError] = useState('');
   const [zones, setZones] = useState<Zone[]>([]);
   const [loading, setLoading] = useState(false);
@@ -37,7 +38,10 @@ export default function CheckoutPage() {
     : geoDeliveryFee;
   if (freeDeliveryUnder5Km) deliveryFee = 0;
   const minOrder = matchedZone?.min_order ?? 0;
-  const discount = appliedPromo?.discount ?? 0;
+  const promoDiscount = appliedPromo?.discount ?? 0;
+  const firstOrder = firstOrderDiscount?.discount ?? 0;
+  const happyHourAmount = isHappyHour ? Math.round((subtotal * happyHourDiscount) / 100) : 0;
+  const discount = Math.max(promoDiscount, firstOrder, happyHourAmount);
   const total = Math.max(0, subtotal + deliveryFee - discount);
 
   useEffect(() => {
@@ -58,6 +62,23 @@ export default function CheckoutPage() {
       router.replace('/menu');
     }
   }, [items.length, loading, router]);
+
+  useEffect(() => {
+    if (!user?.id || subtotal <= 0) {
+      setFirstOrderDiscount(null);
+      return;
+    }
+    fetch(`/api/promo/first-order?user_id=${encodeURIComponent(user.id)}&subtotal=${subtotal}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.valid && data.discount > 0) {
+          setFirstOrderDiscount({ discount: data.discount, message: data.message || 'First order discount' });
+        } else {
+          setFirstOrderDiscount(null);
+        }
+      })
+      .catch(() => setFirstOrderDiscount(null));
+  }, [user?.id, subtotal]);
 
   const applyPromo = () => {
     setPromoError('');
@@ -132,6 +153,7 @@ export default function CheckoutPage() {
           body: JSON.stringify({ promo_id: appliedPromo.id }),
         });
       }
+      setFirstOrderDiscount(null);
 
       clearCart();
       router.push(`/order/${order.id}`);
@@ -189,9 +211,13 @@ export default function CheckoutPage() {
             Min order for your area: Rs {minOrder}/-
           </p>
         )}
-        {appliedPromo && (
+        {discount > 0 && (
           <p className="text-green-600 dark:text-green-400 text-sm mb-2">
-            Promo {appliedPromo.code}: -Rs {appliedPromo.discount}/-
+            {appliedPromo?.discount === discount
+              ? `Promo ${appliedPromo.code}`
+              : happyHourAmount === discount
+                ? `Happy Hour ${happyHourDiscount}% off`
+                : firstOrderDiscount?.message || 'Discount'}: -Rs {discount}/-
           </p>
         )}
         {estMins != null && (

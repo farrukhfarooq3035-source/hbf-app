@@ -80,6 +80,25 @@ export function useDeals() {
   });
 }
 
+/** Top N products by quantity sold (from order_items). Returns [] if RPC missing or no sales. */
+export function useTopSellingProducts(limit = 5) {
+  return useQuery({
+    queryKey: ['top-selling-products', limit],
+    queryFn: async () => {
+      try {
+        const { data, error } = await supabase.rpc('get_top_selling_products', {
+          lim: limit,
+        });
+        if (error || !data?.length) return [] as Product[];
+        return (data as Product[]).slice(0, limit);
+      } catch {
+        return [] as Product[];
+      }
+    },
+    retry: false,
+  });
+}
+
 /** Top N deals by quantity sold (from order_items). Returns [] if RPC missing or no sales — no throw, no retry. */
 export function useTopSellingDeals(limit = 12) {
   return useQuery({

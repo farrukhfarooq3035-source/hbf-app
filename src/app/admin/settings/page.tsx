@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getStorePhone, DEFAULT_STORE_PHONE_DISPLAY } from '@/lib/store-config';
+import { getStorePhone, DEFAULT_STORE_PHONE_DISPLAY, getWhatsAppOrderLink } from '@/lib/store-config';
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -11,16 +11,25 @@ export default function AdminSettingsPage() {
   const [openTime, setOpenTime] = useState('11:00');
   const [closeTime, setCloseTime] = useState('23:00');
   const [closedDays, setClosedDays] = useState<number[]>([]);
+  const [happyHourStart, setHappyHourStart] = useState('15:00');
+  const [happyHourEnd, setHappyHourEnd] = useState('17:00');
+  const [happyHourDiscount, setHappyHourDiscount] = useState(20);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     fetch('/api/settings/business')
       .then((res) => res.ok ? res.json() : Promise.resolve({}))
-      .then((data: { open_time?: string; close_time?: string; closed_days?: number[] }) => {
+      .then((data: {
+        open_time?: string; close_time?: string; closed_days?: number[];
+        happy_hour_start?: string; happy_hour_end?: string; happy_hour_discount?: number;
+      }) => {
         if (data.open_time) setOpenTime(String(data.open_time));
         if (data.close_time) setCloseTime(String(data.close_time));
         if (Array.isArray(data.closed_days)) setClosedDays(data.closed_days);
+        if (data.happy_hour_start) setHappyHourStart(String(data.happy_hour_start));
+        if (data.happy_hour_end) setHappyHourEnd(String(data.happy_hour_end));
+        if (typeof data.happy_hour_discount === 'number') setHappyHourDiscount(data.happy_hour_discount);
       })
       .catch(() => {});
   }, []);
@@ -31,7 +40,14 @@ export default function AdminSettingsPage() {
     fetch('/api/settings/business', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ open_time: openTime, close_time: closeTime, closed_days: closedDays }),
+      body: JSON.stringify({
+        open_time: openTime,
+        close_time: closeTime,
+        closed_days: closedDays,
+        happy_hour_start: happyHourStart,
+        happy_hour_end: happyHourEnd,
+        happy_hour_discount: happyHourDiscount,
+      }),
     })
       .then((res) => {
         if (res.ok) setSaved(true);
@@ -100,6 +116,45 @@ export default function AdminSettingsPage() {
         {saved && <span className="ml-2 text-green-600 text-sm">Saved</span>}
       </div>
 
+      <div className="bg-white rounded-2xl shadow-sm border p-6 max-w-xl mb-6">
+        <h2 className="font-semibold mb-4">Time-based Deals (Happy Hour)</h2>
+        <p className="text-gray-800 text-sm mb-4">
+          Show &quot;Happy Hour X–Y: Z% off&quot; banner when within these hours.
+        </p>
+        <div className="flex flex-wrap gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">Start</label>
+            <input
+              type="time"
+              value={happyHourStart}
+              onChange={(e) => setHappyHourStart(e.target.value)}
+              className="px-3 py-2 rounded-xl border"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">End</label>
+            <input
+              type="time"
+              value={happyHourEnd}
+              onChange={(e) => setHappyHourEnd(e.target.value)}
+              className="px-3 py-2 rounded-xl border"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">Discount %</label>
+            <input
+              type="number"
+              min={5}
+              max={50}
+              value={happyHourDiscount}
+              onChange={(e) => setHappyHourDiscount(parseInt(e.target.value, 10) || 20)}
+              className="px-3 py-2 rounded-xl border w-20"
+            />
+          </div>
+        </div>
+        <p className="text-sm text-gray-600">Example: 3–5pm, 20% off</p>
+      </div>
+
       <div className="bg-white rounded-2xl shadow-sm border p-6 max-w-xl">
         <h2 className="font-semibold mb-4">Contact Info</h2>
         <p className="text-gray-800 text-sm mb-4">
@@ -120,6 +175,14 @@ export default function AdminSettingsPage() {
           <li>
             <span className="font-medium">Social:</span> @haqbahoofoodshbf
           </li>
+          {getWhatsAppOrderLink() && (
+            <li>
+              <span className="font-medium">WhatsApp Order:</span>{' '}
+              <a href={getWhatsAppOrderLink()!} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                Direct order link
+              </a>
+            </li>
+          )}
         </ul>
       </div>
 

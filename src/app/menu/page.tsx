@@ -1,16 +1,17 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { useMenuCategories, useProducts, useDeals } from '@/hooks/use-menu';
+import { useMenuCategories, useProducts, useDeals, useTopSellingDeals, useTopSellingProducts } from '@/hooks/use-menu';
 import { useBusinessHours } from '@/hooks/use-business-hours';
 import { ProductCard } from '@/components/customer/ProductCard';
 import { DealCard } from '@/components/customer/DealCard';
 import { FoodImage } from '@/components/customer/FoodImage';
 import { HorizontalScrollStrip } from '@/components/customer/HorizontalScrollStrip';
+import { ShareOnWhatsApp } from '@/components/customer/ShareOnWhatsApp';
 import { useCartStore } from '@/store/cart-store';
 import { useFavoritesStore } from '@/store/favorites-store';
 import Link from 'next/link';
-import { Heart, Clock } from 'lucide-react';
+import { Heart, Clock, TrendingUp, CheckCircle2, XCircle } from 'lucide-react';
 import type { Product } from '@/types';
 
 const RECENT_SEARCH_KEY = 'hbf-recent-search';
@@ -72,11 +73,13 @@ export default function MenuPage() {
   const [priceMax, setPriceMax] = useState<string>('');
   const { deliveryMode, setDeliveryMode } = useCartStore();
   const { productIds: favProductIds, dealIds: favDealIds } = useFavoritesStore();
-  const { isOpen, openTime, closeTime } = useBusinessHours();
+  const { isOpen, openTime, closeTime, isHappyHour, happyHourStart, happyHourEnd, happyHourDiscount } = useBusinessHours();
 
   const { data: categories, isLoading: catsLoading } = useMenuCategories();
   const { data: deals } = useDeals();
   const { data: allProducts } = useProducts(undefined);
+  const { data: topDeals } = useTopSellingDeals(6);
+  const { data: topProducts } = useTopSellingProducts(6);
 
   /** Products grouped by category NAME (needed before sorting categories by price) */
   const productsByCategoryName = useMemo(() => {
@@ -194,40 +197,91 @@ export default function MenuPage() {
     setRecentSearches(getRecentSearches());
   };
 
+  const hasBestsellers = (topDeals?.length ?? 0) > 0 || (topProducts?.length ?? 0) > 0;
+
   return (
-    <div className="max-w-4xl mx-auto flex-1 min-h-0 menu-scroll-root">
-      <div className="p-4 space-y-4">
-        {!isOpen && (
-          <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+    <div className="max-w-4xl mx-auto flex-1 min-h-0 menu-scroll-root w-full">
+      <div className="p-4 sm:p-5 space-y-4">
+        {/* Open/Closed + Happy Hour Banner */}
+        <div
+          className={`flex items-center gap-3 p-4 rounded-2xl ${
+            isOpen
+              ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
+              : 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800'
+          }`}
+        >
+          {isOpen ? (
+            <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400 flex-shrink-0" />
+          ) : (
             <Clock className="w-6 h-6 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-            <div>
-              <p className="font-semibold text-amber-800 dark:text-amber-200">We&apos;re closed</p>
-              <p className="text-sm text-amber-700 dark:text-amber-300">
-                Open {openTime} – {closeTime}. You can browse the menu; orders can be placed when we&apos;re open.
+          )}
+          <div className="flex-1 min-w-0">
+            <p className={`font-bold ${isOpen ? 'text-green-800 dark:text-green-200' : 'text-amber-800 dark:text-amber-200'}`}>
+              {isOpen ? "We're Open" : "We're Closed"}
+            </p>
+            <p className={`text-sm ${isOpen ? 'text-green-700 dark:text-green-300' : 'text-amber-700 dark:text-amber-300'}`}>
+              {isOpen ? `Open ${openTime} – ${closeTime}` : `Open ${openTime} – ${closeTime}. Browse menu; order when open.`}
+            </p>
+            {isHappyHour && (
+              <p className="text-sm font-semibold text-amber-700 dark:text-amber-300 mt-1">
+                🎉 Happy Hour {happyHourStart}–{happyHourEnd}: {happyHourDiscount}% off!
               </p>
+            )}
+          </div>
+        </div>
+
+        {/* Delivery / Pickup - improved design */}
+        <div className="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-soft">
+          <div className="bg-gradient-to-r from-primary/5 to-accent/10 dark:from-primary/10 dark:to-accent/20 p-3">
+            <div className="flex gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-xl">
+              <button
+                onClick={() => setDeliveryMode('delivery' as const)}
+                className={`flex-1 py-3 rounded-lg font-semibold transition-all tap-highlight ${
+                  deliveryMode === 'delivery'
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400'
+                }`}
+              >
+                🚚 Delivery
+              </button>
+              <button
+                onClick={() => setDeliveryMode('pickup' as const)}
+                className={`flex-1 py-3 rounded-lg font-semibold transition-all tap-highlight ${
+                  deliveryMode === 'pickup' ? 'bg-primary text-white shadow-sm' : 'text-gray-600 dark:text-gray-400'
+                }`}
+              >
+                🏪 Pickup
+              </button>
             </div>
           </div>
-        )}
-        <div className="flex gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-xl">
-          <button
-            onClick={() => setDeliveryMode('delivery' as const)}
-            className={`flex-1 py-2 rounded-lg font-medium transition-colors tap-highlight ${
-              deliveryMode === 'delivery'
-                ? 'bg-primary text-white'
-                : 'text-gray-600 dark:text-gray-400'
-            }`}
-          >
-            Delivery
-          </button>
-          <button
-            onClick={() => setDeliveryMode('pickup' as const)}
-            className={`flex-1 py-2 rounded-lg font-medium transition-colors tap-highlight ${
-              deliveryMode === 'pickup' ? 'bg-primary text-white' : 'text-gray-600 dark:text-gray-400'
-            }`}
-          >
-            Pickup
-          </button>
         </div>
+
+        {/* Share on WhatsApp */}
+        <div className="flex justify-end">
+          <ShareOnWhatsApp label="Share Menu" />
+        </div>
+
+        {/* Bestsellers / Top Sale */}
+        {hasBestsellers && (
+          <div id="section-bestsellers" className="scroll-mt-4">
+            <h2 className="font-bold text-lg mb-3 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-primary" />
+              Bestsellers / Top Sale
+            </h2>
+            <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+              {topDeals?.map((deal) => (
+                <div key={deal.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card">
+                  <DealCard deal={deal} grid />
+                </div>
+              ))}
+              {topProducts?.map((product) => (
+                <div key={product.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card">
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </HorizontalScrollStrip>
+          </div>
+        )}
 
         <div className="relative">
           <input

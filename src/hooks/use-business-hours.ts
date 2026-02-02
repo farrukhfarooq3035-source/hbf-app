@@ -28,6 +28,9 @@ export function useBusinessHours() {
         open_time: (data.open_time as string) || '11:00',
         close_time: (data.close_time as string) || '23:00',
         closed_days: (data.closed_days as number[]) || [],
+        happy_hour_start: (data.happy_hour_start as string) || '15:00',
+        happy_hour_end: (data.happy_hour_end as string) || '17:00',
+        happy_hour_discount: (data.happy_hour_discount as number) ?? 20,
       };
     },
     staleTime: 60 * 1000,
@@ -38,11 +41,18 @@ export function useBusinessHours() {
   const isClosedDay = data?.closed_days?.includes(day) ?? false;
   const isWithinHours = data ? isBetween(now, data.open_time, data.close_time) : true;
   const isOpen = !isClosedDay && isWithinHours;
+  const isHappyHour = data?.happy_hour_start && data?.happy_hour_end
+    ? isBetween(now, data.happy_hour_start, data.happy_hour_end)
+    : false;
   return {
     ...q,
     openTime: data?.open_time ?? '11:00',
     closeTime: data?.close_time ?? '23:00',
     closedDays: data?.closed_days ?? [],
     isOpen,
+    isHappyHour,
+    happyHourStart: data?.happy_hour_start ?? '15:00',
+    happyHourEnd: data?.happy_hour_end ?? '17:00',
+    happyHourDiscount: data?.happy_hour_discount ?? 20,
   };
 }
