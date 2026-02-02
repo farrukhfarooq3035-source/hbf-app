@@ -16,8 +16,11 @@ function LoginContent() {
     setError('');
     setGoogleLoading(true);
     try {
-      const origin = typeof window !== 'undefined' ? window.location.origin : '';
-      const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(next)}&_=${Date.now()}`;
+      const origin =
+        (typeof window !== 'undefined' ? process.env.NEXT_PUBLIC_APP_URL : null) ||
+        (typeof window !== 'undefined' ? window.location.origin : '') ||
+        '';
+      const redirectTo = `${origin.replace(/\/$/, '')}/auth/callback?next=${encodeURIComponent(next)}&_=${Date.now()}`;
       const { error: err } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo },
