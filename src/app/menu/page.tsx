@@ -282,7 +282,7 @@ export default function MenuPage() {
         {/* Categories row: image + label, horizontal scroll + desktop wheel */}
         <div className="w-full min-w-0">
           <h2 className="font-bold text-lg mb-3">Categories</h2>
-          <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+          <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
             {categoryCards.map(({ key, label, imageUrl }) => (
               <button
                 key={key}
@@ -325,15 +325,15 @@ export default function MenuPage() {
           </div>
         ) : (
           <>
-            {uniqueCategories.map((cat) => {
+            {uniqueCategories.map((cat, idx) => {
               const list = filteredProductsByCategory[cat.id] ?? [];
-              const isHbfBurgers = (cat.name ?? '').trim() === 'HBF Burgers';
+              const isFirst = idx === 0;
               return (
                 <div key={cat.id}>
                   {list.length > 0 && (
                     <div id={`section-${cat.id}`} className="scroll-mt-4">
                       <h2 className="font-bold text-lg mb-3">{cat.name}</h2>
-                      <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+                      <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
                         {list.map((product) => (
                           <div
                             key={product.id}
@@ -345,10 +345,10 @@ export default function MenuPage() {
                       </HorizontalScrollStrip>
                     </div>
                   )}
-                  {isHbfBurgers && filteredAllDeals.length > 0 && (
+                  {isFirst && filteredAllDeals.length > 0 && (
                     <div id="section-hbf-deals" className="scroll-mt-4 mt-4">
                       <h2 className="font-bold text-lg mb-3">HBF Deals</h2>
-                      <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-hide scrollbar-visible-md overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+                      <HorizontalScrollStrip className="flex gap-4 pb-2 -mx-4 px-4 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
                         {filteredAllDeals.map((deal) => (
                           <div key={deal.id} className="flex-shrink-0 w-44 min-h-[304px] scroll-snap-item hover-scale-subtle scroll-strip-card">
                             <DealCard deal={deal} grid />
