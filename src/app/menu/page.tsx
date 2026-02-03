@@ -344,24 +344,24 @@ export default function MenuPage() {
         {/* Categories: mobile flex-wrap (touch scroll works), desktop horizontal scroll */}
         <div className="w-full min-w-0 flex flex-col items-center">
           <h2 className="font-bold text-lg mb-4 text-slate-800 dark:text-slate-100 tracking-tight w-full text-left">Categories</h2>
-          <div className="flex flex-wrap gap-4 sm:gap-5 sm:hidden justify-center w-full max-w-2xl mx-auto">
+          <div className="flex flex-wrap gap-3 sm:gap-5 sm:hidden justify-center w-full max-w-2xl mx-auto">
             {categoryCards.map(({ key, label, imageUrl }) => (
               <button
                 key={key}
                 type="button"
                 onClick={() => scrollToSection(`section-${key}`)}
-                className="flex flex-col items-center justify-center gap-3 tap-highlight w-24"
+                className="flex flex-col items-center justify-center gap-3 tap-highlight w-28"
               >
-                <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-category-pop flex-shrink-0 image-pop ring-1 ring-slate-200/50 dark:ring-slate-600/50 flex items-center justify-center">
+                <div className="w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-category-pop flex-shrink-0 image-pop ring-1 ring-slate-200/50 dark:ring-slate-600/50 flex items-center justify-center">
                   <FoodImage
                     src={imageUrl}
                     alt={label}
                     aspect="1:1"
-                    sizes="96px"
+                    sizes="112px"
                     className="w-full h-full"
                   />
                 </div>
-                <span className="category-label-pill font-heading text-xs px-3 py-1.5 rounded-full line-clamp-2 text-center max-w-full">
+                <span className="category-label-pill font-heading text-[11px] leading-tight px-2.5 py-2 rounded-full flex items-center justify-center text-center min-h-[2.5rem] w-full break-words">
                   {label}
                 </span>
               </button>
@@ -384,7 +384,7 @@ export default function MenuPage() {
                     className="w-full h-full"
                   />
                 </div>
-                <span className="category-label-pill font-heading text-xs px-3 py-1.5 rounded-full line-clamp-2 text-center max-w-[7rem]">
+                <span className="category-label-pill font-heading text-xs px-2.5 py-2 rounded-full flex items-center justify-center text-center min-h-[2.25rem] w-full max-w-[7.5rem]">
                   {label}
                 </span>
               </button>
@@ -395,7 +395,11 @@ export default function MenuPage() {
         {/* HBF Deals: mobile grid (touch scroll works), desktop horizontal scroll */}
         {(hbfDealsProducts.length > 0 || filteredAllDeals.length > 0) && (
           <div id="section-hbf-deals" className="scroll-mt-4">
-            <h2 className="font-bold text-lg mb-3 text-slate-800 dark:text-slate-100 tracking-tight">HBF Deals</h2>
+            <h2 className="font-bold text-lg mb-3">
+              <span className="category-label-pill category-heading-pop font-heading inline-block px-4 py-2.5 rounded-xl text-base">
+                HBF Deals
+              </span>
+            </h2>
             <div className="grid grid-cols-2 gap-3 sm:hidden">
               {hbfDealsProducts.map((product) => (
                 <div key={product.id} className="min-h-0">
