@@ -5,7 +5,6 @@ import { useMenuCategories, useProducts, useDeals, useHappyHourProductIds } from
 import { useBusinessHours } from '@/hooks/use-business-hours';
 import { ProductCard } from '@/components/customer/ProductCard';
 import { DealCard } from '@/components/customer/DealCard';
-import { ReviewsSection } from '@/components/customer/ReviewsSection';
 import { FoodImage } from '@/components/customer/FoodImage';
 import { HorizontalScrollStrip } from '@/components/customer/HorizontalScrollStrip';
 import { useCartStore } from '@/store/cart-store';
@@ -469,7 +468,6 @@ export default function MenuPage() {
           </>
         )}
 
-        <ReviewsSection />
       </div>
     </div>
   );

@@ -18,6 +18,7 @@ import {
   CalendarDays,
   Sparkles,
   Star,
+  Smartphone,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -36,6 +37,7 @@ const navItems = [
   { href: '/admin/zones', icon: MapPin, label: 'Delivery Zones' },
   { href: '/admin/reservations', icon: CalendarDays, label: 'Reservations' },
   { href: '/admin/reports', icon: BarChart3, label: 'Reports' },
+  { href: '/admin/download', icon: Smartphone, label: 'Download App' },
   { href: '/admin/settings', icon: Settings, label: 'Settings' },
 ];
 
@@ -43,7 +45,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 min-h-screen bg-dark text-white flex flex-col">
+    <aside className="no-print w-64 min-h-screen bg-dark text-white flex flex-col">
       <Link href="/admin" className="p-4 flex items-center gap-2 border-b border-white/10">
         <img
           src="/logo.png"

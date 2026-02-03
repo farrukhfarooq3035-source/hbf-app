@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { Package, ChevronRight, RotateCcw, RefreshCw, Star } from 'lucide-react';
+import { ReviewsSection } from '@/components/customer/ReviewsSection';
 import { useCustomerOrders } from '@/hooks/use-customer-orders';
 import { useCartStore } from '@/store/cart-store';
 import { useAuth } from '@/hooks/use-auth';
@@ -132,7 +133,8 @@ export default function OrdersPage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.replace('/login?next=' + encodeURIComponent('/orders'));
+      const next = typeof window !== 'undefined' ? window.location.pathname + window.location.hash || '/orders' : '/orders';
+      router.replace('/login?next=' + encodeURIComponent(next));
     }
   }, [authLoading, user, router]);
 
@@ -236,6 +238,10 @@ export default function OrdersPage() {
           </div>
         </div>
       )}
+
+      <div id="reviews" className="scroll-mt-4 mt-8">
+        <ReviewsSection />
+      </div>
     </div>
   );
 }

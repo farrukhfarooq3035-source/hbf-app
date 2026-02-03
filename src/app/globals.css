@@ -349,3 +349,12 @@ a [data-food-image] {
 .animate-section-enter {
   animation: section-enter 0.4s var(--ease-out-expo) forwards;
 }
+
+/* Admin Download: print only QR card */
+@media print {
+  aside, .no-print { display: none !important; }
+  .print-qr-card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}
