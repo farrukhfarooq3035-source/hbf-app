@@ -16,6 +16,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-outfit)', 'system-ui', 'sans-serif'],
+        heading: ['var(--font-sora)', 'var(--font-outfit)', 'system-ui', 'sans-serif'],
       },
       transitionDuration: {
         '250': '250ms',

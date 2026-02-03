@@ -342,17 +342,17 @@ export default function MenuPage() {
         )}
 
         {/* Categories: mobile flex-wrap (touch scroll works), desktop horizontal scroll */}
-        <div className="w-full min-w-0">
-          <h2 className="font-bold text-lg mb-4 text-slate-800 dark:text-slate-100 tracking-tight">Categories</h2>
-          <div className="flex flex-wrap gap-4 sm:gap-5 sm:hidden justify-center">
+        <div className="w-full min-w-0 flex flex-col items-center">
+          <h2 className="font-bold text-lg mb-4 text-slate-800 dark:text-slate-100 tracking-tight w-full text-left">Categories</h2>
+          <div className="flex flex-wrap gap-4 sm:gap-5 sm:hidden justify-center w-full max-w-2xl mx-auto">
             {categoryCards.map(({ key, label, imageUrl }) => (
               <button
                 key={key}
                 type="button"
                 onClick={() => scrollToSection(`section-${key}`)}
-                className="flex flex-col items-center gap-3 tap-highlight text-left w-24"
+                className="flex flex-col items-center justify-center gap-3 tap-highlight w-24"
               >
-                <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-category-pop flex-shrink-0 image-pop ring-1 ring-slate-200/50 dark:ring-slate-600/50">
+                <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-category-pop flex-shrink-0 image-pop ring-1 ring-slate-200/50 dark:ring-slate-600/50 flex items-center justify-center">
                   <FoodImage
                     src={imageUrl}
                     alt={label}
@@ -361,21 +361,21 @@ export default function MenuPage() {
                     className="w-full h-full"
                   />
                 </div>
-                <span className="category-label-pill text-xs font-semibold px-3 py-1.5 rounded-full line-clamp-2 text-center max-w-full">
+                <span className="category-label-pill font-heading text-xs px-3 py-1.5 rounded-full line-clamp-2 text-center max-w-full">
                   {label}
                 </span>
               </button>
             ))}
           </div>
-          <HorizontalScrollStrip className="hidden sm:flex gap-5 pb-2 px-1 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip">
+          <HorizontalScrollStrip className="hidden sm:flex gap-5 pb-2 px-1 scrollbar-visible overscroll-x-contain min-w-0 w-full horizontal-scroll-strip justify-start">
             {categoryCards.map(({ key, label, imageUrl }) => (
               <button
                 key={key}
                 type="button"
                 onClick={() => scrollToSection(`section-${key}`)}
-                className="flex-shrink-0 flex flex-col items-center gap-3 tap-highlight text-left scroll-snap-item hover-scale-subtle scroll-strip-card"
+                className="flex-shrink-0 flex flex-col items-center justify-center gap-3 tap-highlight scroll-snap-item hover-scale-subtle scroll-strip-card"
               >
-                <div className="w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-category-pop ring-1 ring-slate-200/50 dark:ring-slate-600/50 focus:ring-primary/30 flex-shrink-0 image-pop">
+                <div className="w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-700 shadow-category-pop ring-1 ring-slate-200/50 dark:ring-slate-600/50 focus:ring-primary/30 flex-shrink-0 image-pop flex items-center justify-center">
                   <FoodImage
                     src={imageUrl}
                     alt={label}
@@ -384,7 +384,7 @@ export default function MenuPage() {
                     className="w-full h-full"
                   />
                 </div>
-                <span className="category-label-pill text-xs font-semibold px-3 py-1.5 rounded-full line-clamp-2 text-center max-w-[7rem]">
+                <span className="category-label-pill font-heading text-xs px-3 py-1.5 rounded-full line-clamp-2 text-center max-w-[7rem]">
                   {label}
                 </span>
               </button>
@@ -448,7 +448,7 @@ export default function MenuPage() {
                   {list.length > 0 && (
                     <div id={`section-${cat.id}`} className="scroll-mt-4">
                       <h2 className="font-bold text-lg mb-3">
-                        <span className="category-label-pill inline-block px-4 py-2 rounded-xl font-semibold text-base">
+                        <span className="category-label-pill category-heading-pop font-heading inline-block px-4 py-2.5 rounded-xl text-base">
                           {cat.name}
                         </span>
                       </h2>

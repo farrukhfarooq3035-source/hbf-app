@@ -110,24 +110,35 @@ body {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* Category cards: pop-up premium shadow */
+/* Category cards: pop-up premium shadow - centered, strong drop shadow */
 .shadow-category-pop {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14), 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 .dark .shadow-category-pop {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 6px 16px rgba(0, 0, 0, 0.25);
 }
 
-/* Category label: premium pill with dark slate (not plain black) */
+/* Category label: premium pill - bold, pop-up, drop shadow */
 .category-label-pill {
   background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   color: #f8fafc;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.4);
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.5), 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 .dark .category-label-pill {
   background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
   color: #f8fafc;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Category section heading (HBF Burgers, HBF Pizzas): pop-up, bold, vibrant drop shadow */
+.category-heading-pop {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.45), 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+.dark .category-heading-pop {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 .image-pop {
   transition: transform 0.2s var(--ease-out-expo), box-shadow 0.2s var(--ease-smooth);
@@ -137,11 +148,11 @@ body {
 }
 @media (hover: hover) {
   .image-pop:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16), 0 8px 16px rgba(0, 0, 0, 0.08);
   }
   .dark .image-pop:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 8px 16px rgba(0, 0, 0, 0.25);
   }
 }
 
