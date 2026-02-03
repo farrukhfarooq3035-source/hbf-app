@@ -69,8 +69,6 @@ function addRecentSearch(term: string) {
 export default function MenuPage() {
   const [search, setSearch] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  const [priceMin, setPriceMin] = useState<string>('');
-  const [priceMax, setPriceMax] = useState<string>('');
   const { deliveryMode, setDeliveryMode } = useCartStore();
   const { productIds: favProductIds, dealIds: favDealIds } = useFavoritesStore();
   const { isOpen, openTime, closeTime, isHappyHour, isAfterMidnight, showHappyHourDeals, happyHourStart, happyHourEnd, happyHourDiscount } = useBusinessHours();
@@ -114,14 +112,10 @@ export default function MenuPage() {
 
   useEffect(() => setRecentSearches(getRecentSearches()), []);
 
-  const minN = priceMin === '' ? null : Number(priceMin);
-  const maxN = priceMax === '' ? null : Number(priceMax);
   const bySearchProduct = (p: { name: string }) =>
     !search.trim() || p.name.toLowerCase().includes(search.toLowerCase());
   const bySearchDeal = (d: { title: string }) =>
     !search.trim() || d.title.toLowerCase().includes(search.toLowerCase());
-  const byPrice = (price: number) =>
-    (minN == null || price >= minN) && (maxN == null || price <= maxN);
 
   /** First product image per category (for category card) */
   const categoryImageMap = useMemo(() => {
@@ -139,15 +133,13 @@ export default function MenuPage() {
     const map: Record<string, Product[]> = {};
     const getPrice = (p: Product) => p.size_options?.[0]?.price ?? p.price;
     uniqueCategories.forEach((c) => {
-      let list = (productsByCategoryName[c.name] ?? []).filter(bySearchProduct);
-      if (minN != null || maxN != null) {
-        list = list.filter((p) => byPrice(getPrice(p)));
-      }
-      list = [...list].sort((a, b) => getPrice(a) - getPrice(b));
+      const list = [...(productsByCategoryName[c.name] ?? []).filter(bySearchProduct)].sort(
+        (a, b) => getPrice(a) - getPrice(b)
+      );
       map[c.id] = list;
     });
     return map;
-  }, [uniqueCategories, productsByCategoryName, search, minN, maxN]);
+  }, [uniqueCategories, productsByCategoryName, search]);
 
   const favoriteProducts = useMemo(
     () => (allProducts || []).filter((p) => favProductIds.includes(p.id)),
@@ -168,10 +160,9 @@ export default function MenuPage() {
         if (seen.has(d.id)) return false;
         seen.add(d.id);
         if (!bySearchDeal(d)) return false;
-        if (minN != null || maxN != null) return byPrice(d.price);
         return true;
       });
-  }, [deals, search, minN, maxN]);
+  }, [deals, search]);
 
   /** HBF Deals products: from products table (category "HBF Deals"), filtered by search + price */
   const hbfDealsProducts = useMemo(() => {
@@ -180,12 +171,9 @@ export default function MenuPage() {
       (k) => (k ?? '').toLowerCase().includes('hbf') && (k ?? '').toLowerCase().includes('deal')
     );
     if (!hbfDealsKey) return [];
-    let list = (productsByCategoryName[hbfDealsKey] ?? []).filter(bySearchProduct);
-    if (minN != null || maxN != null) {
-      list = list.filter((p) => byPrice(getPrice(p)));
-    }
+    const list = (productsByCategoryName[hbfDealsKey] ?? []).filter(bySearchProduct);
     return [...list].sort((a, b) => getPrice(a) - getPrice(b));
-  }, [productsByCategoryName, search, minN, maxN]);
+  }, [productsByCategoryName, search]);
 
   /** Category cards: product categories only (HBF Deals has its own section below) */
   const categoryCards = useMemo(
@@ -303,27 +291,6 @@ export default function MenuPage() {
           )}
         </div>
 
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-sm text-gray-600 dark:text-gray-400">Price:</span>
-          <input
-            type="number"
-            placeholder="Min"
-            value={priceMin}
-            onChange={(e) => setPriceMin(e.target.value)}
-            min={0}
-            className="w-20 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-          />
-          <span className="text-gray-400">–</span>
-          <input
-            type="number"
-            placeholder="Max"
-            value={priceMax}
-            onChange={(e) => setPriceMax(e.target.value)}
-            min={0}
-            className="w-20 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
-          />
-        </div>
-
         {hasFavorites && (
           <div>
             <h2 className="font-bold text-lg mb-3 flex items-center gap-2 text-slate-800 dark:text-slate-100 tracking-tight">
@@ -343,7 +310,11 @@ export default function MenuPage() {
 
         {/* Categories: mobile flex-wrap (touch scroll works), desktop horizontal scroll */}
         <div className="w-full min-w-0 flex flex-col items-center">
-          <h2 className="font-bold text-lg mb-4 text-slate-800 dark:text-slate-100 tracking-tight w-full text-left">Categories</h2>
+          <h2 className="font-bold text-lg mb-4 w-full text-left">
+            <span className="category-label-pill category-heading-pop font-heading inline-block px-4 py-2.5 rounded-xl text-base">
+              Categories
+            </span>
+          </h2>
           <div className="flex flex-wrap gap-3 sm:gap-5 sm:hidden justify-center w-full max-w-2xl mx-auto">
             {categoryCards.map(({ key, label, imageUrl }) => (
               <button
