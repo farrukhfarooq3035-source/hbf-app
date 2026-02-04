@@ -44,11 +44,8 @@ function uniqueCategoriesByName<T extends { id: string; name: string }>(list: T[
   });
 }
 
-const DELIVERY_POPUP_KEY = 'hbf-delivery-popup-seen';
-
 export default function MenuPage() {
   const [search, setSearch] = useState('');
-  const [showDeliveryPopup, setShowDeliveryPopup] = useState(false);
   const { user } = useAuth();
   const { deliveryMode, setDeliveryMode } = useCartStore();
   const { productIds: favProductIds, dealIds: favDealIds } = useFavoritesStore();
@@ -90,18 +87,6 @@ export default function MenuPage() {
       return ia - ib;
     });
   }, [categories]);
-
-  useEffect(() => {
-    if (deliveryMode === 'delivery' && typeof window !== 'undefined') {
-      const seen = sessionStorage.getItem(DELIVERY_POPUP_KEY);
-      if (!seen) setShowDeliveryPopup(true);
-    }
-  }, [deliveryMode]);
-
-  const dismissDeliveryPopup = () => {
-    setShowDeliveryPopup(false);
-    if (typeof window !== 'undefined') sessionStorage.setItem(DELIVERY_POPUP_KEY, '1');
-  };
 
   const bySearchProduct = (p: { name: string }) =>
     !search.trim() || p.name.toLowerCase().includes(search.toLowerCase());
@@ -240,28 +225,6 @@ export default function MenuPage() {
             )}
           </div>
         </div>
-
-        {/* Delivery charges popup */}
-        {showDeliveryPopup && deliveryMode === 'delivery' && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-sm w-full p-6 text-center">
-              <h3 className="text-lg font-bold text-dark dark:text-white mb-3">Delivery Charges</h3>
-              <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                <strong>Within 5 km:</strong> Free delivery
-              </p>
-              <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
-                <strong>Beyond 5 km:</strong> Rs 30 per km
-              </p>
-              <button
-                type="button"
-                onClick={dismissDeliveryPopup}
-                className="w-full py-3 rounded-xl bg-primary text-white font-semibold hover:bg-red-700"
-              >
-                Got it
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Happy Hour Deals: 3-5pm 10% off, after midnight 10% on Hot Wings, B.B.Q Grilled Burger, Broast Full */}
         {showHappyHourDeals && happyHourProducts.length > 0 && (

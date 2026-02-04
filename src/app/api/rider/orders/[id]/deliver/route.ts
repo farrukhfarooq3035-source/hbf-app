@@ -25,7 +25,7 @@ export async function POST(
 
   const { data: order, error: fetchError } = await supabaseAdmin
     .from('orders')
-    .select('id, rider_id, status')
+    .select('id, rider_id, status, total_price, amount_paid')
     .eq('id', orderId)
     .single();
 
@@ -45,6 +45,21 @@ export async function POST(
   };
   if (paymentReceived) {
     updates.payment_received_at = new Date().toISOString();
+    const totalPrice = Number(order.total_price ?? 0);
+    const alreadyPaid = Number(order.amount_paid ?? 0);
+    if (totalPrice > 0 && alreadyPaid < totalPrice) {
+      await supabaseAdmin.from('order_payments').insert({
+        order_id: orderId,
+        amount: totalPrice - alreadyPaid,
+        method: 'cash',
+        channel: 'pos',
+        notes: 'COD collected by rider',
+      });
+    }
+    if (totalPrice > 0) {
+      updates.amount_paid = totalPrice;
+      updates.amount_due = 0;
+    }
   }
 
   const { error: updateError } = await supabaseAdmin

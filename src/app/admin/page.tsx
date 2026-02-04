@@ -196,6 +196,15 @@ export default function AdminDashboardPage() {
         </div>
         <div className="bg-white rounded-2xl p-6 shadow-sm border">
           <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div
+                className={`w-3 h-3 rounded-full ${(pendingOrders?.length ?? 0) > 0 ? 'bg-amber-500 animate-pulse' : 'bg-gray-300'}`}
+                title={(pendingOrders?.length ?? 0) > 0 ? 'Alert: Pending orders' : 'No pending orders'}
+              />
+              <span className="text-xs font-medium text-gray-500">
+                {(pendingOrders?.length ?? 0) > 0 ? 'ON' : 'OFF'}
+              </span>
+            </div>
             <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
               <Clock className="w-6 h-6 text-blue-600" />
             </div>
