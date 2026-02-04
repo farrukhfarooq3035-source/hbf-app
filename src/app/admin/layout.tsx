@@ -1,16 +1,9 @@
-import { Sidebar } from '@/components/admin/Sidebar';
-import { NewOrderAlert } from '@/components/admin/NewOrderAlert';
+import { AdminLayoutInner } from '@/components/admin/AdminLayoutInner';
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className="flex min-h-screen bg-gray-50">
-      <NewOrderAlert />
-      <Sidebar />
-      <main className="flex-1 overflow-auto bg-white text-gray-900">{children}</main>
-    </div>
-  );
+  return <AdminLayoutInner>{children}</AdminLayoutInner>;
 }

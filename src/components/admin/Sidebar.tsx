@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -22,7 +22,9 @@ import {
   PenSquare,
   FileSpreadsheet,
   UtensilsCrossed,
+  LogOut,
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 import { clsx } from 'clsx';
 
 const navItems = [
@@ -49,6 +51,13 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.replace('/admin/login');
+    router.refresh();
+  };
 
   return (
     <aside className="no-print w-64 min-h-screen bg-dark text-white flex flex-col">
@@ -79,12 +88,22 @@ export function Sidebar() {
           );
         })}
       </nav>
-      <Link
-        href="/"
-        className="p-4 border-t border-white/10 text-sm text-gray-400 hover:text-white"
-      >
-        ← Back to Store
-      </Link>
+      <div className="p-4 border-t border-white/10 space-y-2">
+        <button
+          type="button"
+          onClick={handleSignOut}
+          className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm text-gray-400 hover:bg-white/10 hover:text-white transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+          Sign out
+        </button>
+        <Link
+          href="/"
+          className="block text-sm text-gray-400 hover:text-white"
+        >
+          ← Back to Store
+        </Link>
+      </div>
     </aside>
   );
 }
