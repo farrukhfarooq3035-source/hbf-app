@@ -11,11 +11,27 @@ interface PosItemPayload {
   name: string;
 }
 
-function generateReceiptNumber() {
+/** Format: #MM-NNNN (e.g. #02-0001) - month + sequential */
+async function generateReceiptNumber(): Promise<string> {
   const now = new Date();
-  const year = now.getFullYear().toString().slice(-2);
-  const random = Math.random().toString(36).slice(2, 8).toUpperCase();
-  return `INV-${year}${random}`;
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const prefix = `#${month}-`;
+  const year = now.getFullYear();
+  const nextMonth = now.getMonth() + 2;
+  const nextMonthStr = nextMonth > 12 ? '01' : String(nextMonth).padStart(2, '0');
+  const nextYear = nextMonth > 12 ? year + 1 : year;
+  const monthStart = `${year}-${month}-01T00:00:00`;
+  const monthEnd = `${nextYear}-${nextMonthStr}-01T00:00:00`;
+
+  const { count } = await supabaseAdmin
+    .from('orders')
+    .select('id', { count: 'exact', head: true })
+    .gte('receipt_issued_at', monthStart)
+    .lt('receipt_issued_at', monthEnd)
+    .like('receipt_number', `${prefix}%`);
+
+  const seq = (count ?? 0) + 1;
+  return `${prefix}${String(seq).padStart(4, '0')}`;
 }
 
 export async function POST(req: Request) {
@@ -70,7 +86,7 @@ export async function POST(req: Request) {
       service_mode: serviceMode,
       table_number: sanitizeText(body.table_number, '') || null,
       token_number: sanitizeText(body.token_number, '') || null,
-      receipt_number: generateReceiptNumber(),
+      receipt_number: await generateReceiptNumber(),
       receipt_issued_at: invoiceTimestamp,
       invoice_status: 'issued',
       last_invoice_edit_at: invoiceTimestamp,

@@ -49,6 +49,7 @@ export interface Order {
   token_number?: string | null;
   receipt_number?: string | null;
   receipt_issued_at?: string | null;
+  invoice_generated_by?: string | null;
   invoice_status?: string | null;
   last_invoice_edit_at?: string | null;
   total_price: number;

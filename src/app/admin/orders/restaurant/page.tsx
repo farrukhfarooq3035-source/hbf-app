@@ -139,11 +139,14 @@ function RestaurantOrdersContent() {
       }
       const { error } = await supabase.from('orders').update(updates).eq('id', id);
       if (error) throw error;
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
       if (status === 'ready' && !order.ready_at) {
-        await fetch(`/api/admin/orders/${id}/invoice`, { method: 'POST' });
+        await fetch(`/api/admin/orders/${id}/invoice`, { method: 'POST', headers, body: JSON.stringify({}) });
       }
       if (status === 'closed') {
-        await fetch(`/api/admin/orders/${id}/invoice`, { method: 'POST' });
+        await fetch(`/api/admin/orders/${id}/invoice`, { method: 'POST', headers, body: JSON.stringify({}) });
       }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-orders-restaurant'] }),

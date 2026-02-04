@@ -24,7 +24,7 @@ npm install
    - Then `supabase/migrations/002_order_ratings.sql` (order ratings)
    - Then `supabase/migrations/003_order_timestamps_distance.sql` (ready_at, delivered_at, distance_km)
    - ... through `012_happy_hour_products_reviews.sql` (Happy Hour products, customer reviews)
-   - Continue with `013_walkin_orders.sql`, `014_reporting_filters.sql`, `015_invoice_status.sql`, `016_order_chat.sql`, `017_restaurant_order_statuses.sql`, `018_business_hours_10am_1am.sql`, and `019_admin_users.sql` (walk-in POS, reporting filters, invoice workflow, customer-admin chat, dine-in/takeaway statuses, business hours, admin users)
+   - Continue with `013_walkin_orders.sql` through `019_admin_users.sql`, `020_admin_users_allow_read.sql`, and `021_invoice_admin_profile.sql` (walk-in, invoice, admin users, admin profile for bills)
 3. Create storage buckets: Supabase Dashboard → Storage → New bucket → create `posters` (for AI posters) and `products` (for product images), both set to Public
 4. Enable Realtime on the `orders` table (included in migration)
 

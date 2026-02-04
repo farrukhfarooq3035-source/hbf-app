@@ -3,15 +3,50 @@ import { supabaseAdmin } from '@/lib/supabase-server';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
-function generateReceiptNumber() {
+/** Format: #MM-NNNN (e.g. #02-0001) - month + sequential */
+async function generateReceiptNumber(): Promise<string> {
   const now = new Date();
-  const year = now.getFullYear().toString().slice(-2);
-  const random = Math.random().toString(36).slice(2, 8).toUpperCase();
-  return `INV-${year}${random}`;
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const prefix = `#${month}-`;
+  const year = now.getFullYear();
+  const nextMonth = now.getMonth() + 2;
+  const nextMonthStr = nextMonth > 12 ? '01' : String(nextMonth).padStart(2, '0');
+  const nextYear = nextMonth > 12 ? year + 1 : year;
+  const monthStart = `${year}-${month}-01T00:00:00`;
+  const monthEnd = `${nextYear}-${nextMonthStr}-01T00:00:00`;
+
+  const { count } = await supabaseAdmin
+    .from('orders')
+    .select('id', { count: 'exact', head: true })
+    .gte('receipt_issued_at', monthStart)
+    .lt('receipt_issued_at', monthEnd)
+    .like('receipt_number', `${prefix}%`);
+
+  const seq = (count ?? 0) + 1;
+  return `${prefix}${String(seq).padStart(4, '0')}`;
 }
 
-export async function POST(_: Request, context: RouteContext) {
+export async function POST(req: Request, context: RouteContext) {
   const { id: orderId } = await context.params;
+  const body = await req.json().catch(() => ({}));
+  let adminName = typeof body.generated_by === 'string' ? body.generated_by.trim() : null;
+
+  if (!adminName) {
+    const authHeader = req.headers.get('authorization');
+    const token = authHeader?.replace(/^Bearer\s+/i, '');
+    if (token) {
+      const { data: { user } } = await supabaseAdmin.auth.getUser(token);
+      if (user?.email) {
+        const { data: admin } = await supabaseAdmin
+          .from('admin_users')
+          .select('display_name')
+          .ilike('email', user.email.trim())
+          .maybeSingle();
+        adminName = admin?.display_name ?? null;
+      }
+    }
+  }
+
   const { data: order, error } = await supabaseAdmin
     .from('orders')
     .select('id, receipt_number, receipt_issued_at')
@@ -23,18 +58,19 @@ export async function POST(_: Request, context: RouteContext) {
   }
 
   const now = new Date().toISOString();
-  const receiptNumber = order.receipt_number || generateReceiptNumber();
+  const receiptNumber = order.receipt_number || (await generateReceiptNumber());
 
   const { data: updated, error: updateError } = await supabaseAdmin
     .from('orders')
     .update({
       receipt_number: receiptNumber,
       receipt_issued_at: now,
+      invoice_generated_by: adminName,
       invoice_status: 'issued',
       last_invoice_edit_at: now,
     })
     .eq('id', orderId)
-    .select('id, receipt_number, receipt_issued_at, invoice_status, last_invoice_edit_at')
+    .select('id, receipt_number, receipt_issued_at, invoice_generated_by, invoice_status, last_invoice_edit_at')
     .single();
 
   if (updateError) {
@@ -58,6 +94,9 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (body.receipt_issued_at) {
     updates.receipt_issued_at = new Date(body.receipt_issued_at).toISOString();
   }
+  if (typeof body.invoice_generated_by === 'string') {
+    updates.invoice_generated_by = body.invoice_generated_by.trim() || null;
+  }
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: 'No updates provided' }, { status: 400 });
   }
@@ -67,7 +106,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     .from('orders')
     .update(updates)
     .eq('id', orderId)
-    .select('id, receipt_number, receipt_issued_at, invoice_status, last_invoice_edit_at')
+    .select('id, receipt_number, receipt_issued_at, invoice_generated_by, invoice_status, last_invoice_edit_at')
     .single();
 
   if (error || !updated) {

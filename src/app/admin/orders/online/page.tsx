@@ -152,7 +152,15 @@ function OnlineOrdersContent() {
       const { error } = await supabase.from('orders').update(updates).eq('id', id);
       if (error) throw error;
       if (status === 'ready' && !order.ready_at) {
-        await fetch(`/api/admin/orders/${id}/invoice`, { method: 'POST' });
+        const { data: { session } } = await supabase.auth.getSession();
+        await fetch(`/api/admin/orders/${id}/invoice`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(session?.access_token && { Authorization: `Bearer ${session.access_token}` }),
+          },
+          body: JSON.stringify({}),
+        });
       }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-orders-online'] }),
