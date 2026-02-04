@@ -2,9 +2,11 @@
 
 Admin panel uses **Email + Password** login. Admin users are stored in the `admin_users` table.
 
-## 1. Run Migration
+## 1. Run Migrations
 
-Run `supabase/migrations/019_admin_users.sql` in Supabase SQL Editor. This creates the `admin_users` table and adds `Admin@gmail.com` as the first admin.
+Run in Supabase SQL Editor (in order):
+- `019_admin_users.sql` – creates `admin_users` table, adds `Admin@gmail.com`
+- `020_admin_users_allow_read.sql` – allows read for admin check (fixes redirect loop)
 
 ## 2. Create Admin User in Supabase Auth
 

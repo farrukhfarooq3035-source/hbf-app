@@ -1,13 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { Loader2, Lock, Mail, Shield } from 'lucide-react';
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -41,8 +39,10 @@ export default function AdminLoginPage() {
         return;
       }
 
-      router.replace('/admin');
-      router.refresh();
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('hbf-admin-verified', '1');
+      }
+      window.location.href = '/admin';
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {

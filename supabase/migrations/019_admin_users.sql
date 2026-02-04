@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS admin_users (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Allow public read (anon) - we only check if email exists
+-- Allow read for authenticated - we only check if email exists
 ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Allow read for authenticated" ON admin_users

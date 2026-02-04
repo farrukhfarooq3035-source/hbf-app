@@ -54,6 +54,7 @@ export function Sidebar() {
   const router = useRouter();
 
   const handleSignOut = async () => {
+    if (typeof window !== 'undefined') sessionStorage.removeItem('hbf-admin-verified');
     await supabase.auth.signOut();
     router.replace('/admin/login');
     router.refresh();
