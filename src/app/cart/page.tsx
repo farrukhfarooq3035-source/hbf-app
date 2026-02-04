@@ -21,7 +21,7 @@ function CartItemRow({
   removeItem: (index: number) => void;
 }) {
   const sizeOptions = item.size_options ?? [];
-  const addonOptions = item.addon_options ?? [];
+  const addonOptions = (item.is_pizza ? item.addon_options : undefined) ?? [];
   const currentAddons = item.addons ?? [];
   const basePrice = item.size && sizeOptions.length
     ? sizeOptions.find((s) => s.name === item.size)?.price ?? sizeOptions[0]?.price ?? item.price
@@ -139,10 +139,18 @@ export default function CartPage() {
     setRefreshingLocation(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/b49ee9de-50a9-4b90-89b0-cd9575d76b4f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'cart/page.tsx:refreshLocation',message:'getCurrentPosition success',data:{lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:pos.coords.accuracy},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2,H3'})}).catch(()=>{});
+        // #endregion
         setUserLocation(pos.coords.latitude, pos.coords.longitude);
         setRefreshingLocation(false);
       },
-      () => setRefreshingLocation(false),
+      (err) => {
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/b49ee9de-50a9-4b90-89b0-cd9575d76b4f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'cart/page.tsx:refreshLocation',message:'getCurrentPosition error',data:{code:err.code,message:err.message},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+        // #endregion
+        setRefreshingLocation(false);
+      },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   };

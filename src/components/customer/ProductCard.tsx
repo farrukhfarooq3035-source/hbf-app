@@ -9,6 +9,7 @@ import { useCompareStore } from '@/store/compare-store';
 import { FoodImage } from '@/components/customer/FoodImage';
 import { QuickPeek } from '@/components/customer/QuickPeek';
 import { AddToCartModal } from '@/components/customer/AddToCartModal';
+import { isPizzaProduct } from '@/lib/pizza-addons';
 import type { Product } from '@/types';
 
 interface ProductCardProps {
@@ -35,7 +36,7 @@ export function ProductCard({ product, discountPercent }: ProductCardProps) {
   const [quickPeekOpen, setQuickPeekOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const { add: addToCompare, has: isInCompare } = useCompareStore();
-  const isPizza = sizeOptions.length > 0;
+  const isPizza = sizeOptions.length > 0 && isPizzaProduct(product);
 
   useEffect(() => {
     if (sizeOptions.length) {

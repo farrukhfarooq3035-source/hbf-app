@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Minus, Plus } from 'lucide-react';
 import { useProduct } from '@/hooks/use-menu';
 import { useCartStore } from '@/store/cart-store';
-import { PIZZA_ADDONS } from '@/lib/pizza-addons';
+import { PIZZA_ADDONS, isPizzaProduct } from '@/lib/pizza-addons';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -99,7 +99,7 @@ export default function ProductDetailPage() {
             </div>
           )}
 
-          {sizeOptions.length > 0 && (
+          {sizeOptions.length > 0 && isPizzaProduct(product) && (
             <div className="mt-4">
               <h2 className="font-semibold text-dark dark:text-white text-sm mb-2">Add-ons</h2>
               <div className="space-y-2">
@@ -163,6 +163,7 @@ export default function ProductDetailPage() {
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t safe-area-bottom">
         <button
           onClick={() => {
+            const isPizza = isPizzaProduct(product);
             addItem({
               product_id: product.id,
               name: product.name,
@@ -170,9 +171,10 @@ export default function ProductDetailPage() {
               qty,
               notes: notes || undefined,
               size: selectedSize || undefined,
-              addons: selectedAddons.length ? selectedAddons : undefined,
+              addons: isPizza && selectedAddons.length ? selectedAddons : undefined,
               size_options: sizeOptions.length ? sizeOptions : undefined,
-              addon_options: PIZZA_ADDONS.map((a) => ({ name: a.name, price: a.price })),
+              addon_options: isPizza ? PIZZA_ADDONS.map((a) => ({ name: a.name, price: a.price })) : undefined,
+              is_pizza: isPizza,
             });
           }}
           className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-red-700 transition-colors"

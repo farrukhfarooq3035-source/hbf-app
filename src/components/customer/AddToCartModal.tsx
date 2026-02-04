@@ -44,6 +44,7 @@ export function AddToCartModal({ product, discountPercent, onClose }: AddToCartM
       addons: selectedAddons.length ? selectedAddons : undefined,
       size_options: sizeOptions.length ? sizeOptions : undefined,
       addon_options: PIZZA_ADDONS.map((a) => ({ name: a.name, price: a.price })),
+      is_pizza: true,
     });
     onClose();
   };

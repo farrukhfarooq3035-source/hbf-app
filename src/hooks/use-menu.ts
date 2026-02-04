@@ -36,7 +36,7 @@ export function useProducts(categoryId?: string) {
     queryFn: async () => {
       let query = supabase
         .from('products')
-        .select('*')
+        .select('*, categories(name)')
         .eq('is_active', true)
         .order('name');
       if (categoryId) {
@@ -44,7 +44,10 @@ export function useProducts(categoryId?: string) {
       }
       const { data, error } = await query;
       if (error) throw error;
-      return data as Product[];
+      return (data ?? []).map((p: Product & { categories?: { name: string } | null }) => ({
+        ...p,
+        category_name: p.categories?.name ?? undefined,
+      })) as Product[];
     },
   });
 }
@@ -56,11 +59,12 @@ export function useProduct(id: string | null) {
       if (!id) return null;
       const { data, error } = await supabase
         .from('products')
-        .select('*')
+        .select('*, categories(name)')
         .eq('id', id)
         .single();
       if (error) throw error;
-      return data as Product;
+      const p = data as Product & { categories?: { name: string } | null };
+      return p ? { ...p, category_name: p.categories?.name ?? undefined } as Product : null;
     },
     enabled: !!id,
   });

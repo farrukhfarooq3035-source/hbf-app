@@ -21,6 +21,7 @@ export interface Product {
   price: number;
   description?: string;
   category_id?: string;
+  category_name?: string;
   image_url?: string;
   is_active?: boolean;
   size_options?: { name: string; price: number }[];
@@ -104,6 +105,7 @@ export interface CartItem {
   size_options?: { name: string; price: number }[];
   addons?: string[];
   addon_options?: { name: string; price: number }[];
+  is_pizza?: boolean;
   notes?: string;
 }
 
