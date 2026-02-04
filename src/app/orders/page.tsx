@@ -1,18 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
-import { Package, ChevronRight, RotateCcw, RefreshCw, Star } from 'lucide-react';
+import { Package, ChevronRight, RotateCcw, RefreshCw, Star, Heart } from 'lucide-react';
 import { ReviewsSection } from '@/components/customer/ReviewsSection';
 import { useCustomerOrders } from '@/hooks/use-customer-orders';
 import { useCartStore } from '@/store/cart-store';
+import { useFavoritesStore } from '@/store/favorites-store';
 import { useAuth } from '@/hooks/use-auth';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { formatOrderNumber } from '@/lib/order-utils';
 import { StarRatingDisplay } from '@/components/customer/StarRating';
+import { ProductCard } from '@/components/customer/ProductCard';
+import { DealCard } from '@/components/customer/DealCard';
+import { useProducts, useDeals } from '@/hooks/use-menu';
 import type { Order, OrderItem } from '@/types';
 
 const STATUS_LABELS: Record<string, string> = {
@@ -99,7 +103,20 @@ export default function OrdersPage() {
   const queryClient = useQueryClient();
   const { user, loading: authLoading } = useAuth();
   const addItem = useCartStore((s) => s.addItem);
+  const { productIds: favProductIds, dealIds: favDealIds } = useFavoritesStore();
   const { data: orders = [], isLoading, refetch } = useCustomerOrders(user?.id ?? null);
+  const { data: allProducts = [] } = useProducts(undefined);
+  const { data: allDeals = [] } = useDeals();
+
+  const favoriteProducts = useMemo(
+    () => allProducts.filter((p) => favProductIds.includes(p.id)),
+    [allProducts, favProductIds]
+  );
+  const favoriteDeals = useMemo(
+    () => allDeals.filter((d) => favDealIds.includes(d.id)),
+    [allDeals, favDealIds]
+  );
+  const hasFavoriteItems = favoriteProducts.length > 0 || favoriteDeals.length > 0;
 
   const { data: favoriteOrderIds = [] } = useQuery({
     queryKey: ['favorite-orders', user?.id],
@@ -177,6 +194,27 @@ export default function OrdersPage() {
         </button>
       </div>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">{user?.email ?? 'My orders'}</p>
+
+      {hasFavoriteItems && (
+        <div className="mb-8">
+          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+            <Heart className="w-4 h-4 fill-primary text-primary" />
+            Favorite products — quick reorder
+          </h2>
+          <div className="grid grid-cols-2 gap-3">
+            {favoriteProducts.map((p) => (
+              <div key={p.id} className="min-h-0">
+                <ProductCard product={p} />
+              </div>
+            ))}
+            {favoriteDeals.map((d) => (
+              <div key={d.id} className="min-h-0">
+                <DealCard deal={d} grid />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="space-y-3">

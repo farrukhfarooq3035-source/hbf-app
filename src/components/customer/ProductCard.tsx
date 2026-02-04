@@ -71,6 +71,11 @@ export function ProductCard({ product, discountPercent }: ProductCardProps) {
         <h3 className="font-semibold text-dark dark:text-white text-sm line-clamp-2">
           {product.name}
         </h3>
+        {product.description && (
+          <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5 line-clamp-2">
+            {product.description}
+          </p>
+        )}
         <div className="mt-1 flex items-baseline gap-2">
           {discountPercent ? (
             <>

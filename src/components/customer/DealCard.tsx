@@ -11,7 +11,7 @@ import { QuickPeek } from '@/components/customer/QuickPeek';
 import type { Deal } from '@/types';
 
 interface DealCardProps {
-  deal: Deal & { deal_items?: { product_id: string; qty: number }[] };
+  deal: Deal & { deal_items?: { product_id: string; qty: number; product_name?: string }[] };
   grid?: boolean;
 }
 
@@ -70,6 +70,12 @@ export function DealCard({ deal, grid }: DealCardProps) {
           <h3 className="font-semibold text-dark dark:text-white text-sm line-clamp-2">
             {deal.title}
           </h3>
+          {(deal.deal_items?.length ?? 0) > 0 && (
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+              {deal.deal_items!.slice(0, 3).map((i) => `${i.qty > 1 ? `${i.qty}x ` : ''}${i.product_name ?? 'Item'}`).join(', ')}
+              {(deal.deal_items!.length ?? 0) > 3 ? '...' : ''}
+            </p>
+          )}
           <p className="text-primary font-bold text-lg mt-1">
             Rs {deal.price}/-
           </p>
@@ -139,6 +145,12 @@ export function DealCard({ deal, grid }: DealCardProps) {
       </div>
       <Link href={`/menu/deal/${deal.id}`} className="block p-3">
         <h3 className="font-bold text-dark dark:text-white">{deal.title}</h3>
+        {(deal.deal_items?.length ?? 0) > 0 && (
+          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+            {deal.deal_items!.slice(0, 3).map((i) => `${i.qty > 1 ? `${i.qty}x ` : ''}${i.product_name ?? 'Item'}`).join(', ')}
+            {(deal.deal_items!.length ?? 0) > 3 ? '...' : ''}
+          </p>
+        )}
         <p className="text-primary font-bold text-xl mt-1">
           Rs {deal.price}/-
         </p>

@@ -283,7 +283,7 @@ export default function MenuPage() {
         <div className="space-y-2">
           {!user && (
             <p className="text-sm font-bold text-amber-700 dark:text-amber-400">
-              Must login before order
+              Login Required
             </p>
           )}
           <input

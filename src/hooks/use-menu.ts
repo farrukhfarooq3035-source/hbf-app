@@ -72,10 +72,17 @@ export function useDeals() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('deals')
-        .select('*, deal_items(*)')
+        .select('*, deal_items(product_id, qty, products(name))')
         .eq('is_active', true);
       if (error) throw error;
-      return data as (Deal & { deal_items?: { product_id: string; qty: number }[] })[];
+      return (data ?? []).map((d) => ({
+        ...d,
+        deal_items: (d.deal_items ?? []).map((di: { product_id: string; qty: number; products?: { name: string } }) => ({
+          product_id: di.product_id,
+          qty: di.qty,
+          product_name: di.products?.name ?? 'Item',
+        })),
+      })) as (Deal & { deal_items?: { product_id: string; qty: number; product_name?: string }[] })[];
     },
   });
 }
@@ -139,11 +146,22 @@ export function useDeal(id: string | null) {
       if (!id) return null;
       const { data, error } = await supabase
         .from('deals')
-        .select('*, deal_items(*)')
+        .select('*, deal_items(product_id, qty, products(name))')
         .eq('id', id)
         .single();
       if (error) throw error;
-      return data;
+      const d = data as (Deal & { deal_items?: { product_id: string; qty: number; products?: { name: string } }[] }) | null;
+      if (!d) return null;
+      const rawItems = d.deal_items ?? [];
+      const result: Deal & { deal_items?: { product_id: string; qty: number; product_name?: string }[] } = {
+        ...d,
+        deal_items: rawItems.map((di: { product_id: string; qty: number; products?: { name: string } }) => ({
+          product_id: di.product_id,
+          qty: di.qty,
+          product_name: di.products?.name ?? 'Item',
+        })),
+      };
+      return result;
     },
     enabled: !!id,
   });
