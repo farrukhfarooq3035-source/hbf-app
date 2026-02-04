@@ -10,17 +10,15 @@ interface ItemPayload {
   price: number;
 }
 
-type RouteParams = {
-  params: { id: string };
-};
+type RouteContext = { params: Promise<{ id: string }> };
 
 function parseNumber(value: unknown, fallback = 0) {
   const num = Number(value);
   return Number.isFinite(num) ? num : fallback;
 }
 
-export async function PATCH(request: Request, { params }: RouteParams) {
-  const orderId = params.id;
+export async function PATCH(request: Request, context: RouteContext) {
+  const { id: orderId } = await context.params;
   const body = await request.json().catch(() => ({}));
   const payloadItems: ItemPayload[] = Array.isArray(body.items) ? body.items : [];
 

@@ -1,11 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-server';
 
-type RouteParams = {
-  params: {
-    id: string;
-  };
-};
+type RouteContext = { params: Promise<{ id: string }> };
 
 function generateReceiptNumber() {
   const now = new Date();
@@ -14,8 +10,8 @@ function generateReceiptNumber() {
   return `INV-${year}${random}`;
 }
 
-export async function POST(_: Request, { params }: RouteParams) {
-  const orderId = params.id;
+export async function POST(_: Request, context: RouteContext) {
+  const { id: orderId } = await context.params;
   const { data: order, error } = await supabaseAdmin
     .from('orders')
     .select('id, receipt_number, receipt_issued_at')
@@ -48,8 +44,8 @@ export async function POST(_: Request, { params }: RouteParams) {
   return NextResponse.json(updated);
 }
 
-export async function PATCH(request: Request, { params }: RouteParams) {
-  const orderId = params.id;
+export async function PATCH(request: Request, context: RouteContext) {
+  const { id: orderId } = await context.params;
   const body = await request.json().catch(() => ({}));
 
   const updates: Record<string, unknown> = {};
