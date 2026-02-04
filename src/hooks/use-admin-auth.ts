@@ -38,7 +38,7 @@ export function useAdminAuth() {
       return;
     }
     let cancelled = false;
-    supabase
+    void supabase
       .from('admin_users')
       .select('email')
       .ilike('email', user.email.trim())
@@ -50,13 +50,16 @@ export function useAdminAuth() {
           setLoading(false);
         }
       })
-      .catch(() => {
-        if (!cancelled) {
-          setIsAdmin(false);
-          setAdminCheckDone(true);
-          setLoading(false);
+      .then(
+        () => {},
+        () => {
+          if (!cancelled) {
+            setIsAdmin(false);
+            setAdminCheckDone(true);
+            setLoading(false);
+          }
         }
-      });
+      );
     return () => {
       cancelled = true;
     };
