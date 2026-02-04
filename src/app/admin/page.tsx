@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { format, subDays } from 'date-fns';
 import {
@@ -25,61 +26,86 @@ import {
 } from 'recharts';
 import { formatOrderNumber } from '@/lib/order-utils';
 
+const CHANNEL_OPTIONS = [
+  { value: 'all', label: 'All channels' },
+  { value: 'online', label: 'Online' },
+  { value: 'walk_in', label: 'Walk-in' },
+  { value: 'dine_in', label: 'Dine-in' },
+  { value: 'takeaway', label: 'Takeaway' },
+];
+
 export default function AdminDashboardPage() {
   const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const [channelFilter, setChannelFilter] = useState<'all' | 'online' | 'walk_in' | 'dine_in' | 'takeaway'>('all');
 
   const { data: todayOrders } = useQuery({
-    queryKey: ['orders-today'],
+    queryKey: ['orders-today', channelFilter],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('orders')
         .select('id, total_price, status, customer_name, phone, address, created_at')
         .gte('created_at', `${todayStr}T00:00:00`)
         .lt('created_at', `${todayStr}T23:59:59`)
         .order('created_at', { ascending: false });
+      if (channelFilter !== 'all') {
+        query = query.eq('order_channel', channelFilter);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },
   });
 
   const { data: pendingOrders } = useQuery({
-    queryKey: ['orders-pending'],
+    queryKey: ['orders-pending', channelFilter],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('orders')
         .select('id')
         .in('status', ['new', 'preparing', 'ready', 'on_the_way']);
+      if (channelFilter !== 'all') {
+        query = query.eq('order_channel', channelFilter);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },
   });
 
   const { data: recentOrders } = useQuery({
-    queryKey: ['orders-recent'],
+    queryKey: ['orders-recent', channelFilter],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('orders')
         .select('id, total_price, status, customer_name, created_at')
         .order('created_at', { ascending: false })
         .limit(10);
+      if (channelFilter !== 'all') {
+        query = query.eq('order_channel', channelFilter);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },
   });
 
   const { data: salesData } = useQuery({
-    queryKey: ['sales-chart'],
+    queryKey: ['sales-chart', channelFilter],
     queryFn: async () => {
       const days = 7;
       const result = [];
       for (let i = days - 1; i >= 0; i--) {
         const d = subDays(new Date(), i);
         const dayStr = format(d, 'yyyy-MM-dd');
-        const { data } = await supabase
+        let query = supabase
           .from('orders')
           .select('total_price')
           .gte('created_at', `${dayStr}T00:00:00`)
           .lt('created_at', `${dayStr}T23:59:59`);
+        if (channelFilter !== 'all') {
+          query = query.eq('order_channel', channelFilter);
+        }
+        const { data } = await query;
         const total = data?.reduce((s, o) => s + (o.total_price || 0), 0) || 0;
         result.push({
           date: format(d, 'MMM d'),
@@ -92,7 +118,10 @@ export default function AdminDashboardPage() {
 
   const todaySales = todayOrders?.reduce((s, o) => s + (o.total_price || 0), 0) || 0;
   const totalOrders = todayOrders?.length || 0;
-  const { data: topProducts } = useTopSellingProducts(5);
+  const { data: topProducts } = useTopSellingProducts(
+    5,
+    channelFilter === 'all' ? null : channelFilter
+  );
 
   const exportTodayCSV = () => {
     const rows = todayOrders || [];
@@ -122,7 +151,25 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-600">Channel:</span>
+          <select
+            value={channelFilter}
+            onChange={(e) =>
+              setChannelFilter(e.target.value as 'all' | 'online' | 'walk_in' | 'dine_in' | 'takeaway')
+            }
+            className="rounded-xl border border-gray-200 px-3 py-2 text-sm"
+          >
+            {CHANNEL_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-2xl p-6 shadow-sm border">

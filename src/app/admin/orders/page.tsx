@@ -9,6 +9,8 @@ import { Star } from 'lucide-react';
 import { formatOrderNumber } from '@/lib/order-utils';
 import { StarRatingDisplay } from '@/components/customer/StarRating';
 import type { OrderStatus } from '@/types';
+import { InvoiceActions } from '@/components/admin/invoice/InvoiceActions';
+import { PaymentLedger } from '@/components/admin/payments/PaymentLedger';
 
 function minsBetween(a: string | null | undefined, b: string | null | undefined): number | null {
   if (!a || !b) return null;
@@ -23,6 +25,16 @@ const COLUMNS: { key: OrderStatus; label: string }[] = [
   { key: 'on_the_way', label: 'On the Way' },
   { key: 'delivered', label: 'Delivered' },
 ];
+
+const CHANNEL_BADGES: Record<
+  string,
+  { label: string; className: string }
+> = {
+  online: { label: 'Online', className: 'bg-blue-100 text-blue-700' },
+  walk_in: { label: 'Walk-in', className: 'bg-emerald-100 text-emerald-700' },
+  dine_in: { label: 'Dine-in', className: 'bg-purple-100 text-purple-700' },
+  takeaway: { label: 'Takeaway', className: 'bg-amber-100 text-amber-700' },
+};
 
 function AdminOrdersContent() {
   const queryClient = useQueryClient();
@@ -201,6 +213,14 @@ function AdminOrdersContent() {
                   >
                     <p className="font-semibold text-sm flex items-center gap-1 text-gray-900">
                       {formatOrderNumber(order.id)} • Rs {order.total_price}/-
+                      <span
+                        className={`ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                          CHANNEL_BADGES[order.order_channel ?? 'online']?.className ??
+                          'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        {CHANNEL_BADGES[order.order_channel ?? 'online']?.label ?? 'Online'}
+                      </span>
                       {isRegular && (
                         <span title="Regular customer (3+ orders)">
                           <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500 flex-shrink-0" />
@@ -216,6 +236,12 @@ function AdminOrdersContent() {
                       {order.customer_name} • {order.phone}
                     </p>
                     <p className="text-xs text-gray-900 truncate">{order.address}</p>
+                    {order.table_number && (
+                      <p className="text-xs text-gray-900 mt-1">Table: {order.table_number}</p>
+                    )}
+                    {order.token_number && (
+                      <p className="text-xs text-gray-900 mt-1">Token: {order.token_number}</p>
+                    )}
                     {assignedRider && (
                       <p className="text-xs text-primary font-medium mt-1">
                         Rider: {assignedRider.name} ({assignedRider.phone})
@@ -256,7 +282,20 @@ function AdminOrdersContent() {
                         </span>
                       </div>
                     )}
-                    {order.status === 'ready' && riders?.length && (
+                    <div className="mt-3">
+                      <InvoiceActions order={order} items={order.order_items ?? []} />
+                    </div>
+                    <div className="mt-2">
+                      <PaymentLedger
+                        orderId={order.id}
+                        amountPaid={order.amount_paid}
+                        amountDue={order.amount_due}
+                      />
+                    </div>
+                    {order.status === 'ready' &&
+                      riders?.length &&
+                      order.order_channel !== 'walk_in' &&
+                      order.order_channel !== 'dine_in' && (
                       <div className="mt-2">
                         <label className="text-xs text-gray-900 block mb-1">Assign rider (for On the way)</label>
                         <select
@@ -278,7 +317,9 @@ function AdminOrdersContent() {
                         </select>
                       </div>
                     )}
-                    {order.status === 'on_the_way' && (
+                    {order.status === 'on_the_way' &&
+                      order.order_channel !== 'walk_in' &&
+                      order.order_channel !== 'dine_in' && (
                       <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
                         Delivered tab sirf rider app se — rider &quot;Mark delivered&quot; karega.
                       </p>

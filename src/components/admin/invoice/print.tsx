@@ -1,0 +1,254 @@
+'use client';
+
+import { renderToStaticMarkup } from 'react-dom/server';
+import type { Order, OrderItem } from '@/types';
+import { format } from 'date-fns';
+import { formatOrderNumber } from '@/lib/order-utils';
+
+interface InvoiceOptions {
+  businessName: string;
+  businessAddress: string;
+  phone: string;
+  taxLabel: string;
+}
+
+const DEFAULT_OPTIONS: InvoiceOptions = {
+  businessName: 'Haq Bahu Foods',
+  businessAddress: 'Near Pak Arab Society, Opposite Awan Market',
+  phone: '0315 | 0333 | 0300 | 9408619',
+  taxLabel: 'GST',
+};
+
+const baseStyles = `
+  * { box-sizing: border-box; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; color: #111827; }
+  body { margin: 0; padding: 24px; background: #f5f5f5; }
+  .card { background: #fff; border-radius: 16px; padding: 24px; border: 1px solid #e5e7eb; width: 720px; margin: 0 auto; }
+  h1, h2, h3, h4 { margin: 0; }
+  table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+  th, td { padding: 10px 8px; text-align: left; font-size: 13px; }
+  th { font-weight: 600; border-bottom: 1px solid #e5e7eb; }
+  tr:not(:last-child) td { border-bottom: 1px solid #f3f4f6; }
+  .totals { margin-top: 18px; width: 100%; }
+  .totals td { padding: 6px 0; font-size: 14px; }
+  .totals td:last-child { text-align: right; font-weight: 600; }
+  .muted { color: #6b7280; font-size: 12px; }
+  .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 11px; text-transform: uppercase; background: #eef2ff; color: #4338ca; }
+`;
+
+function formatCurrency(value: number) {
+  return `Rs ${value.toFixed(0)}/-`;
+}
+
+function ensureItems(order: Order, items?: OrderItem[] | null) {
+  if (items && items.length > 0) return items;
+  if (order.order_items && order.order_items.length > 0) return order.order_items;
+  return [];
+}
+
+function InvoiceLayout({
+  order,
+  items,
+  options,
+}: {
+  order: Order;
+  items: OrderItem[];
+  options: InvoiceOptions;
+}) {
+  const subTotal =
+    order.sub_total ??
+    items.reduce((sum, item) => sum + (item.price ?? 0) * (item.qty ?? 0), 0);
+  const discount = order.discount_amount ?? 0;
+  const taxAmount = order.tax_amount ?? 0;
+  const deliveryFee = order.delivery_fee ?? 0;
+  const total = order.total_price ?? subTotal - discount + taxAmount + deliveryFee;
+  const amountPaid = order.amount_paid ?? total;
+  const amountDue = order.amount_due ?? Math.max(total - amountPaid, 0);
+
+  return (
+    <div className="card">
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
+        <div>
+          <h1 style={{ fontSize: 24, fontWeight: 800 }}>{options.businessName}</h1>
+          <p className="muted">{options.businessAddress}</p>
+          <p className="muted">{options.phone}</p>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <p className="badge">Invoice</p>
+          <p style={{ marginTop: 8, fontWeight: 600 }}>{formatOrderNumber(order.id)}</p>
+          <p className="muted">
+            {order.created_at ? format(new Date(order.created_at), 'MMM d, yyyy h:mm a') : ''}
+          </p>
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+          gap: 16,
+          marginBottom: 8,
+        }}
+      >
+        <div>
+          <p className="muted">Customer</p>
+          <p style={{ fontWeight: 600 }}>{order.customer_name}</p>
+          <p className="muted">{order.phone}</p>
+          <p className="muted">{order.address}</p>
+        </div>
+        <div>
+          <p className="muted">Order details</p>
+          <p>Channel: {order.order_channel ?? 'online'}</p>
+          {order.service_mode && <p>Service: {order.service_mode}</p>}
+          {order.table_number && <p>Table: {order.table_number}</p>}
+          {order.token_number && <p>Token: {order.token_number}</p>}
+          {order.notes && <p>Notes: {order.notes}</p>}
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th style={{ textAlign: 'center' }}>Qty</th>
+            <th style={{ textAlign: 'right' }}>Price</th>
+            <th style={{ textAlign: 'right' }}>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item) => (
+            <tr key={item.id ?? `${item.product_id}-${item.item_name}`}>
+              <td>{item.item_name}</td>
+              <td style={{ textAlign: 'center' }}>{item.qty}</td>
+              <td style={{ textAlign: 'right' }}>{formatCurrency(item.price ?? 0)}</td>
+              <td style={{ textAlign: 'right' }}>
+                {formatCurrency((item.price ?? 0) * (item.qty ?? 0))}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <table className="totals">
+        <tbody>
+          <tr>
+            <td>Subtotal</td>
+            <td>{formatCurrency(subTotal)}</td>
+          </tr>
+          <tr>
+            <td>Discount</td>
+            <td>- {formatCurrency(discount)}</td>
+          </tr>
+          <tr>
+            <td>{options.taxLabel}</td>
+            <td>{formatCurrency(taxAmount)}</td>
+          </tr>
+          <tr>
+            <td>Delivery / Service fee</td>
+            <td>{formatCurrency(deliveryFee)}</td>
+          </tr>
+          <tr>
+            <td style={{ fontSize: 16 }}>Total</td>
+            <td style={{ fontSize: 16 }}>{formatCurrency(total)}</td>
+          </tr>
+          <tr>
+            <td>Amount paid ({order.status})</td>
+            <td>{formatCurrency(amountPaid)}</td>
+          </tr>
+          <tr>
+            <td>Amount due</td>
+            <td>{formatCurrency(amountDue)}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p className="muted" style={{ marginTop: 24 }}>
+        Thank you! Please retain this receipt for your records.
+      </p>
+    </div>
+  );
+}
+
+function KitchenTicket({
+  order,
+  items,
+}: {
+  order: Order;
+  items: OrderItem[];
+}) {
+  return (
+    <div className="card">
+      <h1 style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>Kitchen Ticket</h1>
+      <p className="muted" style={{ marginBottom: 8 }}>
+        {formatOrderNumber(order.id)} · {order.order_channel?.toUpperCase() || 'ONLINE'}
+      </p>
+      {order.table_number && <p>Table: {order.table_number}</p>}
+      {order.token_number && <p>Token: {order.token_number}</p>}
+      <p>Customer: {order.customer_name}</p>
+      {order.notes && (
+        <p style={{ marginTop: 6, fontWeight: 600 }}>Notes: {order.notes}</p>
+      )}
+      <table style={{ marginTop: 12 }}>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th style={{ textAlign: 'center' }}>Qty</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item) => (
+            <tr key={item.id ?? `${item.product_id}-${item.item_name}`}>
+              <td style={{ fontWeight: 600 }}>{item.item_name}</td>
+              <td style={{ textAlign: 'center', fontSize: 16, fontWeight: 700 }}>{item.qty}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function buildHtml(bodyMarkup: string, title: string) {
+  return `<!DOCTYPE html>
+  <html>
+    <head>
+      <title>${title}</title>
+      <style>${baseStyles}</style>
+    </head>
+    <body>${bodyMarkup}</body>
+  </html>`;
+}
+
+function openPrintWindow(html: string) {
+  if (typeof window === 'undefined') return;
+  const printWindow = window.open('', '_blank', 'width=900,height=1000');
+  if (!printWindow) return;
+  printWindow.document.open();
+  printWindow.document.write(html);
+  printWindow.document.close();
+  printWindow.focus();
+  setTimeout(() => {
+    printWindow.print();
+    printWindow.close();
+  }, 300);
+}
+
+export function printInvoice(order: Order, items?: OrderItem[] | null, opts?: Partial<InvoiceOptions>) {
+  if (typeof window === 'undefined') return;
+  const options = { ...DEFAULT_OPTIONS, ...opts };
+  const resolvedItems = ensureItems(order, items);
+  const html = buildHtml(
+    renderToStaticMarkup(<InvoiceLayout order={order} items={resolvedItems} options={options} />),
+    `Invoice-${formatOrderNumber(order.id)}`
+  );
+  openPrintWindow(html);
+}
+
+export function printReadyTicket(order: Order, items?: OrderItem[] | null) {
+  if (typeof window === 'undefined') return;
+  const resolvedItems = ensureItems(order, items);
+  const html = buildHtml(
+    renderToStaticMarkup(<KitchenTicket order={order} items={resolvedItems} />),
+    `Ticket-${formatOrderNumber(order.id)}`
+  );
+  openPrintWindow(html);
+}

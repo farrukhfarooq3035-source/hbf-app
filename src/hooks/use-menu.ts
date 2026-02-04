@@ -81,13 +81,14 @@ export function useDeals() {
 }
 
 /** Top N products by quantity sold (from order_items). Returns [] if RPC missing or no sales. */
-export function useTopSellingProducts(limit = 5) {
+export function useTopSellingProducts(limit = 5, channel?: string | null) {
   return useQuery({
-    queryKey: ['top-selling-products', limit],
+    queryKey: ['top-selling-products', limit, channel ?? 'all'],
     queryFn: async () => {
       try {
         const { data, error } = await supabase.rpc('get_top_selling_products', {
           lim: limit,
+          channel_filter: channel ?? null,
         });
         if (error || !data?.length) return [] as Product[];
         return (data as Product[]).slice(0, limit);

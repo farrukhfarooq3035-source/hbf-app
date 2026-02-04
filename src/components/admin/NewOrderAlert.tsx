@@ -21,14 +21,39 @@ export function NewOrderAlert() {
           table: 'orders',
         },
         (payload) => {
-          const order = payload.new as { id: string; total_price?: number; customer_name?: string };
+          const order = payload.new as {
+            id: string;
+            total_price?: number;
+            customer_name?: string;
+            order_channel?: string;
+            table_number?: string | null;
+            token_number?: string | null;
+          };
           const orderNum = formatOrderNumber(order.id);
           const total = order.total_price ?? 0;
           const name = order.customer_name ?? 'Customer';
+          const channel = order.order_channel ?? 'online';
+          const channelLabel =
+            channel === 'walk_in'
+              ? 'Walk-in POS'
+              : channel === 'dine_in'
+              ? 'Dine-in'
+              : channel === 'takeaway'
+              ? 'Takeaway'
+              : 'Online';
+          const locationHint =
+            channel === 'dine_in' && order.table_number
+              ? `Table ${order.table_number}`
+              : channel === 'walk_in' && order.token_number
+              ? `Token ${order.token_number}`
+              : '';
+          const notificationBody = [channelLabel, `${name} • Rs ${total}/-`, locationHint]
+            .filter(Boolean)
+            .join(' • ');
 
           if (Notification.permission === 'granted') {
             new Notification(`New order: ${orderNum}`, {
-              body: `${name} • Rs ${total}/-`,
+              body: notificationBody,
               icon: '/logo.png',
               tag: order.id,
             }).onclick = () => {

@@ -42,6 +42,7 @@ export default function CheckoutPage() {
   const firstOrder = firstOrderDiscount?.discount ?? 0;
   const happyHourAmount = isHappyHour ? Math.round((subtotal * happyHourDiscount) / 100) : 0;
   const discount = Math.max(promoDiscount, firstOrder, happyHourAmount);
+  const taxAmount = 0; // Placeholder until tax logic is wired
   const total = Math.max(0, subtotal + deliveryFee - discount);
 
   useEffect(() => {
@@ -129,6 +130,13 @@ export default function CheckoutPage() {
           discount_amount: discount,
           promo_code_id: appliedPromo?.id || null,
           delivery_zone_id: matchedZone?.id || null,
+          order_channel: 'online',
+          service_mode: 'delivery',
+          sub_total: subtotal,
+          delivery_fee: deliveryFee,
+          tax_amount: taxAmount,
+          amount_due: total,
+          amount_paid: 0,
         })
         .select('id')
         .single();

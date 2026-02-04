@@ -23,24 +23,29 @@ export default function AdminReportsPage() {
   const [period, setPeriod] = useState<'7' | '30' | 'custom'>('7');
   const [fromDate, setFromDate] = useState(format(defaultStart, 'yyyy-MM-dd'));
   const [toDate, setToDate] = useState(format(defaultEnd, 'yyyy-MM-dd'));
+  const [channelFilter, setChannelFilter] = useState<'all' | 'online' | 'walk_in' | 'dine_in' | 'takeaway'>('all');
   const printRef = useRef<HTMLDivElement>(null);
 
   const start = period === 'custom' ? fromDate : format(subDays(new Date(), period === '30' ? 29 : 6), 'yyyy-MM-dd');
   const end = period === 'custom' ? toDate : format(new Date(), 'yyyy-MM-dd');
 
   const { data: salesData } = useQuery({
-    queryKey: ['reports-sales', start, end],
+    queryKey: ['reports-sales', start, end, channelFilter],
     queryFn: async () => {
       const result = [];
       const startD = new Date(start + 'T00:00:00');
       const endD = new Date(end + 'T23:59:59');
       for (let d = new Date(startD); d <= endD; d.setDate(d.getDate() + 1)) {
         const dayStr = format(d, 'yyyy-MM-dd');
-        const { data } = await supabase
+        let query = supabase
           .from('orders')
           .select('total_price')
           .gte('created_at', `${dayStr}T00:00:00`)
           .lt('created_at', `${dayStr}T23:59:59`);
+        if (channelFilter !== 'all') {
+          query = query.eq('order_channel', channelFilter);
+        }
+        const { data } = await query;
         const total = data?.reduce((s, o) => s + (o.total_price || 0), 0) || 0;
         result.push({
           date: format(d, 'MMM d'),
@@ -64,14 +69,18 @@ export default function AdminReportsPage() {
   });
 
   const { data: rangeOrders } = useQuery({
-    queryKey: ['reports-orders-range', start, end],
+    queryKey: ['reports-orders-range', start, end, channelFilter],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('orders')
-        .select('id, total_price, status, customer_name, phone, created_at')
+        .select('id, total_price, status, customer_name, phone, created_at, order_channel')
         .gte('created_at', start + 'T00:00:00')
         .lte('created_at', end + 'T23:59:59')
         .order('created_at', { ascending: false });
+      if (channelFilter !== 'all') {
+        query = query.eq('order_channel', channelFilter);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       return data || [];
     },
@@ -83,12 +92,16 @@ export default function AdminReportsPage() {
   const profit = totalSales - totalExpenses;
 
   const { data: ratingsData } = useQuery({
-    queryKey: ['reports-ratings'],
+    queryKey: ['reports-ratings', channelFilter],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('orders')
         .select('rating_stars, rating_delivery, rating_quality, rated_at')
         .not('rating_stars', 'is', null);
+      if (channelFilter !== 'all') {
+        query = query.eq('order_channel', channelFilter);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       const rated = data || [];
       const n = rated.length;
@@ -127,7 +140,7 @@ export default function AdminReportsPage() {
 
   const exportCSV = () => {
     const rows = rangeOrders || [];
-    const headers = ['Order #', 'Date', 'Customer', 'Phone', 'Total (Rs)', 'Status'];
+    const headers = ['Order #', 'Date', 'Customer', 'Phone', 'Channel', 'Total (Rs)', 'Status'];
     const csvRows = [
       headers.join(','),
       ...rows.map((o) =>
@@ -136,6 +149,7 @@ export default function AdminReportsPage() {
           o.created_at ? format(new Date(o.created_at), 'yyyy-MM-dd HH:mm') : '',
           `"${(o.customer_name || '').replace(/"/g, '""')}"`,
           (o.phone || '').replace(/,/g, ' '),
+          o.order_channel ?? '',
           o.total_price ?? '',
           o.status ?? '',
         ].join(',')
@@ -160,15 +174,15 @@ export default function AdminReportsPage() {
       <style>body{font-family:sans-serif;padding:20px;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;} th{background:#f5f5f5;}</style>
       </head><body>
       <h1>HBF Report</h1>
-      <p>Period: ${start} to ${end}</p>
+      <p>Period: ${start} to ${end} · Channel: ${channelFilter}</p>
       <p><strong>Total Sales:</strong> Rs ${totalSales}/- &nbsp; <strong>Expenses:</strong> Rs ${totalExpenses}/- &nbsp; <strong>Profit:</strong> Rs ${profit}/-</p>
       <h2>Daily Sales</h2>
       <table><tr><th>Date</th><th>Sales (Rs)</th></tr>
       ${(salesData || []).map((d) => `<tr><td>${d.date}</td><td>${d.sales}</td></tr>`).join('')}
       </table>
       <h2>Orders</h2>
-      <table><tr><th>Order #</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th></tr>
-      ${(rangeOrders || []).map((o) => `<tr><td>${formatOrderNumber(o.id)}</td><td>${o.created_at ? format(new Date(o.created_at), 'yyyy-MM-dd HH:mm') : ''}</td><td>${o.customer_name || ''}</td><td>${o.total_price}</td><td>${o.status}</td></tr>`).join('')}
+      <table><tr><th>Order #</th><th>Date</th><th>Customer</th><th>Channel</th><th>Total</th><th>Status</th></tr>
+      ${(rangeOrders || []).map((o) => `<tr><td>${formatOrderNumber(o.id)}</td><td>${o.created_at ? format(new Date(o.created_at), 'yyyy-MM-dd HH:mm') : ''}</td><td>${o.customer_name || ''}</td><td>${o.order_channel || ''}</td><td>${o.total_price}</td><td>${o.status}</td></tr>`).join('')}
       </table>
       </body></html>
     `);
@@ -223,6 +237,22 @@ export default function AdminReportsPage() {
             />
           </>
         )}
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-600">Channel:</span>
+          <select
+            value={channelFilter}
+            onChange={(e) =>
+              setChannelFilter(e.target.value as 'all' | 'online' | 'walk_in' | 'dine_in' | 'takeaway')
+            }
+            className="rounded-xl border px-3 py-2"
+          >
+            <option value="all">All</option>
+            <option value="online">Online</option>
+            <option value="walk_in">Walk-in</option>
+            <option value="dine_in">Dine-in</option>
+            <option value="takeaway">Takeaway</option>
+          </select>
+        </div>
         <div className="flex-1" />
         <button
           onClick={exportCSV}

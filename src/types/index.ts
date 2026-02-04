@@ -1,4 +1,6 @@
 export type OrderStatus = 'new' | 'preparing' | 'ready' | 'on_the_way' | 'delivered';
+export type OrderChannel = 'online' | 'walk_in' | 'dine_in' | 'takeaway';
+export type ServiceMode = 'delivery' | 'pickup' | 'dine_in';
 
 export interface Category {
   id: string;
@@ -34,7 +36,21 @@ export interface Order {
   phone: string;
   address: string;
   status: OrderStatus;
+  order_channel?: OrderChannel;
+  service_mode?: ServiceMode | null;
+  table_number?: string | null;
+  token_number?: string | null;
+  receipt_number?: string | null;
+  receipt_issued_at?: string | null;
   total_price: number;
+  sub_total?: number | null;
+  tax_amount?: number | null;
+  delivery_fee?: number | null;
+  discount_amount?: number | null;
+  amount_paid?: number | null;
+  amount_due?: number | null;
+  due_at?: string | null;
+  last_payment_at?: string | null;
   rider_id?: string;
   notes?: string;
   created_at: string;
@@ -77,4 +93,17 @@ export interface CartItem {
   size?: string;
   addons?: string[];
   notes?: string;
+}
+
+export interface OrderPayment {
+  id: string;
+  order_id: string;
+  amount: number;
+  method: string;
+  reference?: string | null;
+  paid_at: string;
+  channel?: string;
+  notes?: string | null;
+  received_by?: string | null;
+  created_at: string;
 }

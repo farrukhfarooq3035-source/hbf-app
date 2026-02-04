@@ -19,12 +19,14 @@ import {
   Sparkles,
   Star,
   Smartphone,
+  PenSquare,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
 const navItems = [
   { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/admin/orders', icon: ShoppingBag, label: 'Orders' },
+  { href: '/admin/walkin', icon: PenSquare, label: 'Walk-in POS' },
   { href: '/admin/customers', icon: Users, label: 'Customers' },
   { href: '/admin/products', icon: Package, label: 'Products' },
   { href: '/admin/import', icon: Upload, label: 'Import Menu' },
