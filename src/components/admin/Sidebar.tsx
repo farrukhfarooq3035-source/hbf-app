@@ -21,12 +21,14 @@ import {
   Smartphone,
   PenSquare,
   FileSpreadsheet,
+  UtensilsCrossed,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
 const navItems = [
   { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/admin/orders', icon: ShoppingBag, label: 'Orders' },
+  { href: '/admin/orders/online', icon: ShoppingBag, label: 'Online Orders' },
+  { href: '/admin/orders/restaurant', icon: UtensilsCrossed, label: 'Restaurant Orders' },
   { href: '/admin/walkin', icon: PenSquare, label: 'Walk-in POS' },
   { href: '/admin/customers', icon: Users, label: 'Customers' },
   { href: '/admin/products', icon: Package, label: 'Products' },

@@ -52,13 +52,14 @@ export function NewOrderAlert() {
             .join(' • ');
 
           if (Notification.permission === 'granted') {
-            new Notification(`New order: ${orderNum}`, {
+            const isRestaurant = ['walk_in', 'dine_in', 'takeaway'].includes(channel);
+            new Notification(`New ${channelLabel} order: ${orderNum}`, {
               body: notificationBody,
               icon: '/logo.png',
               tag: order.id,
             }).onclick = () => {
               window.focus();
-              router.push('/admin/orders');
+              router.push(isRestaurant ? '/admin/orders/restaurant' : '/admin/orders/online');
             };
           }
 

@@ -182,7 +182,7 @@ export default function AdminRidersPage() {
                   </td>
                   <td className="p-4">
                     <Link
-                      href={`/admin/orders?rider_id=${r.id}`}
+                      href={`/admin/orders/online?rider_id=${r.id}`}
                       className="flex items-center gap-1 text-primary hover:underline font-medium"
                     >
                       <Package className="w-4 h-4" />

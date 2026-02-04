@@ -1,4 +1,11 @@
-export type OrderStatus = 'new' | 'preparing' | 'ready' | 'on_the_way' | 'delivered';
+export type OrderStatus =
+  | 'new'
+  | 'preparing'
+  | 'ready'
+  | 'on_the_way'
+  | 'delivered'
+  | 'order_on_table'
+  | 'closed';
 export type OrderChannel = 'online' | 'walk_in' | 'dine_in' | 'takeaway';
 export type ServiceMode = 'delivery' | 'pickup' | 'dine_in';
 

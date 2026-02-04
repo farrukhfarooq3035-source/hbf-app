@@ -243,7 +243,7 @@ export default function AdminDashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-bold text-lg">Recent Orders</h2>
             <Link
-              href="/admin/orders"
+              href="/admin/orders/online"
               className="text-primary text-sm font-medium flex items-center gap-1 hover:underline"
             >
               View all
@@ -257,7 +257,7 @@ export default function AdminDashboardPage() {
               (recentOrders || []).map((o) => (
                 <li key={o.id}>
                   <Link
-                    href="/admin/orders"
+                    href="/admin/orders/online"
                     className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 text-sm"
                   >
                     <span className="font-medium">{formatOrderNumber(o.id)}</span>

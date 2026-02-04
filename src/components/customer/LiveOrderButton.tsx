@@ -8,12 +8,14 @@ import { formatOrderNumber } from '@/lib/order-utils';
 import { Package } from 'lucide-react';
 import type { OrderStatus } from '@/types';
 
-const STATUS_LABELS: Record<OrderStatus, string> = {
+const STATUS_LABELS: Partial<Record<OrderStatus, string>> = {
   new: 'New',
   preparing: 'Preparing',
   ready: 'Ready',
   on_the_way: 'On the way',
   delivered: 'Delivered',
+  order_on_table: 'Order on table',
+  closed: 'Closed',
 };
 
 /** Rough ETA (mins) from now by status */

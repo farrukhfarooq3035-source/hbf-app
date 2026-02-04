@@ -13,6 +13,8 @@ const STATUS_LABELS: Record<OrderStatus, string> = {
   ready: 'Ready',
   on_the_way: 'On the way',
   delivered: 'Delivered',
+  order_on_table: 'Order on table',
+  closed: 'Closed',
 };
 
 function getEtaMins(status: OrderStatus): number {

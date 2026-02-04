@@ -23,15 +23,38 @@ const STATUS_LABELS: Record<OrderStatus, string> = {
   ready: 'Ready',
   on_the_way: 'On the Way',
   delivered: 'Delivered',
+  order_on_table: 'Order on table',
+  closed: 'Closed',
 };
 
-const STATUS_STEPS: { key: OrderStatus; label: string }[] = [
+const ONLINE_STEPS: { key: OrderStatus; label: string }[] = [
   { key: 'new', label: 'New' },
   { key: 'preparing', label: 'Preparing' },
   { key: 'ready', label: 'Ready' },
   { key: 'on_the_way', label: 'On the Way' },
   { key: 'delivered', label: 'Delivered' },
 ];
+
+const RESTAURANT_DINEIN_STEPS: { key: OrderStatus; label: string }[] = [
+  { key: 'new', label: 'New' },
+  { key: 'preparing', label: 'Preparing' },
+  { key: 'order_on_table', label: 'Order on table' },
+  { key: 'closed', label: 'Closed' },
+];
+
+const RESTAURANT_TAKEAWAY_STEPS: { key: OrderStatus; label: string }[] = [
+  { key: 'new', label: 'New' },
+  { key: 'preparing', label: 'Preparing' },
+  { key: 'ready', label: 'Ready' },
+  { key: 'closed', label: 'Closed' },
+];
+
+function getStatusSteps(order: Order): { key: OrderStatus; label: string }[] {
+  if (order.order_channel === 'online') return ONLINE_STEPS;
+  if (order.order_channel === 'takeaway') return RESTAURANT_TAKEAWAY_STEPS;
+  if (order.order_channel === 'dine_in' || order.order_channel === 'walk_in') return RESTAURANT_DINEIN_STEPS;
+  return ONLINE_STEPS;
+}
 
 export default function OrderTrackingPage() {
   const params = useParams();
@@ -164,7 +187,10 @@ export default function OrderTrackingPage() {
     );
   }
 
-  const currentIndex = STATUS_STEPS.findIndex((s) => s.key === order.status);
+  const STATUS_STEPS = getStatusSteps(order);
+  const isDineIn = order.order_channel === 'dine_in' || order.order_channel === 'walk_in';
+  const resolvedStatus = isDineIn && order.status === 'ready' ? 'order_on_table' : order.status;
+  const currentIndex = STATUS_STEPS.findIndex((s) => s.key === resolvedStatus);
 
   const isDeliveredUnrated = order.status === 'delivered' && order.rating_stars == null;
   const ratingForm = (
