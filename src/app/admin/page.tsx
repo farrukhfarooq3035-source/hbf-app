@@ -220,7 +220,7 @@ export default function AdminDashboardPage() {
                 className={`h-4 w-4 rounded-full ${hasPending ? 'bg-amber-500 animate-pulse' : 'bg-gray-300'}`}
                 title={hasPending ? 'Alert: Pending orders' : 'No pending orders'}
               />
-              <span className={`text-sm font-semibold ${hasPending ? 'text-amber-700' : 'text-gray-500'}`}>
+              <span className={`text-sm font-semibold ${hasPending ? 'text-amber-700' : 'text-gray-700'}`}>
                 {hasPending ? 'ON' : 'OFF'}
               </span>
             </div>

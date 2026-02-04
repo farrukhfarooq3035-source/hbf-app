@@ -61,7 +61,7 @@ export default function AdminLoginPage() {
             <Shield className="w-7 h-7" />
           </div>
           <h1 className="text-2xl font-bold text-dark dark:text-white">Admin Login</h1>
-          <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+          <p className="text-gray-700 dark:text-gray-300 text-sm mt-1">
             Sign in with your admin email and password
           </p>
         </div>
@@ -78,7 +78,7 @@ export default function AdminLoginPage() {
               Email
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600" />
               <input
                 id="email"
                 type="email"
@@ -97,7 +97,7 @@ export default function AdminLoginPage() {
               Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600" />
               <input
                 id="password"
                 type="password"
@@ -124,7 +124,7 @@ export default function AdminLoginPage() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+        <p className="mt-6 text-center text-sm text-gray-700 dark:text-gray-300">
           <Link href="/menu" className="text-primary hover:underline">← Back to Menu</Link>
         </p>
       </div>

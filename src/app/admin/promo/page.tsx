@@ -195,7 +195,7 @@ export default function AdminPromoPage() {
           </table>
         </div>
         {(!promos?.length && !isLoading) && (
-          <div className="p-12 text-center text-gray-500">No promo codes yet.</div>
+          <div className="p-12 text-center text-gray-700">No promo codes yet.</div>
         )}
       </div>
     </div>

@@ -61,14 +61,14 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="no-print w-64 min-h-screen bg-dark text-white flex flex-col">
+    <aside className="no-print w-64 min-h-screen bg-slate-900 text-white flex flex-col">
       <Link href="/admin" className="p-4 flex items-center gap-2 border-b border-white/10">
         <img
           src="/logo.png"
           alt=""
           className="h-10 w-auto object-contain max-w-[120px]"
         />
-        <span className="font-bold text-lg">HBF Admin</span>
+        <span className="font-bold text-lg text-white">HBF Admin</span>
       </Link>
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
@@ -80,7 +80,7 @@ export function Sidebar() {
               href={item.href}
               className={clsx(
                 'flex items-center gap-3 px-4 py-3 rounded-xl transition-colors',
-                isActive ? 'bg-primary text-white' : 'hover:bg-white/10'
+                isActive ? 'bg-primary text-white' : 'text-slate-200 hover:bg-white/10 hover:text-white'
               )}
             >
               <Icon className="w-5 h-5" />
@@ -93,14 +93,14 @@ export function Sidebar() {
         <button
           type="button"
           onClick={handleSignOut}
-          className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm text-gray-400 hover:bg-white/10 hover:text-white transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
         >
           <LogOut className="w-4 h-4" />
           Sign out
         </button>
         <Link
           href="/"
-          className="block text-sm text-gray-400 hover:text-white"
+          className="block text-sm text-slate-300 hover:text-white"
         >
           ← Back to Store
         </Link>

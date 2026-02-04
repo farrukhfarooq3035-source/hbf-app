@@ -140,13 +140,13 @@ export default function SalesRecordPage() {
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Sales Record</h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-700">
             Track revenue, payments, and dues across online and restaurant channels.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-2 rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700">
-            <Filter className="h-4 w-4 text-gray-500" />
+            <Filter className="h-4 w-4 text-gray-600" />
             <span>Channel</span>
             <select
               value={channel}
@@ -167,7 +167,7 @@ export default function SalesRecordPage() {
             onChange={(e) => setFromDate(e.target.value)}
             className="rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:border-primary focus:outline-none"
           />
-          <span className="text-sm text-gray-500">to</span>
+          <span className="text-sm text-gray-700">to</span>
           <input
             type="date"
             value={toDate}
@@ -188,34 +188,34 @@ export default function SalesRecordPage() {
 
       <div className="grid gap-4 lg:grid-cols-4">
         <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-gray-500">Total revenue</p>
+          <p className="text-xs uppercase tracking-wide text-gray-700">Total revenue</p>
           <p className="mt-2 text-2xl font-semibold text-gray-900">
             {formatCurrency(summary.totalRevenue)}
           </p>
         </div>
         <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-gray-500">Amount received</p>
+          <p className="text-xs uppercase tracking-wide text-gray-700">Amount received</p>
           <p className="mt-2 text-2xl font-semibold text-green-600">
             {formatCurrency(summary.totalPaid)}
           </p>
         </div>
         <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-gray-500">Outstanding dues</p>
+          <p className="text-xs uppercase tracking-wide text-gray-700">Outstanding dues</p>
           <p className="mt-2 text-2xl font-semibold text-amber-600">
             {formatCurrency(summary.totalDue)}
           </p>
         </div>
         <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-gray-500">Orders</p>
+          <p className="text-xs uppercase tracking-wide text-gray-700">Orders</p>
           <p className="mt-2 text-2xl font-semibold text-gray-900">{summary.count}</p>
-          <p className="text-xs text-gray-400">Limited to 1000 latest orders</p>
+          <p className="text-xs text-gray-600">Limited to 1000 latest orders</p>
         </div>
       </div>
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
         <div className="max-h-[70vh] overflow-auto">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="sticky top-0 bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+            <thead className="sticky top-0 bg-gray-50 text-xs uppercase tracking-wide text-gray-700">
               <tr>
                 <th className="px-4 py-3 text-left">Date</th>
                 <th className="px-4 py-3 text-left">Order ID</th>
@@ -236,7 +236,7 @@ export default function SalesRecordPage() {
             <tbody className="divide-y divide-gray-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={14} className="px-4 py-6 text-center text-sm text-gray-500">
+                  <td colSpan={14} className="px-4 py-6 text-center text-sm text-gray-700">
                     Loading sales data...
                   </td>
                 </tr>
@@ -250,7 +250,7 @@ export default function SalesRecordPage() {
                     </td>
                     <td className="px-4 py-2 font-semibold text-gray-900">{row.id}</td>
                     <td className="px-4 py-2 text-gray-700">{row.order_channel ?? '—'}</td>
-                    <td className="px-4 py-2 text-gray-500">{row.service_mode ?? '—'}</td>
+                    <td className="px-4 py-2 text-gray-700">{row.service_mode ?? '—'}</td>
                     <td className="px-4 py-2 text-gray-700">
                       {row.customer_name || 'Walk-in guest'}
                     </td>
@@ -278,15 +278,15 @@ export default function SalesRecordPage() {
                     <td className="px-4 py-2 text-gray-600">
                       <div className="flex flex-col text-xs">
                         <span>{row.invoice_status ?? '—'}</span>
-                        <span className="text-gray-400">{row.receipt_number ?? ''}</span>
+                        <span className="text-gray-600">{row.receipt_number ?? ''}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-2 text-gray-500">{row.status ?? ''}</td>
+                    <td className="px-4 py-2 text-gray-700">{row.status ?? ''}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={14} className="px-4 py-6 text-center text-sm text-gray-500">
+                  <td colSpan={14} className="px-4 py-6 text-center text-sm text-gray-700">
                     No sales found for the selected range.
                   </td>
                 </tr>

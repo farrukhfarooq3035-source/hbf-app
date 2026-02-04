@@ -62,7 +62,7 @@ export default function AdminReviewsPage() {
         <Star className="w-7 h-7 text-amber-500" />
         Customer Reviews
       </h1>
-      <p className="text-gray-600 dark:text-gray-400 mb-6">
+      <p className="text-gray-700 dark:text-gray-300 mb-6">
         Approve or reject reviews. Only approved reviews appear on the app.
       </p>
 
@@ -90,7 +90,7 @@ export default function AdminReviewsPage() {
       ) : reviews.length === 0 ? (
         <div className="text-center py-16 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-200 dark:border-gray-700">
           <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-600 dark:text-gray-400">No reviews yet.</p>
+          <p className="text-gray-700 dark:text-gray-300">No reviews yet.</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -107,7 +107,7 @@ export default function AdminReviewsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-semibold text-gray-900 dark:text-white">{r.customer_name}</span>
-                    <span className="text-sm text-gray-500">{formatDate(r.created_at)}</span>
+                    <span className="text-sm text-gray-700">{formatDate(r.created_at)}</span>
                   </div>
                   <div className="flex gap-0.5 mb-2">
                     {[1, 2, 3, 4, 5].map((i) => (

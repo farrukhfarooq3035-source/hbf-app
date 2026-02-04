@@ -39,7 +39,7 @@ export default function AdminDownloadPage() {
         <Smartphone className="w-7 h-7 text-primary" />
         Download App – QR Code
       </h1>
-      <p className="text-gray-600 dark:text-gray-400 mb-6">
+      <p className="text-gray-700 dark:text-gray-300 mb-6">
         Download ya print karke customers ko dein. Scan karke app open ho jayegi.
       </p>
 
@@ -59,7 +59,7 @@ export default function AdminDownloadPage() {
             <div className="w-[280px] h-[280px] bg-gray-100 dark:bg-gray-700 rounded-2xl animate-pulse mb-4" />
           )}
           <p className="text-center font-semibold text-gray-800 dark:text-gray-200 mb-1">Scan → Install popup will appear</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">{appUrl}</p>
+          <p className="text-sm text-gray-700 dark:text-gray-300 text-center mb-6">{appUrl}</p>
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
@@ -83,7 +83,7 @@ export default function AdminDownloadPage() {
         <div className="flex-1 space-y-4 print:hidden">
           <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Direct link</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Customers ko ye link share karein:</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">Customers ko ye link share karein:</p>
             <code className="block p-3 bg-white dark:bg-gray-800 rounded-lg text-sm break-all border border-gray-200 dark:border-gray-600">
               {baseUrl || appUrl || 'Loading...'}
             </code>

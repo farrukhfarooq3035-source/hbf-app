@@ -76,18 +76,18 @@ export default function AdminHappyHourPage() {
         <Sparkles className="w-7 h-7 text-amber-500" />
         Happy Hour Deals
       </h1>
-      <p className="text-gray-600 dark:text-gray-400 mb-6">
+      <p className="text-gray-700 dark:text-gray-300 mb-6">
         Select products to show during Happy Hour (3–5pm) and after midnight. Discount % is set in Settings.
       </p>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <h2 className="font-semibold text-lg mb-3">Selected Products ({selectedIds.length})</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          <h2 className="font-semibold text-lg mb-3 text-gray-900 dark:text-white">Selected Products ({selectedIds.length})</h2>
+          <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
             Drag order shown on menu. Click trash to remove.
           </p>
           {selectedProducts.length === 0 ? (
-            <p className="text-gray-500 dark:text-gray-400 py-8 text-center">
+            <p className="text-gray-700 dark:text-gray-300 py-8 text-center">
               No products selected. Add from the list on the right.
             </p>
           ) : (
@@ -141,8 +141,8 @@ export default function AdminHappyHourPage() {
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <h2 className="font-semibold text-lg mb-3">All Products</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          <h2 className="font-semibold text-lg mb-3 text-gray-900 dark:text-white">All Products</h2>
+          <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
             Click + to add to Happy Hour deals.
           </p>
           {isLoading ? (
@@ -150,7 +150,7 @@ export default function AdminHappyHourPage() {
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
           ) : availableProducts.length === 0 ? (
-            <p className="text-gray-500 dark:text-gray-400 py-8 text-center">
+            <p className="text-gray-700 dark:text-gray-300 py-8 text-center">
               {products.length === 0 ? 'No products in menu.' : 'All products are already selected.'}
             </p>
           ) : (

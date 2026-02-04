@@ -146,7 +146,7 @@ export default function AdminProductsPage() {
             ))}
           </select>
           <div className="flex flex-col gap-1">
-            <label className="text-sm text-gray-500">Image (optional)</label>
+            <label className="text-sm text-gray-700">Image (optional)</label>
             <input
               type="file"
               accept="image/*"
@@ -218,7 +218,7 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="p-4 font-medium">{p.name}</td>
                   <td className="p-4">Rs {p.price}/-</td>
-                  <td className="p-4 text-gray-500">
+                  <td className="p-4 text-gray-700">
                     {(p.categories as { name?: string })?.name || '—'}
                   </td>
                   <td className="p-4">
@@ -261,7 +261,7 @@ export default function AdminProductsPage() {
           </table>
         </div>
         {!products?.length && !isLoading && (
-          <div className="p-12 text-center text-gray-500">
+          <div className="p-12 text-center text-gray-700">
             No products. Add some or run Import Menu.
           </div>
         )}
