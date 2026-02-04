@@ -8,23 +8,33 @@ export function useAdminAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [adminCheckDone, setAdminCheckDone] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      setLoading(false);
+      if (!session?.user) {
+        setAdminCheckDone(true);
+        setLoading(false);
+      }
     });
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } =     supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (!session?.user) {
+        setAdminCheckDone(true);
+        setIsAdmin(false);
+        setLoading(false);
+      }
     });
     return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
     if (!user?.email) {
-      setIsAdmin(false);
+      setAdminCheckDone(true);
+      setLoading(false);
       return;
     }
     let cancelled = false;
@@ -34,7 +44,18 @@ export function useAdminAuth() {
       .ilike('email', user.email.trim())
       .maybeSingle()
       .then(({ data }) => {
-        if (!cancelled) setIsAdmin(!!data);
+        if (!cancelled) {
+          setIsAdmin(!!data);
+          setAdminCheckDone(true);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setIsAdmin(false);
+          setAdminCheckDone(true);
+          setLoading(false);
+        }
       });
     return () => {
       cancelled = true;
@@ -45,5 +66,5 @@ export function useAdminAuth() {
     await supabase.auth.signOut();
   };
 
-  return { user, loading, isAdmin, signOut };
+  return { user, loading: loading || !adminCheckDone, isAdmin, signOut };
 }
