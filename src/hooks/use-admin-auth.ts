@@ -37,7 +37,6 @@ export function useAdminAuth() {
   useEffect(() => {
     if (!user?.email) {
       setAdminCheckDone(true);
-      setLoading(false);
       return;
     }
     if (typeof window !== 'undefined' && sessionStorage.getItem(ADMIN_VERIFIED_KEY)) {
@@ -47,31 +46,41 @@ export function useAdminAuth() {
       return;
     }
     let cancelled = false;
-    void supabase
-      .from('admin_users')
-      .select('email')
-      .ilike('email', user.email.trim())
-      .maybeSingle()
-      .then(({ data }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const token = session?.access_token;
+      if (!token || cancelled) {
         if (!cancelled) {
-          setIsAdmin(!!data);
-          if (!!data && typeof window !== 'undefined') {
-            sessionStorage.setItem(ADMIN_VERIFIED_KEY, '1');
-          }
           setAdminCheckDone(true);
           setLoading(false);
         }
+        return;
+      }
+      fetch('/api/admin/check', {
+        headers: { Authorization: `Bearer ${token}` },
       })
-      .then(
-        () => {},
-        () => {
+        .then((r) => r.json())
+        .then((body) => {
           if (!cancelled) {
-            setIsAdmin(false);
+            const ok = body?.isAdmin === true;
+            setIsAdmin(ok);
+            if (ok && typeof window !== 'undefined') {
+              sessionStorage.setItem(ADMIN_VERIFIED_KEY, '1');
+            }
             setAdminCheckDone(true);
             setLoading(false);
           }
-        }
-      );
+        })
+        .then(
+          () => {},
+          () => {
+            if (!cancelled) {
+              setIsAdmin(false);
+              setAdminCheckDone(true);
+              setLoading(false);
+            }
+          }
+        );
+    });
     return () => {
       cancelled = true;
     };
