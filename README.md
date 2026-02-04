@@ -1,6 +1,6 @@
 # HBF - Haq Bahu Foods Smart Ordering Platform
 
-A modern, mobile-first Progressive Web App for Haq Bahu Foods - order online, manage orders, generate marketing posters, and track sales.
+A modern, mobile-first Progressive Web App for Haq Bahu Foods - order online, manage orders, generate marketing posters, and track sales. for Haq Bahu Foods - order online, manage orders, generate marketing posters, and track sales.
 
 ## Tech Stack
 
@@ -115,3 +115,4 @@ See [DEPLOY.md](DEPLOY.md) for full steps. Quick deploy:
 - **Background:** White
 - **Text:** Dark (#1E1E1E)
 - Mobile-first, rounded cards, bold typography
+
