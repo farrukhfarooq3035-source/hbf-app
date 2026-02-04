@@ -16,7 +16,7 @@ interface DealCardProps {
 }
 
 const cardBase =
-  'bg-white dark:bg-gray-800 rounded-2xl shadow-premium border border-gray-100 dark:border-gray-700 overflow-hidden hover-lift dark:ring-1 dark:ring-primary/20 image-pop';
+  'bg-white dark:bg-gray-800 rounded-premium-lg shadow-premium border border-gray-100 dark:border-gray-700/60 overflow-hidden transition-all duration-280 hover:shadow-lg dark:hover:shadow-xl active:scale-[0.98] dark:ring-1 dark:ring-primary/20';
 
 export function DealCard({ deal, grid }: DealCardProps) {
   const addItem = useCartStore((s) => s.addItem);

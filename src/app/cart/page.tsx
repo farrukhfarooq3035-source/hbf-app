@@ -142,7 +142,7 @@ export default function CartPage() {
         </div>
         <button
           onClick={() => router.push('/checkout')}
-          className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-red-700 transition-colors"
+          className="w-full py-4 bg-gradient-to-r from-primary to-primary-deep text-white font-bold rounded-xl hover:opacity-95 shadow-lg transition-all duration-280 active:scale-[0.98]"
         >
           Place Order
         </button>

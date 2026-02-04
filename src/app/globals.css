@@ -2,22 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Design tokens */
+/* Design tokens - Premium HBF: deep red, charcoal, luxury */
 :root {
-  --primary: #E50914;
-  --primary-hover: #c40812;
-  --accent: #FFC83D;
-  --dark: #1E1E1E;
+  --primary: #B91C1C;
+  --primary-hover: #991B1B;
+  --primary-deep: #7F1D1D;
+  --accent: #D4AF37;
+  --accent-matte: #C9A227;
+  --charcoal: #1a1a1a;
+  --charcoal-muted: #2d2d2d;
   --bg: #ffffff;
-  --bg-muted: #f9fafb;
-  --text: #1E1E1E;
+  --bg-muted: #fafafa;
+  --text: #1a1a1a;
   --text-muted: #6b7280;
   --border: #e5e7eb;
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --radius: 0.75rem;
-  --radius-lg: 1rem;
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.06);
+  --shadow: 0 4px 12px -2px rgb(0 0 0 / 0.08), 0 2px 6px -2px rgb(0 0 0 / 0.04);
+  --shadow-lg: 0 12px 24px -4px rgb(0 0 0 / 0.1), 0 4px 8px -2px rgb(0 0 0 / 0.06);
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --spacing-1: 8px;
+  --spacing-2: 16px;
+  --spacing-3: 24px;
   /* Premium motion: high-end app feel */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);

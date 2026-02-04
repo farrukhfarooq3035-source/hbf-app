@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { ProductCard } from '@/components/customer/ProductCard';
 import { DealCard } from '@/components/customer/DealCard';
 import { FoodImage } from '@/components/customer/FoodImage';
+import { TrustSection } from '@/components/customer/TrustSection';
 import { HorizontalScrollStrip } from '@/components/customer/HorizontalScrollStrip';
 import { useCartStore } from '@/store/cart-store';
 import { useFavoritesStore } from '@/store/favorites-store';
@@ -166,6 +167,9 @@ export default function MenuPage() {
   return (
     <div className="max-w-4xl mx-auto flex-1 min-h-0 menu-scroll-root w-full min-w-0 overflow-x-hidden px-3 sm:px-5">
       <div className="space-y-4 pb-4">
+        {/* Trust & Social Proof - near top */}
+        <TrustSection />
+
         {/* Open/Closed + Happy Hour Banner */}
         <div
           className={`flex items-center gap-3 p-4 rounded-2xl ${

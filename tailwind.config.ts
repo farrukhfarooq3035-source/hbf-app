@@ -9,10 +9,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: '#E50914',
-        'primary-hover': '#c40812',
-        accent: '#FFC83D',
-        dark: '#1E1E1E',
+        primary: '#B91C1C',
+        'primary-hover': '#991B1B',
+        'primary-deep': '#7F1D1D',
+        accent: '#D4AF37',
+        'accent-matte': '#C9A227',
+        charcoal: '#1a1a1a',
+        'charcoal-muted': '#2d2d2d',
+      },
+      borderRadius: {
+        'premium': '16px',
+        'premium-lg': '20px',
       },
       fontFamily: {
         sans: ['var(--font-outfit)', 'system-ui', 'sans-serif'],
