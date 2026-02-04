@@ -14,8 +14,13 @@ export function getWhatsAppOrderLink(): string | null {
   return process.env.NEXT_PUBLIC_WHATSAPP_ORDER_LINK || null;
 }
 
-/** App URL for sharing. Set NEXT_PUBLIC_APP_URL in .env */
+/** Production app URL - use for QR codes, redirects. Set NEXT_PUBLIC_APP_URL in Vercel. */
+export const PRODUCTION_APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL || 'https://hbf-app-kappa.vercel.app';
+
+/** App URL for sharing. Uses production URL when set, else current origin. */
 export function getAppUrl(): string {
+  if (process.env.NEXT_PUBLIC_APP_URL) return PRODUCTION_APP_URL;
   if (typeof window !== 'undefined') return window.location.origin;
-  return process.env.NEXT_PUBLIC_APP_URL || 'https://hbf.vercel.app';
+  return PRODUCTION_APP_URL;
 }

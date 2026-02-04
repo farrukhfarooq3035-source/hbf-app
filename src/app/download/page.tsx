@@ -3,13 +3,15 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Smartphone, ExternalLink, QrCode } from 'lucide-react';
+import { PRODUCTION_APP_URL } from '@/lib/store-config';
 
 export default function DownloadPage() {
   const [appUrl, setAppUrl] = useState('');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const base = window.location.origin;
+      // Use production URL for QR so it always points to stable kappa (not 404 e4480561)
+      const base = PRODUCTION_APP_URL.replace(/\/$/, '');
       setAppUrl(`${base}/download?install=1`);
     }
   }, []);

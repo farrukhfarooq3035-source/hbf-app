@@ -60,7 +60,7 @@ export default function ProductDetailPage() {
           </div>
         )}
       </div>
-      <div className="px-4 -mt-6 relative z-10">
+      <div className="px-4 mt-8">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4">
           <h1 className="text-xl font-bold text-dark dark:text-white">{product.name}</h1>
 

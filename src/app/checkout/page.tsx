@@ -207,7 +207,7 @@ export default function CheckoutPage() {
         </p>
         <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 mb-3">
           <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
-            📍 Delivery charges: ≤5 km <strong>FREE</strong> • Above 5 km Rs 30/km
+            📍 Delivery charges: Free within 5 km • Rs 30 per km beyond 5 km
           </p>
         </div>
         {freeDeliveryUnder5Km && (

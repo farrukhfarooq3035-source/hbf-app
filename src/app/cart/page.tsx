@@ -71,7 +71,7 @@ export default function CartPage() {
         <div className="space-y-1 mb-4">
           {deliveryMode === 'delivery' && (
             <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">
-              ≤5 km FREE • Above 5 km Rs 30/km
+              Free within 5 km • Rs 30 per km beyond 5 km
             </p>
           )}
           <div className="flex justify-between text-sm">

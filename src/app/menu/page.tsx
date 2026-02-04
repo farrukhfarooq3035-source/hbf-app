@@ -234,7 +234,7 @@ export default function MenuPage() {
             {deliveryMode === 'delivery' && (
               <div className="mt-2 p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
                 <p className="text-xs font-medium text-blue-800 dark:text-blue-200">
-                  ≤5 km delivery <strong>FREE</strong> • Above 5 km Rs 30/km
+                  Free delivery within 5 km • Rs 30 per km beyond 5 km
                 </p>
               </div>
             )}
@@ -247,10 +247,10 @@ export default function MenuPage() {
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-sm w-full p-6 text-center">
               <h3 className="text-lg font-bold text-dark dark:text-white mb-3">Delivery Charges</h3>
               <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                <strong>≤5 km:</strong> FREE delivery
+                <strong>Within 5 km:</strong> Free delivery
               </p>
               <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
-                <strong>Above 5 km:</strong> Rs 30 per km
+                <strong>Beyond 5 km:</strong> Rs 30 per km
               </p>
               <button
                 type="button"
