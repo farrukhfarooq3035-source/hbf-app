@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useMenuCategories, useProducts, useDeals, useHappyHourProductIds } from '@/hooks/use-menu';
 import { useBusinessHours } from '@/hooks/use-business-hours';
+import { useAuth } from '@/hooks/use-auth';
 import { ProductCard } from '@/components/customer/ProductCard';
 import { DealCard } from '@/components/customer/DealCard';
 import { FoodImage } from '@/components/customer/FoodImage';
@@ -12,9 +13,6 @@ import { useFavoritesStore } from '@/store/favorites-store';
 import Link from 'next/link';
 import { Heart, Clock, CheckCircle2, XCircle } from 'lucide-react';
 import type { Product } from '@/types';
-
-const RECENT_SEARCH_KEY = 'hbf-recent-search';
-const RECENT_SEARCH_MAX = 5;
 
 /** Fixed category order for main page (HBF Deals excluded from pills - has its own section) */
 const CATEGORY_ORDER = [
@@ -46,28 +44,12 @@ function uniqueCategoriesByName<T extends { id: string; name: string }>(list: T[
   });
 }
 
-function getRecentSearches(): string[] {
-  if (typeof window === 'undefined') return [];
-  try {
-    const s = localStorage.getItem(RECENT_SEARCH_KEY);
-    return s ? (JSON.parse(s) as string[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function addRecentSearch(term: string) {
-  if (!term.trim()) return;
-  const prev = getRecentSearches().filter((t) => t.toLowerCase() !== term.trim().toLowerCase());
-  const next = [term.trim(), ...prev].slice(0, RECENT_SEARCH_MAX);
-  try {
-    localStorage.setItem(RECENT_SEARCH_KEY, JSON.stringify(next));
-  } catch {}
-}
+const DELIVERY_POPUP_KEY = 'hbf-delivery-popup-seen';
 
 export default function MenuPage() {
   const [search, setSearch] = useState('');
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [showDeliveryPopup, setShowDeliveryPopup] = useState(false);
+  const { user } = useAuth();
   const { deliveryMode, setDeliveryMode } = useCartStore();
   const { productIds: favProductIds, dealIds: favDealIds } = useFavoritesStore();
   const { isOpen, openTime, closeTime, isHappyHour, isAfterMidnight, showHappyHourDeals, happyHourStart, happyHourEnd, happyHourDiscount } = useBusinessHours();
@@ -109,7 +91,17 @@ export default function MenuPage() {
     });
   }, [categories]);
 
-  useEffect(() => setRecentSearches(getRecentSearches()), []);
+  useEffect(() => {
+    if (deliveryMode === 'delivery' && typeof window !== 'undefined') {
+      const seen = sessionStorage.getItem(DELIVERY_POPUP_KEY);
+      if (!seen) setShowDeliveryPopup(true);
+    }
+  }, [deliveryMode]);
+
+  const dismissDeliveryPopup = () => {
+    setShowDeliveryPopup(false);
+    if (typeof window !== 'undefined') sessionStorage.setItem(DELIVERY_POPUP_KEY, '1');
+  };
 
   const bySearchProduct = (p: { name: string }) =>
     !search.trim() || p.name.toLowerCase().includes(search.toLowerCase());
@@ -185,11 +177,6 @@ export default function MenuPage() {
     [uniqueCategories, categoryImageMap]
   );
 
-  const handleSearchBlur = () => {
-    if (search.trim()) addRecentSearch(search.trim());
-    setRecentSearches(getRecentSearches());
-  };
-
   return (
     <div className="max-w-4xl mx-auto flex-1 min-h-0 menu-scroll-root w-full min-w-0 overflow-x-hidden px-3 sm:px-5">
       <div className="space-y-4 pb-4">
@@ -244,8 +231,37 @@ export default function MenuPage() {
                 🏪 Pickup
               </button>
             </div>
+            {deliveryMode === 'delivery' && (
+              <div className="mt-2 p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                <p className="text-xs font-medium text-blue-800 dark:text-blue-200">
+                  ≤5 km delivery <strong>FREE</strong> • Above 5 km Rs 30/km
+                </p>
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Delivery charges popup */}
+        {showDeliveryPopup && deliveryMode === 'delivery' && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-sm w-full p-6 text-center">
+              <h3 className="text-lg font-bold text-dark dark:text-white mb-3">Delivery Charges</h3>
+              <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                <strong>≤5 km:</strong> FREE delivery
+              </p>
+              <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
+                <strong>Above 5 km:</strong> Rs 30 per km
+              </p>
+              <button
+                type="button"
+                onClick={dismissDeliveryPopup}
+                className="w-full py-3 rounded-xl bg-primary text-white font-semibold hover:bg-red-700"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Happy Hour Deals: 3-5pm 10% off, after midnight 10% on Hot Wings, B.B.Q Grilled Burger, Broast Full */}
         {showHappyHourDeals && happyHourProducts.length > 0 && (
@@ -264,30 +280,19 @@ export default function MenuPage() {
           </div>
         )}
 
-        <div className="relative">
+        <div className="space-y-2">
+          {!user && (
+            <p className="text-sm font-bold text-amber-700 dark:text-amber-400">
+              Must login before order
+            </p>
+          )}
           <input
             type="search"
             placeholder="Search menu..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            onBlur={handleSearchBlur}
             className="w-full pl-4 pr-10 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
-          {recentSearches.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
-              <span className="text-xs text-gray-500 dark:text-gray-400">Recent:</span>
-              {recentSearches.map((term) => (
-                <button
-                  key={term}
-                  type="button"
-                  onClick={() => setSearch(term)}
-                  className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 tap-highlight"
-                >
-                  {term}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
 
         {hasFavorites && (

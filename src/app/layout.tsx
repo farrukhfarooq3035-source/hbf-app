@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
 import { Outfit, Sora } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 import { CartBar } from '@/components/customer/CartBar';
 import { LiveOrderButton } from '@/components/customer/LiveOrderButton';
 import { LocationPermission } from '@/components/customer/LocationPermission';
+import { InstallPrompt } from '@/components/customer/InstallPrompt';
 import { RedirectToProduction } from '@/components/RedirectToProduction';
 
 const outfit = Outfit({
@@ -47,6 +49,9 @@ export default function RootLayout({
         <RedirectToProduction />
         <Providers>
           <LocationPermission />
+          <Suspense fallback={null}>
+            <InstallPrompt />
+          </Suspense>
           {children}
           <LiveOrderButton />
           <CartBar />

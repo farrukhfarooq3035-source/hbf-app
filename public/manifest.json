@@ -2,12 +2,14 @@
   "name": "HBF - Haq Bahu Foods",
   "short_name": "HBF",
   "description": "Order delicious food from Haq Bahu Foods",
-  "start_url": "/",
+  "start_url": "/menu",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#E50914",
   "orientation": "portrait-primary",
   "icons": [
-    { "src": "/logo.png", "sizes": "any", "type": "image/png", "purpose": "any" }
+    { "src": "/logo.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

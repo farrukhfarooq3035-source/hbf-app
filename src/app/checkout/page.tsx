@@ -32,10 +32,16 @@ export default function CheckoutPage() {
   const geoDeliveryFee = getDeliveryFee();
   const matchedZone = address.trim() ? zones.find((z) => address.toLowerCase().includes(z.name.toLowerCase())) : null;
   const distanceKm = getDistanceKm();
-  const freeDeliveryUnder5Km = distanceKm != null && distanceKm < 5;
-  let deliveryFee = matchedZone
-    ? (matchedZone.free_above != null && subtotal >= matchedZone.free_above ? 0 : (matchedZone.delivery_fee ?? 0))
-    : geoDeliveryFee;
+  const freeDeliveryUnder5Km = distanceKm != null && distanceKm <= 5;
+  // When we have location: always use geo-based fee (zone does NOT override). Zone only when no location.
+  let deliveryFee: number;
+  if (distanceKm != null) {
+    deliveryFee = geoDeliveryFee; // 0 if ≤5 km, else (km-5)*30
+  } else if (matchedZone) {
+    deliveryFee = matchedZone.free_above != null && subtotal >= matchedZone.free_above ? 0 : (matchedZone.delivery_fee ?? 0);
+  } else {
+    deliveryFee = 0;
+  }
   if (freeDeliveryUnder5Km) deliveryFee = 0;
   const minOrder = matchedZone?.min_order ?? 0;
   const promoDiscount = appliedPromo?.discount ?? 0;
@@ -199,6 +205,11 @@ export default function CheckoutPage() {
         <p className="text-gray-600 dark:text-gray-400 mb-2">
           {items.length} items • Subtotal Rs {subtotal}/-
         </p>
+        <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 mb-3">
+          <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+            📍 Delivery charges: ≤5 km <strong>FREE</strong> • Above 5 km Rs 30/km
+          </p>
+        </div>
         {freeDeliveryUnder5Km && (
           <p className="text-green-600 dark:text-green-400 text-sm mb-2">
             Free delivery (within 5 km)

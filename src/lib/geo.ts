@@ -24,7 +24,7 @@ export function haversineDistance(
   return R * c;
 }
 
-/** Delivery fee: 0–5 km free, beyond 5 km Rs 30 per km */
+/** Delivery fee: ≤5 km free, beyond 5 km Rs 30 per km */
 export function getDeliveryFeeFromDistance(km: number): number {
   if (km <= 5) return 0;
   return Math.ceil((km - 5) * 30);

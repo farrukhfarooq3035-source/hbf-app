@@ -69,6 +69,11 @@ export default function CartPage() {
 
       <div className="fixed bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700 shadow-soft-lg safe-area-bottom" style={{ backgroundColor: 'var(--bg)' }}>
         <div className="space-y-1 mb-4">
+          {deliveryMode === 'delivery' && (
+            <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">
+              ≤5 km FREE • Above 5 km Rs 30/km
+            </p>
+          )}
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Subtotal</span>
             <span>Rs {getSubtotal()}/-</span>

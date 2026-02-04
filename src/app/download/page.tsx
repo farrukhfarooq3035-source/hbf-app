@@ -8,9 +8,13 @@ export default function DownloadPage() {
   const [appUrl, setAppUrl] = useState('');
 
   useEffect(() => {
-    setAppUrl(typeof window !== 'undefined' ? window.location.origin : '');
+    if (typeof window !== 'undefined') {
+      const base = window.location.origin;
+      setAppUrl(`${base}/download?install=1`);
+    }
   }, []);
 
+  const baseUrl = appUrl ? new URL(appUrl).origin : '';
   const qrUrl = appUrl
     ? `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(appUrl)}`
     : '';
@@ -46,11 +50,11 @@ export default function DownloadPage() {
           <div className="w-[200px] h-[200px] sm:w-[240px] sm:h-[240px] bg-gray-100 dark:bg-gray-700 rounded-2xl animate-pulse mb-6" />
         )}
         <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-6">
-          Open your camera and scan the QR code to open the app in your browser
+          Scan QR code — Install popup will appear for Add to Home Screen
         </p>
 
         <a
-          href={appUrl || '#'}
+          href={baseUrl ? `${baseUrl}/menu` : '#'}
           className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-primary text-white font-bold rounded-xl hover:bg-red-700 transition-colors tap-highlight"
         >
           <ExternalLink className="w-5 h-5" />

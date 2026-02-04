@@ -7,9 +7,13 @@ export default function AdminDownloadPage() {
   const [appUrl, setAppUrl] = useState('');
 
   useEffect(() => {
-    setAppUrl(typeof window !== 'undefined' ? window.location.origin : '');
+    if (typeof window !== 'undefined') {
+      const base = window.location.origin;
+      setAppUrl(`${base}/download?install=1`);
+    }
   }, []);
 
+  const baseUrl = appUrl ? appUrl.replace('/download?install=1', '') : '';
   const qrUrl = appUrl
     ? `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(appUrl)}`
     : '';
@@ -52,7 +56,7 @@ export default function AdminDownloadPage() {
           ) : (
             <div className="w-[280px] h-[280px] bg-gray-100 dark:bg-gray-700 rounded-2xl animate-pulse mb-4" />
           )}
-          <p className="text-center font-semibold text-gray-800 dark:text-gray-200 mb-1">Scan to open HBF App</p>
+          <p className="text-center font-semibold text-gray-800 dark:text-gray-200 mb-1">Scan → Install popup will appear</p>
           <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">{appUrl}</p>
           <div className="flex flex-wrap gap-3">
             <button
@@ -79,10 +83,10 @@ export default function AdminDownloadPage() {
             <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Direct link</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Customers ko ye link share karein:</p>
             <code className="block p-3 bg-white dark:bg-gray-800 rounded-lg text-sm break-all border border-gray-200 dark:border-gray-600">
-              {appUrl || 'Loading...'}
+              {baseUrl || appUrl || 'Loading...'}
             </code>
             <a
-              href={appUrl}
+              href={baseUrl || appUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block mt-2 text-primary font-medium hover:underline"
@@ -92,7 +96,7 @@ export default function AdminDownloadPage() {
           </div>
           <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
             <p className="text-sm text-amber-800 dark:text-amber-200">
-              <strong>Tip:</strong> QR print karke counter pe laga dein. Customers scan karke app khol sakte hain aur &quot;Add to Home Screen&quot; se phone pe install kar sakte hain.
+              <strong>Tip:</strong> QR print karke counter pe laga dein. Scan karke Install popup aayega — Android pe Install tap karein, iPhone pe Share → Add to Home Screen.
             </p>
           </div>
         </div>
