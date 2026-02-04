@@ -149,8 +149,23 @@ export default function AdminDashboardPage() {
     URL.revokeObjectURL(url);
   };
 
+  const hasPending = (pendingOrders?.length ?? 0) > 0;
+
   return (
     <div className="p-6">
+      {hasPending && (
+        <div className="mb-4 flex items-center gap-3 rounded-xl border-2 border-amber-400 bg-amber-50 px-4 py-3 shadow-sm">
+          <div className="h-4 w-4 flex-shrink-0 rounded-full bg-amber-500 animate-pulse" title="Alert ON" />
+          <span className="font-semibold text-amber-800">Pending orders alert: ON</span>
+          <span className="text-amber-700">— {pendingOrders?.length} order(s) need attention</span>
+          <Link
+            href="/admin/orders/online"
+            className="ml-auto rounded-lg bg-amber-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-600"
+          >
+            View orders
+          </Link>
+        </div>
+      )}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
         <div className="flex items-center gap-2">
@@ -194,19 +209,23 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm border">
+        <div
+          className={`rounded-2xl p-6 shadow-sm border-2 ${
+            hasPending ? 'border-amber-400 bg-amber-50/50' : 'border border-gray-200 bg-white'
+          }`}
+        >
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <div
-                className={`w-3 h-3 rounded-full ${(pendingOrders?.length ?? 0) > 0 ? 'bg-amber-500 animate-pulse' : 'bg-gray-300'}`}
-                title={(pendingOrders?.length ?? 0) > 0 ? 'Alert: Pending orders' : 'No pending orders'}
+                className={`h-4 w-4 rounded-full ${hasPending ? 'bg-amber-500 animate-pulse' : 'bg-gray-300'}`}
+                title={hasPending ? 'Alert: Pending orders' : 'No pending orders'}
               />
-              <span className="text-xs font-medium text-gray-500">
-                {(pendingOrders?.length ?? 0) > 0 ? 'ON' : 'OFF'}
+              <span className={`text-sm font-semibold ${hasPending ? 'text-amber-700' : 'text-gray-500'}`}>
+                {hasPending ? 'ON' : 'OFF'}
               </span>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-              <Clock className="w-6 h-6 text-blue-600" />
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${hasPending ? 'bg-amber-100' : 'bg-blue-100'}`}>
+              <Clock className={`w-6 h-6 ${hasPending ? 'text-amber-600' : 'text-blue-600'}`} />
             </div>
             <div>
               <p className="text-sm text-gray-800">Pending Orders</p>
