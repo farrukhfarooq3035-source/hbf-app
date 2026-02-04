@@ -1,14 +1,29 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Minus, Plus, Trash2 } from 'lucide-react';
+import { Minus, Plus, Trash2, RefreshCw } from 'lucide-react';
 import { useCartStore } from '@/store/cart-store';
 
 export default function CartPage() {
   const router = useRouter();
-  const { items, updateQty, removeItem, getSubtotal, getDeliveryFee, getGrandTotal, getEstimatedDeliveryMinutes, deliveryMode } = useCartStore();
+  const { items, updateQty, removeItem, getSubtotal, getDeliveryFee, getGrandTotal, getDistanceKm, getEstimatedDeliveryMinutes, deliveryMode, setUserLocation } = useCartStore();
+  const [refreshingLocation, setRefreshingLocation] = useState(false);
   const estMins = getEstimatedDeliveryMinutes();
+  const distanceKm = getDistanceKm();
+  const refreshLocation = () => {
+    if (typeof navigator === 'undefined' || !('geolocation' in navigator)) return;
+    setRefreshingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLocation(pos.coords.latitude, pos.coords.longitude);
+        setRefreshingLocation(false);
+      },
+      () => setRefreshingLocation(false),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
 
   if (items.length === 0) {
     return (
@@ -70,9 +85,22 @@ export default function CartPage() {
       <div className="fixed bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700 shadow-soft-lg safe-area-bottom" style={{ backgroundColor: 'var(--bg)' }}>
         <div className="space-y-1 mb-4">
           {deliveryMode === 'delivery' && (
-            <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">
-              Free within 5 km • Rs 30 per km beyond 5 km
-            </p>
+            <div>
+              <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">
+                Free within 5 km • Rs 30 per km beyond 5 km
+              </p>
+              {distanceKm != null && (
+                <button
+                  type="button"
+                  onClick={refreshLocation}
+                  disabled={refreshingLocation}
+                  className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 hover:underline mt-0.5"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${refreshingLocation ? 'animate-spin' : ''}`} />
+                  {refreshingLocation ? 'Updating...' : 'Wrong distance? Refresh location'}
+                </button>
+              )}
+            </div>
           )}
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Subtotal</span>

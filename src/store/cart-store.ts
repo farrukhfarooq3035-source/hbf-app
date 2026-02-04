@@ -120,6 +120,14 @@ export const useCartStore = create<CartState>()(
         return 20 + Math.round(km * 3);
       },
     }),
-    { name: 'hbf-cart' }
+    {
+      name: 'hbf-cart',
+      partialize: (state) => ({
+        items: state.items,
+        deliveryMode: state.deliveryMode,
+        locationAllowed: state.locationAllowed,
+        bump: state.bump,
+      }),
+    }
   )
 );

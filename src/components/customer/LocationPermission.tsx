@@ -15,7 +15,7 @@ function isSecureContext(): boolean {
 
 export function LocationPermission() {
   const pathname = usePathname();
-  const { locationAllowed, setUserLocation, setLocationDenied } = useCartStore();
+  const { locationAllowed, userLocation, setUserLocation, setLocationDenied } = useCartStore();
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -25,16 +25,17 @@ export function LocationPermission() {
   const secure = isSecureContext();
 
   useEffect(() => {
+    const needsLocation = locationAllowed === null || (locationAllowed === true && userLocation === null);
     if (
       !isAdmin &&
       isCustomerRoute &&
-      locationAllowed === null &&
+      needsLocation &&
       typeof navigator !== 'undefined' &&
       'geolocation' in navigator
     ) {
       setShow(true);
     }
-  }, [locationAllowed, isCustomerRoute, isAdmin]);
+  }, [locationAllowed, userLocation, isCustomerRoute, isAdmin]);
 
   const handleAllow = () => {
     if (!secure) {

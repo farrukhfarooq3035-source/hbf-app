@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, Heart, GitCompare } from 'lucide-react';
 import { useCartStore } from '@/store/cart-store';
@@ -20,12 +20,27 @@ export function ProductCard({ product, discountPercent }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
   const { isProductFavorite, toggleProduct } = useFavoritesStore();
   const isFav = isProductFavorite(product.id);
-  const originalPrice = product.size_options?.[0]?.price ?? product.price;
+  const sizeOptions = product.size_options ?? [];
+  const [selectedSize, setSelectedSize] = useState<string | null>(
+    sizeOptions.length ? sizeOptions[0].name : null
+  );
+  const selectedSizeOption = selectedSize
+    ? sizeOptions.find((s) => s.name === selectedSize)
+    : null;
+  const originalPrice = selectedSizeOption?.price ?? product.size_options?.[0]?.price ?? product.price;
   const price = discountPercent
     ? Math.round(originalPrice * (1 - discountPercent / 100))
     : originalPrice;
   const [quickPeekOpen, setQuickPeekOpen] = useState(false);
   const { add: addToCompare, has: isInCompare } = useCompareStore();
+
+  useEffect(() => {
+    if (sizeOptions.length) {
+      setSelectedSize(sizeOptions[0].name);
+    } else {
+      setSelectedSize(null);
+    }
+  }, [product.id]);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-premium border border-gray-100 dark:border-gray-700 overflow-hidden hover-lift dark:ring-1 dark:ring-primary/20 h-full flex flex-col image-pop">
@@ -76,10 +91,26 @@ export function ProductCard({ product, discountPercent }: ProductCardProps) {
             {product.description}
           </p>
         )}
-        {product.size_options && product.size_options.length > 0 && (
-          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 font-medium">
-            {product.size_options.map((s) => `${s.name} Rs ${s.price}/-`).join(' • ')}
-          </p>
+        {sizeOptions.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {sizeOptions.map((s) => (
+              <button
+                key={s.name}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setSelectedSize(s.name);
+                }}
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                  selectedSize === s.name
+                    ? 'bg-primary text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                {s.name} Rs {s.price}/-
+              </button>
+            ))}
+          </div>
         )}
         <div className="mt-1 flex items-baseline gap-2">
           {discountPercent ? (
@@ -101,12 +132,13 @@ export function ProductCard({ product, discountPercent }: ProductCardProps) {
               product_id: product.id,
               name: product.name,
               price,
+              size: selectedSize ?? undefined,
             });
           }}
           className="w-full py-2 bg-primary text-white rounded-xl flex items-center justify-center gap-2 font-medium hover:bg-primary-hover transition-colors duration-280 ease-smooth tap-highlight"
         >
           <Plus className="w-4 h-4" />
-          Add
+          Add {selectedSize ? `(${selectedSize})` : ''}
         </button>
       </div>
 

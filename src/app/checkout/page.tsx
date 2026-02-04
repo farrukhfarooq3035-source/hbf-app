@@ -6,14 +6,14 @@ import { useCartStore } from '@/store/cart-store';
 import { useBusinessHours } from '@/hooks/use-business-hours';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/lib/supabase';
-import { Clock } from 'lucide-react';
+import { Clock, RefreshCw } from 'lucide-react';
 
 interface Zone { id: string; name: string; min_order: number; delivery_fee: number; free_above: number | null }
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const { items, getSubtotal, getDeliveryFee, getGrandTotal, getDistanceKm, getEstimatedDeliveryMinutes, clearCart } = useCartStore();
+  const { items, getSubtotal, getDeliveryFee, getGrandTotal, getDistanceKm, getEstimatedDeliveryMinutes, clearCart, setUserLocation } = useCartStore();
   const { isOpen, openTime, closeTime, isHappyHour, happyHourDiscount } = useBusinessHours();
   const estMins = getEstimatedDeliveryMinutes();
   const [name, setName] = useState('');
@@ -27,6 +27,7 @@ export default function CheckoutPage() {
   const [zones, setZones] = useState<Zone[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [refreshingLocation, setRefreshingLocation] = useState(false);
 
   const subtotal = getSubtotal();
   const geoDeliveryFee = getDeliveryFee();
@@ -100,6 +101,19 @@ export default function CheckoutPage() {
         }
       })
       .catch(() => setPromoError('Could not validate'));
+  };
+
+  const refreshLocation = () => {
+    if (typeof navigator === 'undefined' || !('geolocation' in navigator)) return;
+    setRefreshingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLocation(pos.coords.latitude, pos.coords.longitude);
+        setRefreshingLocation(false);
+      },
+      () => setRefreshingLocation(false),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -209,6 +223,23 @@ export default function CheckoutPage() {
           <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
             📍 Delivery charges: Free within 5 km • Rs 30 per km beyond 5 km
           </p>
+          {distanceKm != null && (
+            <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+              You&apos;re {distanceKm.toFixed(1)} km away
+              {distanceKm > 5 && ` • Rs ${deliveryFee}/- delivery fee`}
+            </p>
+          )}
+          {distanceKm != null && (
+            <button
+              type="button"
+              onClick={refreshLocation}
+              disabled={refreshingLocation}
+              className="mt-2 flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${refreshingLocation ? 'animate-spin' : ''}`} />
+              {refreshingLocation ? 'Updating...' : 'Wrong distance? Refresh location'}
+            </button>
+          )}
         </div>
         {freeDeliveryUnder5Km && (
           <p className="text-green-600 dark:text-green-400 text-sm mb-2">
