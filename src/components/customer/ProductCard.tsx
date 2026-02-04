@@ -76,6 +76,11 @@ export function ProductCard({ product, discountPercent }: ProductCardProps) {
             {product.description}
           </p>
         )}
+        {product.size_options && product.size_options.length > 0 && (
+          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 font-medium">
+            {product.size_options.map((s) => `${s.name} Rs ${s.price}/-`).join(' • ')}
+          </p>
+        )}
         <div className="mt-1 flex items-baseline gap-2">
           {discountPercent ? (
             <>
