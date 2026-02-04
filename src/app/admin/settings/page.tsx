@@ -8,8 +8,8 @@ const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export default function AdminSettingsPage() {
   const storePhone = getStorePhone() || DEFAULT_STORE_PHONE_DISPLAY;
   const isFromEnv = !!getStorePhone();
-  const [openTime, setOpenTime] = useState('11:00');
-  const [closeTime, setCloseTime] = useState('23:00');
+  const [openTime, setOpenTime] = useState('10:00');
+  const [closeTime, setCloseTime] = useState('01:00');
   const [closedDays, setClosedDays] = useState<number[]>([]);
   const [happyHourStart, setHappyHourStart] = useState('15:00');
   const [happyHourEnd, setHappyHourEnd] = useState('17:00');

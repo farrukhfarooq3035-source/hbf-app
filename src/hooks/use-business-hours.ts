@@ -25,8 +25,8 @@ export function useBusinessHours() {
       if (!res.ok) return null;
       const data = await res.json();
       return {
-        open_time: (data.open_time as string) || '11:00',
-        close_time: (data.close_time as string) || '23:00',
+        open_time: (data.open_time as string) || '10:00',
+        close_time: (data.close_time as string) || '01:00',
         closed_days: (data.closed_days as number[]) || [],
         happy_hour_start: (data.happy_hour_start as string) || '15:00',
         happy_hour_end: (data.happy_hour_end as string) || '17:00',
@@ -48,8 +48,8 @@ export function useBusinessHours() {
   const showHappyHourDeals = isHappyHour || isAfterMidnight;
   return {
     ...q,
-    openTime: data?.open_time ?? '11:00',
-    closeTime: data?.close_time ?? '23:00',
+    openTime: data?.open_time ?? '10:00',
+    closeTime: data?.close_time ?? '01:00',
     closedDays: data?.closed_days ?? [],
     isOpen,
     isHappyHour,
