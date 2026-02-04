@@ -102,6 +102,7 @@ export function NewOrderAlert() {
           const orderId = message.order_id;
           let orderLabel = formatOrderNumber(orderId);
           let customerInfo = '';
+          let orderChannel = 'online';
           try {
             const { data } = await supabase
               .from('orders')
@@ -111,8 +112,11 @@ export function NewOrderAlert() {
             if (data?.customer_name) {
               customerInfo = data.customer_name;
             }
-            if (data?.order_channel && data.order_channel !== 'online') {
-              customerInfo = `${customerInfo ? `${customerInfo} • ` : ''}${data.order_channel}`;
+            if (data?.order_channel) {
+              orderChannel = data.order_channel;
+              if (orderChannel !== 'online') {
+                customerInfo = `${customerInfo ? `${customerInfo} • ` : ''}${orderChannel}`;
+              }
             }
           } catch {
             // ignore
@@ -125,8 +129,29 @@ export function NewOrderAlert() {
               tag: `chat-${orderId}`,
             }).onclick = () => {
               window.focus();
-              router.push('/admin/orders');
+              const isRestaurant = ['walk_in', 'dine_in', 'takeaway'].includes(orderChannel);
+              router.push(isRestaurant ? '/admin/orders/restaurant' : '/admin/orders/online');
             };
+          }
+          try {
+            if (!audioRef.current) {
+              const audio = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU');
+              audio.volume = 0.5;
+              audioRef.current = audio;
+            }
+            const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.frequency.value = 600;
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.15);
+          } catch {
+            // fallback: no sound
           }
         }
       )

@@ -45,6 +45,7 @@ type ChatThreadMeta = {
   order_id: string;
   last_message_preview?: string | null;
   unread_for_admin?: boolean | null;
+  order_chat_messages?: { count: number }[];
 };
 
 function RestaurantOrdersContent() {
@@ -77,7 +78,7 @@ function RestaurantOrdersContent() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('order_chat_threads')
-        .select('id, order_id, last_message_preview, unread_for_admin')
+        .select('id, order_id, last_message_preview, unread_for_admin, order_chat_messages(count)')
         .eq('channel', 'customer_support');
       if (error) return [];
       return (data ?? []) as ChatThreadMeta[];
@@ -97,6 +98,9 @@ function RestaurantOrdersContent() {
     const ch = supabase
       .channel('admin-chat-meta-rest')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'order_chat_threads' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['order-chat-threads'] });
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'order_chat_messages' }, () => {
         queryClient.invalidateQueries({ queryKey: ['order-chat-threads'] });
       })
       .subscribe();
@@ -246,6 +250,7 @@ function RestaurantOrdersContent() {
                 const chatMeta = chatMetaMap.get(order.id);
                 const hasUnreadChat = !!chatMeta?.unread_for_admin;
                 const lastChatPreview = chatMeta?.last_message_preview;
+                const messageCount = (chatMeta as ChatThreadMeta)?.order_chat_messages?.[0]?.count ?? 0;
                 return (
                   <div key={order.id} className="bg-white rounded-xl p-4 shadow-sm border text-gray-900">
                     <p className="font-semibold text-sm flex items-center gap-1 text-gray-900">
@@ -286,6 +291,13 @@ function RestaurantOrdersContent() {
                       >
                         <MessageCircle className="w-4 h-4" />
                         Support chat
+                        {messageCount > 0 && (
+                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                            hasUnreadChat ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'
+                          }`}>
+                            {messageCount > 99 ? '99+' : messageCount}
+                          </span>
+                        )}
                         {hasUnreadChat && (
                           <span className="inline-flex items-center rounded-full bg-primary text-white px-2 py-0.5 text-[10px]">
                             New
