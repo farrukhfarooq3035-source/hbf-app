@@ -2,11 +2,11 @@
 
 import { useEffect } from 'react';
 
-/** Production URL (e4480561 team) - set NEXT_PUBLIC_APP_URL in Vercel if different */
+/** Production URL - set NEXT_PUBLIC_APP_URL in Vercel (Settings → Environment Variables) */
 const PRODUCTION_ORIGIN =
   process.env.NEXT_PUBLIC_APP_URL || 'https://hbf-farrukhs-projects-e4480561.vercel.app';
 
-/** Redirect from old deployment (86ed0370) to production (e4480561) */
+/** Redirect from old team (86ed0370) to production (e4480561) */
 export function RedirectToProduction() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
