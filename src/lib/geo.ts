@@ -1,8 +1,10 @@
 /**
- * HBF store location: Near Pak Arab Society, Opp Awan Market, Lahore
+ * HBF store location: Saroba Garden Housing Society, Ferozepur Road, Lahore
+ * (Near Pak Arab Society, Opp Awan Market - 17 km Lahore-Kasur Road)
+ * Updated to match actual delivery area - user at 31.42,74.35 is ~1.1 km away
  */
-export const STORE_LAT = 31.5204;
-export const STORE_LNG = 74.3587;
+export const STORE_LAT = 31.4315;
+export const STORE_LNG = 74.3555;
 
 /** Distance in km using Haversine formula */
 export function haversineDistance(

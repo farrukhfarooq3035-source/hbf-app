@@ -11,49 +11,18 @@ function CartItemRow({
   item,
   idx,
   updateQty,
-  updateItem,
   removeItem,
 }: {
   item: CartItem;
   idx: number;
   updateQty: (index: number, qty: number) => void;
-  updateItem: (index: number, updates: Partial<Pick<CartItem, 'size' | 'addons' | 'price'>>) => void;
   removeItem: (index: number) => void;
 }) {
-  const sizeOptions = item.size_options ?? [];
-  const addonOptions = (item.is_pizza ? item.addon_options : undefined) ?? [];
   const currentAddons = item.addons ?? [];
-  const basePrice = item.size && sizeOptions.length
-    ? sizeOptions.find((s) => s.name === item.size)?.price ?? sizeOptions[0]?.price ?? item.price
-    : item.price;
-  const addonTotal = addonOptions
-    .filter((a) => currentAddons.includes(a.name))
-    .reduce((s, a) => s + a.price, 0);
-
-  const handleSizeChange = (size: string) => {
-    const sizePrice = sizeOptions.find((s) => s.name === size)?.price ?? basePrice;
-    const newPrice = sizePrice + addonTotal;
-    updateItem(idx, { size, price: newPrice });
-  };
-
-  const handleAddonToggle = (addonName: string) => {
-    const addon = addonOptions.find((a) => a.name === addonName);
-    if (!addon) return;
-    const newAddons = currentAddons.includes(addonName)
-      ? currentAddons.filter((a) => a !== addonName)
-      : [...currentAddons, addonName];
-    const newAddonTotal = addonOptions
-      .filter((a) => newAddons.includes(a.name))
-      .reduce((s, a) => s + a.price, 0);
-    const newPrice = basePrice + newAddonTotal;
-    updateItem(idx, { addons: newAddons, price: newPrice });
-  };
-
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 flex flex-col gap-3">
-      <div className="flex gap-4">
-        <div className="flex-1 min-w-0">
-          <h3 className="font-semibold">{item.name}</h3>
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 flex gap-4">
+      <div className="flex-1 min-w-0">
+        <h3 className="font-semibold">{item.name}</h3>
           {item.size && <p className="text-sm text-gray-500 dark:text-gray-400">{item.size}</p>}
           {currentAddons.length > 0 && (
             <p className="text-xs text-gray-500 dark:text-gray-400">+ {currentAddons.join(', ')}</p>
@@ -81,56 +50,13 @@ function CartItemRow({
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
-      </div>
-      {sizeOptions.length > 0 && (
-        <div>
-          <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Size</p>
-          <div className="flex flex-wrap gap-1.5">
-            {sizeOptions.map((s) => (
-              <button
-                key={s.name}
-                type="button"
-                onClick={() => handleSizeChange(s.name)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium ${
-                  item.size === s.name
-                    ? 'bg-primary text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                {s.name} Rs {s.price}/-
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-      {addonOptions.length > 0 && (
-        <div>
-          <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Add-ons</p>
-          <div className="flex flex-wrap gap-2">
-            {addonOptions.map((a) => (
-              <label
-                key={a.name}
-                className="flex items-center gap-2 text-xs cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  checked={currentAddons.includes(a.name)}
-                  onChange={() => handleAddonToggle(a.name)}
-                  className="w-3.5 h-3.5 rounded"
-                />
-                <span>{a.name} +Rs {a.price}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
 export default function CartPage() {
   const router = useRouter();
-  const { items, updateQty, updateItem, removeItem, getSubtotal, getDeliveryFee, getGrandTotal, getDistanceKm, getEstimatedDeliveryMinutes, deliveryMode, setUserLocation } = useCartStore();
+  const { items, updateQty, removeItem, getSubtotal, getDeliveryFee, getGrandTotal, getDistanceKm, getEstimatedDeliveryMinutes, deliveryMode, setUserLocation } = useCartStore();
   const [refreshingLocation, setRefreshingLocation] = useState(false);
   const estMins = getEstimatedDeliveryMinutes();
   const distanceKm = getDistanceKm();
@@ -139,18 +65,10 @@ export default function CartPage() {
     setRefreshingLocation(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/b49ee9de-50a9-4b90-89b0-cd9575d76b4f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'cart/page.tsx:refreshLocation',message:'getCurrentPosition success',data:{lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:pos.coords.accuracy},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2,H3'})}).catch(()=>{});
-        // #endregion
         setUserLocation(pos.coords.latitude, pos.coords.longitude);
         setRefreshingLocation(false);
       },
-      (err) => {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/b49ee9de-50a9-4b90-89b0-cd9575d76b4f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'cart/page.tsx:refreshLocation',message:'getCurrentPosition error',data:{code:err.code,message:err.message},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
-        // #endregion
-        setRefreshingLocation(false);
-      },
+      () => setRefreshingLocation(false),
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   };
@@ -175,7 +93,7 @@ export default function CartPage() {
         <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
         <div className="space-y-3">
           {items.map((item, idx) => (
-            <CartItemRow key={idx} item={item} idx={idx} updateQty={updateQty} updateItem={updateItem} removeItem={removeItem} />
+            <CartItemRow key={idx} item={item} idx={idx} updateQty={updateQty} removeItem={removeItem} />
           ))}
         </div>
       </div>

@@ -8,7 +8,6 @@ import { useFavoritesStore } from '@/store/favorites-store';
 import { useCompareStore } from '@/store/compare-store';
 import { FoodImage } from '@/components/customer/FoodImage';
 import { QuickPeek } from '@/components/customer/QuickPeek';
-import { AddToCartModal } from '@/components/customer/AddToCartModal';
 import { isPizzaProduct } from '@/lib/pizza-addons';
 import type { Product } from '@/types';
 
@@ -34,7 +33,6 @@ export function ProductCard({ product, discountPercent }: ProductCardProps) {
     ? Math.round(originalPrice * (1 - discountPercent / 100))
     : originalPrice;
   const [quickPeekOpen, setQuickPeekOpen] = useState(false);
-  const [addModalOpen, setAddModalOpen] = useState(false);
   const { add: addToCompare, has: isInCompare } = useCompareStore();
   const isPizza = sizeOptions.length > 0 && isPizzaProduct(product);
 
@@ -129,34 +127,32 @@ export function ProductCard({ product, discountPercent }: ProductCardProps) {
         </div>
       </Link>
       <div className="px-3 pb-3">
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            if (isPizza) {
-              setAddModalOpen(true);
-            } else {
+        {isPizza ? (
+          <Link
+            href={`/menu/product/${product.id}`}
+            className="block w-full py-2 bg-primary text-white rounded-xl flex items-center justify-center gap-2 font-medium hover:bg-primary-hover transition-colors duration-280 ease-smooth tap-highlight text-center"
+          >
+            <Plus className="w-4 h-4" />
+            Customize & Add
+          </Link>
+        ) : (
+          <button
+            onClick={(e) => {
+              e.preventDefault();
               addItem({
                 product_id: product.id,
                 name: product.name,
                 price,
                 size: selectedSize ?? undefined,
               });
-            }
-          }}
-          className="w-full py-2 bg-primary text-white rounded-xl flex items-center justify-center gap-2 font-medium hover:bg-primary-hover transition-colors duration-280 ease-smooth tap-highlight"
-        >
-          <Plus className="w-4 h-4" />
-          Add {!isPizza && selectedSize ? `(${selectedSize})` : isPizza ? 'to Cart' : ''}
-        </button>
+            }}
+            className="w-full py-2 bg-primary text-white rounded-xl flex items-center justify-center gap-2 font-medium hover:bg-primary-hover transition-colors duration-280 ease-smooth tap-highlight"
+          >
+            <Plus className="w-4 h-4" />
+            Add {selectedSize ? `(${selectedSize})` : ''}
+          </button>
+        )}
       </div>
-
-      {addModalOpen && isPizza && (
-        <AddToCartModal
-          product={product}
-          discountPercent={discountPercent}
-          onClose={() => setAddModalOpen(false)}
-        />
-      )}
       {quickPeekOpen && product.image_url && (
         <QuickPeek
           imageUrl={product.image_url}

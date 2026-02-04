@@ -92,35 +92,22 @@ export const useCartStore = create<CartState>()(
       },
       clearCart: () => set({ items: [] }),
       setDeliveryMode: (mode) => set({ deliveryMode: mode }),
-      setUserLocation: (lat, lng) => {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/b49ee9de-50a9-4b90-89b0-cd9575d76b4f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'cart-store.ts:setUserLocation',message:'setUserLocation called',data:{lat,lng,storeLat:STORE_LAT,storeLng:STORE_LNG,km:haversineDistance(STORE_LAT,STORE_LNG,lat,lng)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
-        // #endregion
-        set({ userLocation: { lat, lng }, locationAllowed: true });
-      },
+      setUserLocation: (lat, lng) =>
+        set({ userLocation: { lat, lng }, locationAllowed: true }),
       setLocationDenied: () => set({ locationAllowed: false }),
       getSubtotal: () =>
         get().items.reduce((sum, i) => sum + i.price * i.qty, 0),
       getDeliveryFee: () => {
         const s = get();
         if (s.deliveryMode === 'pickup') return 0;
-        if (!s.userLocation) {
-          // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/b49ee9de-50a9-4b90-89b0-cd9575d76b4f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'cart-store.ts:getDeliveryFee',message:'userLocation is null',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
-          // #endregion
-          return 0;
-        }
+        if (!s.userLocation) return 0;
         const km = haversineDistance(
           STORE_LAT,
           STORE_LNG,
           s.userLocation.lat,
           s.userLocation.lng
         );
-        const fee = getDeliveryFeeFromDistance(km);
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/b49ee9de-50a9-4b90-89b0-cd9575d76b4f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'cart-store.ts:getDeliveryFee',message:'fee computed',data:{userLat:s.userLocation.lat,userLng:s.userLocation.lng,storeLat:STORE_LAT,storeLng:STORE_LNG,km,fee},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1,H3,H4,H5'})}).catch(()=>{});
-        // #endregion
-        return fee;
+        return getDeliveryFeeFromDistance(km);
       },
       getGrandTotal: () =>
         get().getSubtotal() + get().getDeliveryFee(),
@@ -130,16 +117,12 @@ export const useCartStore = create<CartState>()(
       getDistanceKm: () => {
         const s = get();
         if (!s.userLocation) return null;
-        const km = haversineDistance(
+        return haversineDistance(
           STORE_LAT,
           STORE_LNG,
           s.userLocation.lat,
           s.userLocation.lng
         );
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/b49ee9de-50a9-4b90-89b0-cd9575d76b4f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'cart-store.ts:getDistanceKm',message:'distance computed',data:{userLat:s.userLocation.lat,userLng:s.userLocation.lng,km},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1,H3,H4'})}).catch(()=>{});
-        // #endregion
-        return km;
       },
       getEstimatedDeliveryMinutes: () => {
         const s = get();
