@@ -11,6 +11,13 @@ interface PosItemPayload {
   name: string;
 }
 
+function generateReceiptNumber() {
+  const now = new Date();
+  const year = now.getFullYear().toString().slice(-2);
+  const random = Math.random().toString(36).slice(2, 8).toUpperCase();
+  return `INV-${year}${random}`;
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -38,12 +45,13 @@ export async function POST(req: Request) {
     const deliveryFee = Number(body.delivery_fee ?? 0);
     const totalPrice = Number(body.total_price ?? 0);
     const amountPaid = Number(body.amount_paid ?? 0);
-    const amountDue = Number(body.amount_due ?? Math.max(totalPrice - amountPaid, 0));
+    const amountDue = Math.max(totalPrice - amountPaid, 0);
     const dueAt =
       typeof body.due_at === 'string' && body.due_at
         ? new Date(body.due_at).toISOString()
         : null;
 
+    const invoiceTimestamp = new Date().toISOString();
     const orderPayload = {
       status: 'new',
       customer_name: sanitizeText(body.customer_name, 'Walk-in Guest'),
@@ -62,7 +70,10 @@ export async function POST(req: Request) {
       service_mode: serviceMode,
       table_number: sanitizeText(body.table_number, '') || null,
       token_number: sanitizeText(body.token_number, '') || null,
-      receipt_number: sanitizeText(body.receipt_number, '') || null,
+      receipt_number: generateReceiptNumber(),
+      receipt_issued_at: invoiceTimestamp,
+      invoice_status: 'issued',
+      last_invoice_edit_at: invoiceTimestamp,
     };
 
     const { data: order, error } = await supabaseAdmin

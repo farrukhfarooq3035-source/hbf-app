@@ -20,6 +20,7 @@ import {
   Star,
   Smartphone,
   PenSquare,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -38,6 +39,7 @@ const navItems = [
   { href: '/admin/reviews', icon: Star, label: 'Reviews' },
   { href: '/admin/zones', icon: MapPin, label: 'Delivery Zones' },
   { href: '/admin/reservations', icon: CalendarDays, label: 'Reservations' },
+  { href: '/admin/sales', icon: FileSpreadsheet, label: 'Sales Record' },
   { href: '/admin/reports', icon: BarChart3, label: 'Reports' },
   { href: '/admin/download', icon: Smartphone, label: 'Download App' },
   { href: '/admin/settings', icon: Settings, label: 'Settings' },

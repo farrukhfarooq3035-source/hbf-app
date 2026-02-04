@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { Check, Package, Truck, Phone, Share2, RefreshCw, RotateCcw } from 'lucide-react';
+import { Check, Package, Truck, Phone, Share2, RefreshCw, RotateCcw, MessageCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useCartStore } from '@/store/cart-store';
 import { formatOrderNumber } from '@/lib/order-utils';
@@ -15,6 +15,7 @@ import { StarRating, StarRatingDisplay } from '@/components/customer/StarRating'
 import { RiderMap } from '@/components/RiderMap';
 import { STORE_LAT, STORE_LNG } from '@/lib/geo';
 import type { Order, OrderStatus, OrderItem } from '@/types';
+import { OrderChatPanel } from '@/components/customer/OrderChatPanel';
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   new: 'New',
@@ -55,6 +56,7 @@ export default function OrderTrackingPage() {
   const [riderLocation, setRiderLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [riderInfo, setRiderInfo] = useState<{ name: string | null; phone: string | null }>({ name: null, phone: null });
   const [refreshingRider, setRefreshingRider] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const storePhone = getStorePhone();
   const addItem = useCartStore((s) => s.addItem);
   const routerForCart = useRouter();
@@ -349,6 +351,14 @@ export default function OrderTrackingPage() {
             <Share2 className="w-4 h-4" />
             Share tracking link
           </button>
+          <button
+            type="button"
+            onClick={() => setChatOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 text-primary font-medium tap-highlight hover:bg-primary/20"
+          >
+            <MessageCircle className="w-4 h-4" />
+            Chat with support
+          </button>
         </div>
       </div>
 
@@ -484,6 +494,13 @@ export default function OrderTrackingPage() {
         ))}
       </div>
 
+      <OrderChatPanel
+        orderId={order.id}
+        orderNumber={formatOrderNumber(order.id)}
+        open={chatOpen}
+        onClose={() => setChatOpen(false)}
+        userId={user?.id}
+      />
       <Link
         href="/menu"
         className="block w-full py-4 bg-primary text-white font-bold rounded-xl text-center hover:bg-red-700"

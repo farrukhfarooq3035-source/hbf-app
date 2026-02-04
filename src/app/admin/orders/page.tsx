@@ -1,16 +1,17 @@
 'use client';
 
-import { Suspense, useState, useMemo } from 'react';
+import { Suspense, useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { supabase } from '@/lib/supabase';
-import { Star } from 'lucide-react';
+import { Star, MessageCircle } from 'lucide-react';
 import { formatOrderNumber } from '@/lib/order-utils';
 import { StarRatingDisplay } from '@/components/customer/StarRating';
-import type { OrderStatus } from '@/types';
+import type { OrderStatus, Order } from '@/types';
 import { InvoiceActions } from '@/components/admin/invoice/InvoiceActions';
 import { PaymentLedger } from '@/components/admin/payments/PaymentLedger';
+import { AdminOrderChatDrawer } from '@/components/admin/chat/AdminOrderChatDrawer';
 
 function minsBetween(a: string | null | undefined, b: string | null | undefined): number | null {
   if (!a || !b) return null;
@@ -36,11 +37,21 @@ const CHANNEL_BADGES: Record<
   takeaway: { label: 'Takeaway', className: 'bg-amber-100 text-amber-700' },
 };
 
+type ChatThreadMeta = {
+  id: string;
+  order_id: string;
+  last_message_at?: string | null;
+  last_message_preview?: string | null;
+  unread_for_admin?: boolean | null;
+};
+
 function AdminOrdersContent() {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const filterRiderId = searchParams.get('rider_id') ?? null;
   const [selectedRiderByOrderId, setSelectedRiderByOrderId] = useState<Record<string, string>>({});
+  const [chatOrder, setChatOrder] = useState<Order | null>(null);
+  const [chatDrawerOpen, setChatDrawerOpen] = useState(false);
   const today = format(new Date(), 'yyyy-MM-dd');
   const yesterday = format(new Date(Date.now() - 864e5), 'yyyy-MM-dd');
   const [datePreset, setDatePreset] = useState<'today' | 'yesterday' | 'last7' | 'custom'>('today');
@@ -70,6 +81,52 @@ function AdminOrdersContent() {
       return data;
     },
   });
+
+  const { data: chatThreads = [] } = useQuery({
+    queryKey: ['order-chat-threads'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('order_chat_threads')
+        .select('id, order_id, last_message_at, last_message_preview, unread_for_admin')
+        .eq('channel', 'customer_support');
+      if (error) {
+        console.warn('[order-chat-threads]', error.message);
+        return [];
+      }
+      return (data ?? []) as ChatThreadMeta[];
+    },
+    staleTime: 15000,
+  });
+
+  const chatMetaMap = useMemo(() => {
+    const map = new Map<string, ChatThreadMeta>();
+    chatThreads.forEach((thread) => {
+      if (thread?.order_id) {
+        map.set(thread.order_id, thread);
+      }
+    });
+    return map;
+  }, [chatThreads]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-chat-meta')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'order_chat_threads',
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['order-chat-threads'] });
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const filteredOrders = useMemo(() => {
     let list = orders ?? [];
@@ -138,6 +195,11 @@ function AdminOrdersContent() {
         .update(updates)
         .eq('id', id);
       if (error) throw error;
+      if (status === 'ready' && !order.ready_at) {
+        await fetch(`/api/admin/orders/${id}/invoice`, {
+          method: 'POST',
+        });
+      }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-orders'] }),
   });
@@ -154,6 +216,11 @@ function AdminOrdersContent() {
   }
 
   const filterRider = filterRiderId ? riders?.find((r) => r.id === filterRiderId) : null;
+
+  const openChat = (order: Order) => {
+    setChatOrder(order);
+    setChatDrawerOpen(true);
+  };
 
   return (
     <div className="p-6 text-gray-900">
@@ -206,6 +273,9 @@ function AdminOrdersContent() {
                 const phone = (order.phone || '').trim();
                 const isRegular = (orderCountByPhone.get(phone) || 0) >= 3;
                 const assignedRider = order.rider_id ? riders?.find((r) => r.id === order.rider_id) : null;
+                const chatMeta = chatMetaMap.get(order.id);
+                const hasUnreadChat = !!chatMeta?.unread_for_admin;
+                const lastChatPreview = chatMeta?.last_message_preview;
                 return (
                   <div
                     key={order.id}
@@ -282,6 +352,28 @@ function AdminOrdersContent() {
                         </span>
                       </div>
                     )}
+                    <div className="mt-3 flex flex-col gap-1">
+                      <button
+                        type="button"
+                        onClick={() => openChat(order)}
+                        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold ${
+                          hasUnreadChat
+                            ? 'border-primary text-primary bg-primary/5'
+                            : 'border-gray-200 text-gray-700'
+                        }`}
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                        Support chat
+                        {hasUnreadChat && (
+                          <span className="inline-flex items-center rounded-full bg-primary text-white px-2 py-0.5 text-[10px]">
+                            New
+                          </span>
+                        )}
+                      </button>
+                      {lastChatPreview && (
+                        <p className="text-[11px] text-gray-500 truncate">Last: {lastChatPreview}</p>
+                      )}
+                    </div>
                     <div className="mt-3">
                       <InvoiceActions order={order} items={order.order_items ?? []} />
                     </div>
@@ -370,6 +462,13 @@ function AdminOrdersContent() {
           </div>
         ))}
       </div>
+      <AdminOrderChatDrawer
+        open={chatDrawerOpen}
+        orderId={chatOrder?.id ?? null}
+        orderNumber={chatOrder ? formatOrderNumber(chatOrder.id) : undefined}
+        customerName={chatOrder?.customer_name}
+        onClose={() => setChatDrawerOpen(false)}
+      />
     </div>
   );
 }

@@ -86,12 +86,58 @@ export function NewOrderAlert() {
       )
       .subscribe();
 
+    const chatChannel = supabase
+      .channel('admin-chat-alerts')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'order_chat_messages',
+          filter: 'sender_type=eq.customer',
+        },
+        async (payload) => {
+          const message = payload.new as { order_id: string; message: string };
+          const orderId = message.order_id;
+          let orderLabel = formatOrderNumber(orderId);
+          let customerInfo = '';
+          try {
+            const { data } = await supabase
+              .from('orders')
+              .select('customer_name, order_channel')
+              .eq('id', orderId)
+              .single();
+            if (data?.customer_name) {
+              customerInfo = data.customer_name;
+            }
+            if (data?.order_channel && data.order_channel !== 'online') {
+              customerInfo = `${customerInfo ? `${customerInfo} • ` : ''}${data.order_channel}`;
+            }
+          } catch {
+            // ignore
+          }
+          const preview = message.message.slice(0, 80);
+          if (Notification.permission === 'granted') {
+            new Notification(`New chat: ${orderLabel}`, {
+              body: [customerInfo, preview].filter(Boolean).join(' • '),
+              icon: '/logo.png',
+              tag: `chat-${orderId}`,
+            }).onclick = () => {
+              window.focus();
+              router.push('/admin/orders');
+            };
+          }
+        }
+      )
+      .subscribe();
+
     if (Notification.permission === 'default') {
       Notification.requestPermission();
     }
 
     return () => {
       supabase.removeChannel(channel);
+      supabase.removeChannel(chatChannel);
     };
   }, [router]);
 

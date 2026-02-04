@@ -107,3 +107,24 @@ export interface OrderPayment {
   received_by?: string | null;
   created_at: string;
 }
+
+export type OrderChatSenderType = 'customer' | 'admin' | 'rider' | 'system';
+
+export interface OrderChatMessage {
+  id: string;
+  thread_id: string;
+  order_id?: string;
+  sender_type: OrderChatSenderType;
+  sender_id?: string | null;
+  message: string;
+  attachments?: unknown[] | null;
+  created_at: string;
+}
+
+export interface OrderChatThread {
+  id: string;
+  order_id: string;
+  channel: string;
+  created_by?: string | null;
+  created_at?: string;
+}

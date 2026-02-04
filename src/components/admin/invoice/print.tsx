@@ -54,13 +54,16 @@ function InvoiceLayout({
   items: OrderItem[];
   options: InvoiceOptions;
 }) {
-  const subTotal =
-    order.sub_total ??
-    items.reduce((sum, item) => sum + (item.price ?? 0) * (item.qty ?? 0), 0);
+  const computedSubTotal = items.reduce(
+    (sum, item) => sum + (item.price ?? 0) * (item.qty ?? 0),
+    0
+  );
+  const subTotal = order.sub_total ?? computedSubTotal;
   const discount = order.discount_amount ?? 0;
   const taxAmount = order.tax_amount ?? 0;
   const deliveryFee = order.delivery_fee ?? 0;
-  const total = order.total_price ?? subTotal - discount + taxAmount + deliveryFee;
+  const gross = Math.max(subTotal - discount, 0);
+  const total = order.total_price ?? gross + taxAmount + deliveryFee;
   const amountPaid = order.amount_paid ?? total;
   const amountDue = order.amount_due ?? Math.max(total - amountPaid, 0);
 
@@ -75,6 +78,18 @@ function InvoiceLayout({
         <div style={{ textAlign: 'right' }}>
           <p className="badge">Invoice</p>
           <p style={{ marginTop: 8, fontWeight: 600 }}>{formatOrderNumber(order.id)}</p>
+          <p className="muted">
+            Invoice #: {order.receipt_number || 'Pending'}
+          </p>
+          <p className="muted">
+            Issued:{' '}
+            {order.receipt_issued_at
+              ? format(new Date(order.receipt_issued_at), 'MMM d, yyyy h:mm a')
+              : '—'}
+          </p>
+          {order.invoice_status && (
+            <p className="muted">Status: {order.invoice_status}</p>
+          )}
           <p className="muted">
             {order.created_at ? format(new Date(order.created_at), 'MMM d, yyyy h:mm a') : ''}
           </p>
