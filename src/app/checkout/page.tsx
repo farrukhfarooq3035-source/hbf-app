@@ -164,13 +164,16 @@ export default function CheckoutPage() {
       if (orderError) throw orderError;
 
       for (const item of items) {
+        let itemName = item.name;
+        if (item.size) itemName += ` (${item.size})`;
+        if (item.addons?.length) itemName += ` + ${item.addons.join(', ')}`;
         await supabase.from('order_items').insert({
           order_id: order.id,
           product_id: item.product_id || null,
           deal_id: item.deal_id || null,
           qty: item.qty,
           price: item.price,
-          item_name: item.name,
+          item_name: itemName,
         });
       }
 

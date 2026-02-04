@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { Minus, Plus } from 'lucide-react';
 import { useProduct } from '@/hooks/use-menu';
 import { useCartStore } from '@/store/cart-store';
+import { PIZZA_ADDONS } from '@/lib/pizza-addons';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -15,6 +16,7 @@ export default function ProductDetailPage() {
   const addItem = useCartStore((s) => s.addItem);
   const [qty, setQty] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
 
   useEffect(() => {
@@ -41,7 +43,12 @@ export default function ProductDetailPage() {
   const selectedPrice = selectedSize
     ? sizeOptions.find((s) => s.name === selectedSize)?.price ?? basePrice
     : basePrice;
-  const displayPrice = selectedPrice * qty;
+  const addonTotal = selectedAddons.reduce((sum, name) => {
+    const addon = PIZZA_ADDONS.find((a) => a.name === name);
+    return sum + (addon?.price ?? 0);
+  }, 0);
+  const unitPrice = selectedPrice + addonTotal;
+  const displayPrice = unitPrice * qty;
 
   return (
     <div className="max-w-2xl mx-auto pb-32">
@@ -92,6 +99,33 @@ export default function ProductDetailPage() {
             </div>
           )}
 
+          {sizeOptions.length > 0 && (
+            <div className="mt-4">
+              <h2 className="font-semibold text-dark dark:text-white text-sm mb-2">Add-ons</h2>
+              <div className="space-y-2">
+                {PIZZA_ADDONS.map((a) => (
+                  <label
+                    key={a.name}
+                    className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedAddons.includes(a.name)}
+                      onChange={() =>
+                        setSelectedAddons((prev) =>
+                          prev.includes(a.name) ? prev.filter((x) => x !== a.name) : [...prev, a.name]
+                        )
+                      }
+                      className="w-4 h-4 rounded border-gray-300"
+                    />
+                    <span className="flex-1">{a.name}</span>
+                    <span className="font-medium text-primary">+Rs {a.price}/-</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="mt-4">
             <p className="font-medium text-sm text-gray-700 dark:text-gray-400 mb-2">Notes (optional)</p>
             <input
@@ -132,10 +166,13 @@ export default function ProductDetailPage() {
             addItem({
               product_id: product.id,
               name: product.name,
-              price: selectedPrice,
+              price: unitPrice,
               qty,
               notes: notes || undefined,
               size: selectedSize || undefined,
+              addons: selectedAddons.length ? selectedAddons : undefined,
+              size_options: sizeOptions.length ? sizeOptions : undefined,
+              addon_options: PIZZA_ADDONS.map((a) => ({ name: a.name, price: a.price })),
             });
           }}
           className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-red-700 transition-colors"

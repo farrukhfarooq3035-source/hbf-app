@@ -101,7 +101,9 @@ export interface CartItem {
   price: number;
   qty: number;
   size?: string;
+  size_options?: { name: string; price: number }[];
   addons?: string[];
+  addon_options?: { name: string; price: number }[];
   notes?: string;
 }
 

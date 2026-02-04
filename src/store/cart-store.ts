@@ -16,6 +16,7 @@ interface CartState {
   addItem: (item: Omit<CartItem, 'qty'> & { qty?: number }) => void;
   removeItem: (index: number) => void;
   updateQty: (index: number, qty: number) => void;
+  updateItem: (index: number, updates: Partial<Pick<CartItem, 'size' | 'addons' | 'price'>>) => void;
   clearCart: () => void;
   setDeliveryMode: (mode: 'delivery' | 'pickup') => void;
   setUserLocation: (lat: number, lng: number) => void;
@@ -77,6 +78,17 @@ export const useCartStore = create<CartState>()(
             idx === index ? { ...i, qty } : i
           ),
         }));
+      },
+      updateItem: (index, updates) => {
+        set((s) => {
+          const item = s.items[index];
+          if (!item) return s;
+          return {
+            items: s.items.map((i, idx) =>
+              idx === index ? { ...i, ...updates } : i
+            ),
+          };
+        });
       },
       clearCart: () => set({ items: [] }),
       setDeliveryMode: (mode) => set({ deliveryMode: mode }),

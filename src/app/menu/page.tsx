@@ -11,7 +11,7 @@ import { HorizontalScrollStrip } from '@/components/customer/HorizontalScrollStr
 import { useCartStore } from '@/store/cart-store';
 import { useFavoritesStore } from '@/store/favorites-store';
 import Link from 'next/link';
-import { Heart, Clock, CheckCircle2, XCircle } from 'lucide-react';
+import { Heart, Clock, CheckCircle2, XCircle, RefreshCw } from 'lucide-react';
 import type { Product } from '@/types';
 
 /** Fixed category order for main page (HBF Deals excluded from pills - has its own section) */
@@ -47,7 +47,8 @@ function uniqueCategoriesByName<T extends { id: string; name: string }>(list: T[
 export default function MenuPage() {
   const [search, setSearch] = useState('');
   const { user } = useAuth();
-  const { deliveryMode, setDeliveryMode } = useCartStore();
+  const { deliveryMode, setDeliveryMode, getDistanceKm, setUserLocation } = useCartStore();
+  const [refreshingLocation, setRefreshingLocation] = useState(false);
   const { productIds: favProductIds, dealIds: favDealIds } = useFavoritesStore();
   const { isOpen, openTime, closeTime, isHappyHour, isAfterMidnight, showHappyHourDeals, happyHourStart, happyHourEnd, happyHourDiscount } = useBusinessHours();
 
@@ -221,6 +222,27 @@ export default function MenuPage() {
                 <p className="text-xs font-medium text-blue-800 dark:text-blue-200">
                   Free delivery within 5 km • Rs 30 per km beyond 5 km
                 </p>
+                {typeof navigator !== 'undefined' && 'geolocation' in navigator && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRefreshingLocation(true);
+                      navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                          setUserLocation(pos.coords.latitude, pos.coords.longitude);
+                          setRefreshingLocation(false);
+                        },
+                        () => setRefreshingLocation(false),
+                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                      );
+                    }}
+                    disabled={refreshingLocation}
+                    className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 hover:underline mt-1"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${refreshingLocation ? 'animate-spin' : ''}`} />
+                    {refreshingLocation ? 'Updating...' : getDistanceKm() != null ? 'Refresh location' : 'Get location'}
+                  </button>
+                )}
               </div>
             )}
           </div>

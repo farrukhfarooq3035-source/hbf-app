@@ -8,6 +8,7 @@ import { useFavoritesStore } from '@/store/favorites-store';
 import { useCompareStore } from '@/store/compare-store';
 import { FoodImage } from '@/components/customer/FoodImage';
 import { QuickPeek } from '@/components/customer/QuickPeek';
+import { AddToCartModal } from '@/components/customer/AddToCartModal';
 import type { Product } from '@/types';
 
 interface ProductCardProps {
@@ -32,7 +33,9 @@ export function ProductCard({ product, discountPercent }: ProductCardProps) {
     ? Math.round(originalPrice * (1 - discountPercent / 100))
     : originalPrice;
   const [quickPeekOpen, setQuickPeekOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
   const { add: addToCompare, has: isInCompare } = useCompareStore();
+  const isPizza = sizeOptions.length > 0;
 
   useEffect(() => {
     if (sizeOptions.length) {
@@ -128,20 +131,31 @@ export function ProductCard({ product, discountPercent }: ProductCardProps) {
         <button
           onClick={(e) => {
             e.preventDefault();
-            addItem({
-              product_id: product.id,
-              name: product.name,
-              price,
-              size: selectedSize ?? undefined,
-            });
+            if (isPizza) {
+              setAddModalOpen(true);
+            } else {
+              addItem({
+                product_id: product.id,
+                name: product.name,
+                price,
+                size: selectedSize ?? undefined,
+              });
+            }
           }}
           className="w-full py-2 bg-primary text-white rounded-xl flex items-center justify-center gap-2 font-medium hover:bg-primary-hover transition-colors duration-280 ease-smooth tap-highlight"
         >
           <Plus className="w-4 h-4" />
-          Add {selectedSize ? `(${selectedSize})` : ''}
+          Add {!isPizza && selectedSize ? `(${selectedSize})` : isPizza ? 'to Cart' : ''}
         </button>
       </div>
 
+      {addModalOpen && isPizza && (
+        <AddToCartModal
+          product={product}
+          discountPercent={discountPercent}
+          onClose={() => setAddModalOpen(false)}
+        />
+      )}
       {quickPeekOpen && product.image_url && (
         <QuickPeek
           imageUrl={product.image_url}
