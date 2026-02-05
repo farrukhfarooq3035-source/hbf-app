@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Minus, Plus, Trash2, RefreshCw } from 'lucide-react';
+import { RippleButton } from '@/components/customer/RippleButton';
 import { useCartStore } from '@/store/cart-store';
 import type { CartItem } from '@/types';
 
@@ -145,7 +146,7 @@ export default function CartPage() {
             </span>
           </div>
         </div>
-        <button
+        <RippleButton
           onClick={() => router.push('/checkout')}
           disabled={deliveryMode === 'delivery' && getSubtotal() < 500}
           className="w-full py-4 bg-gradient-to-r from-primary to-primary-deep text-white font-bold rounded-xl hover:opacity-95 shadow-lg transition-all duration-280 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
@@ -153,7 +154,7 @@ export default function CartPage() {
           {deliveryMode === 'delivery' && getSubtotal() < 500
             ? `Add Rs ${500 - getSubtotal()}/- more for delivery`
             : 'Place Order'}
-        </button>
+        </RippleButton>
       </div>
     </div>
   );

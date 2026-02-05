@@ -396,6 +396,73 @@ a [data-food-image] {
   transition: transform 0.1s var(--ease-out-expo);
 }
 
+/* Page transition on route change */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-page-enter {
+  animation: page-enter 0.35s var(--ease-out-expo) forwards;
+}
+
+/* Skeleton shimmer loading */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e8e8e8 20%,
+    #f0f0f0 40%,
+    #e8e8e8 60%,
+    #f0f0f0 80%,
+    #e8e8e8 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+.dark .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #1f2937 0%,
+    #374151 20%,
+    #1f2937 40%,
+    #374151 60%,
+    #1f2937 80%,
+    #374151 100%
+  );
+  background-size: 200% 100%;
+}
+
+/* Add-to-cart success bounce */
+@keyframes add-success {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+.animate-add-success {
+  animation: add-success 0.4s var(--ease-spring);
+}
+
+/* Button ripple effect */
+.ripple-effect {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+  margin-top: -10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: scale(0);
+  pointer-events: none;
+  animation: ripple 0.6s var(--ease-out-expo) forwards;
+}
+@keyframes ripple {
+  to { transform: scale(20); opacity: 0; }
+}
+
 /* Admin Download: print only QR card */
 @media print {
   aside, .no-print { display: none !important; }

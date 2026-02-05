@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { hapticMedium } from '@/lib/haptic';
+import { RippleButton } from '@/components/customer/RippleButton';
 import { useCartStore } from '@/store/cart-store';
 import { PIZZA_ADDONS } from '@/lib/pizza-addons';
 import type { Product } from '@/types';
@@ -108,12 +109,12 @@ export function AddToCartModal({ product, discountPercent, onClose }: AddToCartM
           </div>
         </div>
         <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-          <button
+          <RippleButton
             onClick={handleAdd}
             className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-red-700"
           >
             Add to Cart - Rs {unitPrice}/-
-          </button>
+          </RippleButton>
         </div>
       </div>
     </div>

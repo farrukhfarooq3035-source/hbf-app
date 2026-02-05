@@ -9,6 +9,7 @@ import { DealCard } from '@/components/customer/DealCard';
 import { FoodImage } from '@/components/customer/FoodImage';
 import { TrustSection } from '@/components/customer/TrustSection';
 import { HorizontalScrollStrip } from '@/components/customer/HorizontalScrollStrip';
+import { ScrollReveal } from '@/components/customer/ScrollReveal';
 import { useCartStore } from '@/store/cart-store';
 import { useFavoritesStore } from '@/store/favorites-store';
 import Link from 'next/link';
@@ -168,7 +169,9 @@ export default function MenuPage() {
     <div className="max-w-4xl mx-auto flex-1 min-h-0 menu-scroll-root w-full min-w-0 overflow-x-hidden px-3 sm:px-5">
       <div className="space-y-4 pb-4">
         {/* Trust & Social Proof - near top */}
-        <TrustSection />
+        <ScrollReveal>
+          <TrustSection />
+        </ScrollReveal>
 
         {/* Open/Closed + Happy Hour Banner */}
         <div
@@ -254,6 +257,7 @@ export default function MenuPage() {
 
         {/* Happy Hour Deals: 3-5pm 10% off, after midnight 10% on Hot Wings, B.B.Q Grilled Burger, Broast Full */}
         {showHappyHourDeals && happyHourProducts.length > 0 && (
+          <ScrollReveal>
           <div id="section-happy-hour" className="scroll-mt-4">
             <h2 className="font-bold text-lg mb-1 text-slate-800 dark:text-slate-100 tracking-tight">Happy Hour Deals</h2>
             <p className="text-xs text-amber-600 dark:text-amber-400 mb-3 font-medium">
@@ -267,6 +271,7 @@ export default function MenuPage() {
               ))}
             </div>
           </div>
+          </ScrollReveal>
         )}
 
         <div className="space-y-2">
@@ -302,6 +307,7 @@ export default function MenuPage() {
         )}
 
         {/* Categories: mobile flex-wrap (touch scroll works), desktop horizontal scroll */}
+        <ScrollReveal>
         <div className="w-full min-w-0 flex flex-col items-center">
           <h2 className="font-bold text-lg mb-4 w-full text-left">
             <span className="category-label-pill category-heading-pop font-heading inline-block px-4 py-2.5 rounded-xl text-base">
@@ -355,9 +361,11 @@ export default function MenuPage() {
             ))}
           </HorizontalScrollStrip>
         </div>
+        </ScrollReveal>
 
         {/* HBF Deals: mobile grid (touch scroll works), desktop horizontal scroll */}
         {(hbfDealsProducts.length > 0 || filteredAllDeals.length > 0) && (
+          <ScrollReveal>
           <div id="section-hbf-deals" className="scroll-mt-4">
             <h2 className="font-bold text-lg mb-3">
               <span className="category-label-pill category-heading-pop font-heading inline-block px-4 py-2.5 rounded-xl text-base">
@@ -389,18 +397,19 @@ export default function MenuPage() {
               ))}
             </HorizontalScrollStrip>
           </div>
+          </ScrollReveal>
         )}
 
         {catsLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <div key={i}>
-                <div className="h-6 w-32 bg-gray-100 dark:bg-gray-700 rounded animate-pulse mb-3" />
+                <div className="h-6 w-32 skeleton-shimmer rounded-lg mb-3" />
                 <div className="flex gap-4 overflow-hidden">
                   {[1, 2, 3, 4].map((j) => (
                     <div
                       key={j}
-                      className="flex-shrink-0 w-44 aspect-[4/3] bg-gray-100 dark:bg-gray-700 rounded-2xl animate-pulse"
+                      className="flex-shrink-0 w-44 aspect-[4/3] skeleton-shimmer rounded-2xl"
                     />
                   ))}
                 </div>
@@ -414,7 +423,8 @@ export default function MenuPage() {
               return (
                 <div key={cat.id}>
                   {list.length > 0 && (
-                    <div id={`section-${cat.id}`} className="scroll-mt-4">
+                    <ScrollReveal>
+                      <div id={`section-${cat.id}`} className="scroll-mt-4">
                       <h2 className="font-bold text-lg mb-3">
                         <span className="category-label-pill category-heading-pop font-heading inline-block px-4 py-2.5 rounded-xl text-base">
                           {cat.name}
@@ -438,7 +448,8 @@ export default function MenuPage() {
                           </div>
                         ))}
                       </HorizontalScrollStrip>
-                    </div>
+                      </div>
+                    </ScrollReveal>
                   )}
                 </div>
               );

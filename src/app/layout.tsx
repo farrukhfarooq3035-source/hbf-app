@@ -8,6 +8,7 @@ import { LiveOrderButton } from '@/components/customer/LiveOrderButton';
 import { LocationPermission } from '@/components/customer/LocationPermission';
 import { InstallPrompt } from '@/components/customer/InstallPrompt';
 import { HapticTouch } from '@/components/customer/HapticTouch';
+import { PageTransition } from '@/components/customer/PageTransition';
 import { RedirectToProduction } from '@/components/RedirectToProduction';
 
 const outfit = Outfit({
@@ -54,7 +55,7 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <InstallPrompt />
           </Suspense>
-          {children}
+          <PageTransition>{children}</PageTransition>
           <LiveOrderButton />
           <CartBar />
         </Providers>

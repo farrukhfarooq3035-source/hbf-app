@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cart-store';
 import { hapticMedium } from '@/lib/haptic';
+import { RippleButton } from '@/components/customer/RippleButton';
 import { useBusinessHours } from '@/hooks/use-business-hours';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/lib/supabase';
@@ -359,13 +360,13 @@ export default function CheckoutPage() {
             <p className="text-sm text-gray-500 mb-2">
               Payment: Cash on Delivery (COD)
             </p>
-            <button
+            <RippleButton
               type="submit"
               disabled={loading || !isOpen || (minOrder > 0 && subtotal < minOrder)}
               className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50"
             >
               {loading ? 'Placing Order...' : !isOpen ? `Closed - Open ${openTime}` : `Place Order - Rs ${total}/-`}
-            </button>
+            </RippleButton>
           </div>
         </form>
       </div>

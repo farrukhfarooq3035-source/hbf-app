@@ -78,7 +78,7 @@ export function CartBar() {
         className="flex items-center justify-between mx-4 mb-4 p-4 rounded-2xl bg-gradient-to-r from-primary to-primary-deep text-white shadow-lg tap-highlight transition-all duration-280 hover:shadow-xl active:scale-[0.98]"
       >
         <div className="flex items-center gap-4">
-          <div className="relative p-2 rounded-xl bg-white/20">
+          <div className={`relative p-2 rounded-xl bg-white/20 ${bump ? 'animate-add-success' : ''}`}>
             <ShoppingCart className="w-6 h-6" />
             <span className="absolute -top-1 -right-1 bg-accent text-charcoal text-xs font-bold min-w-[20px] h-5 rounded-full flex items-center justify-center px-1">
               {itemCount}

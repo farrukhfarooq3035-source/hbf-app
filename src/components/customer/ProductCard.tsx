@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, Heart, GitCompare } from 'lucide-react';
 import { hapticLight } from '@/lib/haptic';
+import { RippleButton } from '@/components/customer/RippleButton';
 import { useCartStore } from '@/store/cart-store';
 import { useFavoritesStore } from '@/store/favorites-store';
 import { useCompareStore } from '@/store/compare-store';
@@ -156,7 +157,7 @@ export function ProductCard({ product, discountPercent }: ProductCardProps) {
             Customize & Add
           </Link>
         ) : (
-          <button
+          <RippleButton
             onClick={(e) => {
               e.preventDefault();
               hapticLight();
@@ -171,7 +172,7 @@ export function ProductCard({ product, discountPercent }: ProductCardProps) {
           >
             <Plus className="w-4 h-4" />
             Add {selectedSize ? `(${selectedSize})` : ''}
-          </button>
+          </RippleButton>
         )}
       </div>
       {quickPeekOpen && product.image_url && (
