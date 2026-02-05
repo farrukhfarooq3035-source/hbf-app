@@ -7,6 +7,7 @@ import { CartBar } from '@/components/customer/CartBar';
 import { LiveOrderButton } from '@/components/customer/LiveOrderButton';
 import { LocationPermission } from '@/components/customer/LocationPermission';
 import { InstallPrompt } from '@/components/customer/InstallPrompt';
+import { HapticTouch } from '@/components/customer/HapticTouch';
 import { RedirectToProduction } from '@/components/RedirectToProduction';
 
 const outfit = Outfit({
@@ -48,6 +49,7 @@ export default function RootLayout({
       <body className="min-h-screen antialiased font-sans" style={{ backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
         <RedirectToProduction />
         <Providers>
+          <HapticTouch />
           <LocationPermission />
           <Suspense fallback={null}>
             <InstallPrompt />

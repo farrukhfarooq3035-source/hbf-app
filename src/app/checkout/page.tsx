@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cart-store';
+import { hapticMedium } from '@/lib/haptic';
 import { useBusinessHours } from '@/hooks/use-business-hours';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/lib/supabase';
@@ -44,7 +45,8 @@ export default function CheckoutPage() {
     deliveryFee = 0;
   }
   if (freeDeliveryUnder5Km) deliveryFee = 0;
-  const minOrder = matchedZone?.min_order ?? 0;
+  const ONLINE_DELIVERY_MIN = 500;
+  const minOrder = Math.max(matchedZone?.min_order ?? 0, ONLINE_DELIVERY_MIN);
   const promoDiscount = appliedPromo?.discount ?? 0;
   const firstOrder = firstOrderDiscount?.discount ?? 0;
   const happyHourAmount = isHappyHour ? Math.round((subtotal * happyHourDiscount) / 100) : 0;
@@ -118,6 +120,7 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    hapticMedium();
     setError('');
     if (!isOpen) {
       setError(`We're closed. Open ${openTime} – ${closeTime}.`);
@@ -347,6 +350,9 @@ export default function CheckoutPage() {
               placeholder="e.g. Call on arrival"
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Free delivery within 5 km • Rs 30 per km beyond 5 km
+            </p>
           </div>
 
           <div className="pt-4">

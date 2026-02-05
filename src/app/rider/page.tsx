@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { MapPin, Loader2, CheckCircle, LogOut, Package, Bike, Check, Truck } from 'lucide-react';
+import { MapPin, Loader2, CheckCircle, LogOut, Package, Bike, Check, Truck, Bell } from 'lucide-react';
 import { formatOrderNumber } from '@/lib/order-utils';
 import { clearRiderSession, setRiderSession } from '@/app/rider/login/page';
 import { format } from 'date-fns';
+import { supabase } from '@/lib/supabase';
 
 interface RiderOrder {
   id: string;
@@ -29,13 +29,20 @@ export default function RiderPage() {
   const [lastSent, setLastSent] = useState<Date | null>(null);
   const [deliveringOrderId, setDeliveringOrderId] = useState<string | null>(null);
   const [paymentReceived, setPaymentReceived] = useState(true);
+  const [newOrderToast, setNewOrderToast] = useState<string | null>(null);
   const watchIdRef = useRef<number | null>(null);
+  const prevOrderIdsRef = useRef<Set<string>>(new Set());
 
   const refetchOrders = () => {
     if (!rider?.id) return;
     fetch('/api/rider/orders', { credentials: 'include' })
       .then((res) => (res.ok ? res.json() : []))
-      .then((data) => setOrders(Array.isArray(data) ? data : []))
+      .then((data) => {
+        const newOrders = Array.isArray(data) ? data : [];
+        setOrders(newOrders);
+        const pending = newOrders.filter((o: RiderOrder) => o.status !== 'delivered');
+        prevOrderIdsRef.current = new Set(pending.map((o: RiderOrder) => o.id));
+      })
       .catch(() => setOrders([]));
   };
 
@@ -69,6 +76,58 @@ export default function RiderPage() {
     if (!rider?.id) return;
     refetchOrders();
   }, [rider?.id]);
+
+  // Realtime: new order notification when rider gets assigned
+  useEffect(() => {
+    if (!rider?.id) return;
+    const ch = supabase
+      .channel(`rider-orders-${rider.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'orders',
+          filter: `rider_id=eq.${rider.id}`,
+        },
+        () => {
+          const prevIds = new Set(prevOrderIdsRef.current);
+          fetch('/api/rider/orders', { credentials: 'include' })
+            .then((res) => (res.ok ? res.json() : []))
+            .then((data) => {
+              const newOrders = Array.isArray(data) ? data : [];
+              setOrders(newOrders);
+              const pending = newOrders.filter((o: RiderOrder) => o.status !== 'delivered');
+              const newIds = new Set(pending.map((o: RiderOrder) => o.id));
+              const hadNew = [...newIds].some((id: string) => !prevIds.has(id));
+              prevOrderIdsRef.current = newIds;
+              if (hadNew && pending.length > 0) {
+                const latest = pending[0];
+                if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+                  new Notification('New Order!', {
+                    body: `${formatOrderNumber(latest.id)} · Rs ${latest.total_price}/- · ${latest.customer_name}`,
+                    icon: '/logo.png',
+                  });
+                }
+                setNewOrderToast(`New order: ${formatOrderNumber(latest.id)}`);
+                setTimeout(() => setNewOrderToast(null), 4000);
+              }
+            })
+            .catch(() => {});
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [rider?.id]);
+
+  useEffect(() => {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
 
   const handleMarkDelivered = (orderId: string) => {
     setDeliveringOrderId(orderId);
@@ -122,6 +181,7 @@ export default function RiderPage() {
     });
   };
 
+  const pendingOrders = orders.filter((o) => o.status === 'ready' || o.status === 'on_the_way');
   const onTheWay = orders.filter((o) => o.status === 'on_the_way');
   const delivered = orders.filter((o) => o.status === 'delivered');
   const todayStart = new Date();
@@ -139,7 +199,13 @@ export default function RiderPage() {
   }
 
   return (
-    <div className="min-h-screen max-w-md mx-auto p-6 pb-24 bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen max-w-md mx-auto p-6 pb-24 bg-gray-50 dark:bg-gray-900 relative">
+      {newOrderToast && (
+        <div className="fixed top-4 left-4 right-4 z-50 flex items-center gap-2 p-4 bg-primary text-white rounded-xl shadow-lg animate-slide-up">
+          <Bell className="w-5 h-5 flex-shrink-0" />
+          <span className="font-semibold">{newOrderToast}</span>
+        </div>
+      )}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Bike className="w-6 h-6 text-primary" />
@@ -212,11 +278,11 @@ export default function RiderPage() {
         )}
       </div>
 
-      {onTheWay.length > 0 && (
+      {pendingOrders.length > 0 && (
         <>
           <h2 className="font-semibold text-dark dark:text-white mb-3 flex items-center gap-2">
-            <Truck className="w-4 h-4 text-primary" />
-            On the way — Mark delivered
+            <Package className="w-4 h-4 text-primary" />
+            Pending orders ({pendingOrders.length})
           </h2>
           <ul className="space-y-3 mb-6">
             {onTheWay.map((o) => (

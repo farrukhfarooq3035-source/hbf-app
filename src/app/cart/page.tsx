@@ -103,7 +103,7 @@ export default function CartPage() {
           {deliveryMode === 'delivery' && (
             <div>
               <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">
-                Free within 5 km • Rs 30 per km beyond 5 km
+                Min order Rs 500 • Free delivery within 5 km • Rs 30 per km beyond 5 km
               </p>
               {distanceKm != null && (
                 <button
@@ -133,6 +133,11 @@ export default function CartPage() {
               Estimated {deliveryMode === 'delivery' ? 'delivery' : 'pickup'}: ~{estMins} min
             </p>
           )}
+          {deliveryMode === 'delivery' && getSubtotal() < 500 && (
+            <p className="text-sm text-amber-600 dark:text-amber-400">
+              Min order for delivery: Rs 500/-
+            </p>
+          )}
           <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-700">
             <span className="font-semibold">Total</span>
             <span className="text-xl font-bold text-primary">
@@ -142,9 +147,12 @@ export default function CartPage() {
         </div>
         <button
           onClick={() => router.push('/checkout')}
-          className="w-full py-4 bg-gradient-to-r from-primary to-primary-deep text-white font-bold rounded-xl hover:opacity-95 shadow-lg transition-all duration-280 active:scale-[0.98]"
+          disabled={deliveryMode === 'delivery' && getSubtotal() < 500}
+          className="w-full py-4 bg-gradient-to-r from-primary to-primary-deep text-white font-bold rounded-xl hover:opacity-95 shadow-lg transition-all duration-280 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Place Order
+          {deliveryMode === 'delivery' && getSubtotal() < 500
+            ? `Add Rs ${500 - getSubtotal()}/- more for delivery`
+            : 'Place Order'}
         </button>
       </div>
     </div>

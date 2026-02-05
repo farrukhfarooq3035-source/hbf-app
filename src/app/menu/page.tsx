@@ -259,7 +259,7 @@ export default function MenuPage() {
             <p className="text-xs text-amber-600 dark:text-amber-400 mb-3 font-medium">
               {isHappyHour ? `${happyHourStart}–${happyHourEnd}: ${happyHourDiscount}% off` : isAfterMidnight ? `After midnight: ${happyHourDiscount}% off` : ''} on selected items
             </p>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 animate-stagger">
               {happyHourProducts.map((product) => (
                 <div key={product.id} className="min-h-0">
                   <ProductCard product={product} discountPercent={happyHourDiscount} />
@@ -421,7 +421,7 @@ export default function MenuPage() {
                         </span>
                       </h2>
                       {/* Mobile: 2-col grid fills width. Desktop: horizontal scroll */}
-                      <div className="grid grid-cols-2 gap-3 sm:hidden">
+                      <div className="grid grid-cols-2 gap-3 sm:hidden animate-stagger">
                         {list.map((product) => (
                           <div key={product.id} className="min-h-0">
                             <ProductCard product={product} />

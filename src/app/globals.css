@@ -357,6 +357,45 @@ a [data-food-image] {
   animation: section-enter 0.4s var(--ease-out-expo) forwards;
 }
 
+/* Premium: stagger children for list/card grids */
+.animate-stagger > * {
+  animation: fade-in 0.4s var(--ease-out-expo) backwards;
+}
+.animate-stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.animate-stagger > *:nth-child(2) { animation-delay: 0.04s; }
+.animate-stagger > *:nth-child(3) { animation-delay: 0.06s; }
+.animate-stagger > *:nth-child(4) { animation-delay: 0.08s; }
+.animate-stagger > *:nth-child(5) { animation-delay: 0.1s; }
+.animate-stagger > *:nth-child(6) { animation-delay: 0.12s; }
+.animate-stagger > *:nth-child(7) { animation-delay: 0.14s; }
+.animate-stagger > *:nth-child(8) { animation-delay: 0.16s; }
+.animate-stagger > *:nth-child(9) { animation-delay: 0.18s; }
+.animate-stagger > *:nth-child(10) { animation-delay: 0.2s; }
+
+/* Premium: subtle pulse for attention */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+.animate-pulse-soft {
+  animation: pulse-soft 2s var(--ease-smooth) infinite;
+}
+
+/* Premium: scale-in for modals */
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in {
+  animation: scale-in 0.3s var(--ease-out-expo) forwards;
+}
+
+/* Premium: touch feedback - active state */
+.tap-haptic:active {
+  transform: scale(0.98);
+  transition: transform 0.1s var(--ease-out-expo);
+}
+
 /* Admin Download: print only QR card */
 @media print {
   aside, .no-print { display: none !important; }

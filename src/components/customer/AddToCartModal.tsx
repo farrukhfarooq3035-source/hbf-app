@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { X } from 'lucide-react';
+import { hapticMedium } from '@/lib/haptic';
 import { useCartStore } from '@/store/cart-store';
 import { PIZZA_ADDONS } from '@/lib/pizza-addons';
 import type { Product } from '@/types';
@@ -35,6 +36,7 @@ export function AddToCartModal({ product, discountPercent, onClose }: AddToCartM
   };
 
   const handleAdd = () => {
+    hapticMedium();
     addItem({
       product_id: product.id,
       name: product.name,
@@ -50,8 +52,8 @@ export function AddToCartModal({ product, discountPercent, onClose }: AddToCartM
   };
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50">
-      <div className="bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[85vh] overflow-y-auto shadow-xl">
+    <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50 animate-fade-in">
+      <div className="bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[85vh] overflow-y-auto shadow-xl animate-scale-in">
         <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between">
           <h3 className="font-bold text-lg">{product.name}</h3>
           <button

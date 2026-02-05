@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, Heart, GitCompare } from 'lucide-react';
+import { hapticLight } from '@/lib/haptic';
 import { useCartStore } from '@/store/cart-store';
 import { useFavoritesStore } from '@/store/favorites-store';
 import { useCompareStore } from '@/store/compare-store';
@@ -158,6 +159,7 @@ export function ProductCard({ product, discountPercent }: ProductCardProps) {
           <button
             onClick={(e) => {
               e.preventDefault();
+              hapticLight();
               addItem({
                 product_id: product.id,
                 name: product.name,
