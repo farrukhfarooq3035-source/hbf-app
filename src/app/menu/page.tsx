@@ -169,9 +169,6 @@ export default function MenuPage() {
   return (
     <div className="max-w-4xl mx-auto flex-1 min-h-0 menu-scroll-root w-full min-w-0 overflow-x-hidden px-3 sm:px-5">
       <div className="space-y-4 pb-4">
-        {/* Promo Banners - top */}
-        <PromoBanners />
-
         {/* Trust & Social Proof - near top */}
         <ScrollReveal>
           <TrustSection />
@@ -367,6 +364,9 @@ export default function MenuPage() {
         </div>
         </ScrollReveal>
 
+        {/* Promo Banners - below Categories */}
+        <PromoBanners />
+
         {/* HBF Deals: mobile grid (touch scroll works), desktop horizontal scroll */}
         {(hbfDealsProducts.length > 0 || filteredAllDeals.length > 0) && (
           <ScrollReveal>
@@ -476,11 +476,6 @@ export default function MenuPage() {
               )}
           </>
         )}
-
-        {/* Promo Banners - bottom */}
-        <div className="pt-6">
-          <PromoBanners />
-        </div>
       </div>
     </div>
   );

@@ -30,6 +30,8 @@ export default function AdminSettingsPage() {
   const [promoBanners, setPromoBanners] = useState<PromoBanner[]>([]);
   const [promoSaving, setPromoSaving] = useState(false);
   const [promoSaved, setPromoSaved] = useState(false);
+  const [happyHourSaving, setHappyHourSaving] = useState(false);
+  const [happyHourSaved, setHappyHourSaved] = useState(false);
   const promoFileRef = useRef<HTMLInputElement>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -79,15 +81,30 @@ export default function AdminSettingsPage() {
         open_time: openTime,
         close_time: closeTime,
         closed_days: closedDays,
-        happy_hour_start: happyHourStart,
-        happy_hour_end: happyHourEnd,
-        happy_hour_discount: happyHourDiscount,
       }),
     })
       .then((res) => {
         if (res.ok) setSaved(true);
       })
       .finally(() => setSaving(false));
+  };
+
+  const saveHappyHour = () => {
+    setHappyHourSaving(true);
+    setHappyHourSaved(false);
+    fetch('/api/settings/business', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        happy_hour_start: happyHourStart,
+        happy_hour_end: happyHourEnd,
+        happy_hour_discount: happyHourDiscount,
+      }),
+    })
+      .then((res) => {
+        if (res.ok) setHappyHourSaved(true);
+      })
+      .finally(() => setHappyHourSaving(false));
   };
 
   const toggleClosedDay = (day: number) => {
@@ -235,13 +252,22 @@ export default function AdminSettingsPage() {
             />
           </div>
         </div>
-        <p className="text-sm text-gray-600">Example: 3–5pm, 20% off</p>
+        <p className="text-sm text-gray-600 mb-4">Example: 3–5pm, 20% off</p>
+        <button
+          type="button"
+          onClick={saveHappyHour}
+          disabled={happyHourSaving}
+          className="px-4 py-2 bg-primary text-white rounded-xl font-medium hover:bg-red-700 disabled:opacity-50"
+        >
+          {happyHourSaving ? 'Saving...' : 'Save Happy Hour'}
+        </button>
+        {happyHourSaved && <span className="ml-2 text-green-600 text-sm">Saved</span>}
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border p-6 max-w-xl mb-6">
-        <h2 className="font-semibold mb-4">Promo Banners (Top & Bottom of App)</h2>
+        <h2 className="font-semibold mb-4">Promo Banners (Below Categories)</h2>
         <p className="text-gray-800 text-sm mb-4">
-          Create discounted offers with image. Shown at top and bottom of menu.
+          Create discounted offers with image. Shown below Categories on menu.
         </p>
         <div className="space-y-4">
           {promoBanners.map((b, i) => (
