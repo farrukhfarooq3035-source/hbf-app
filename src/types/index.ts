@@ -75,6 +75,8 @@ export interface Order {
   delivered_at?: string | null;
   payment_received_at?: string | null;
   distance_km?: number | null;
+  payment_method?: 'cod' | 'jazzcash' | null;
+  jazzcash_proof_url?: string | null;
 }
 
 export interface OrderItem {

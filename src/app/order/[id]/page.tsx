@@ -1,10 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { Check, Package, Truck, Phone, Share2, RefreshCw, RotateCcw, MessageCircle } from 'lucide-react';
+import { Check, Package, Truck, Phone, Share2, RefreshCw, RotateCcw, MessageCircle, Upload } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useCartStore } from '@/store/cart-store';
 import { formatOrderNumber } from '@/lib/order-utils';
@@ -81,6 +81,8 @@ export default function OrderTrackingPage() {
   const [riderInfo, setRiderInfo] = useState<{ name: string | null; phone: string | null }>({ name: null, phone: null });
   const [refreshingRider, setRefreshingRider] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [uploadingProof, setUploadingProof] = useState(false);
+  const proofInputRef = useRef<HTMLInputElement>(null);
   const storePhone = getStorePhone();
   const { jazzcashTillId, jazzcashQrUrl } = useBusinessHours();
   const addItem = useCartStore((s) => s.addItem);
@@ -323,13 +325,64 @@ export default function OrderTrackingPage() {
               <span className="font-medium">Order notes:</span> {order.notes}
             </p>
           )}
-          {jazzcashTillId && (
-            <div className="mt-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+          {order.payment_method === 'jazzcash' && jazzcashTillId && (
+            <div className="mt-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 space-y-3">
               <p className="font-semibold text-amber-800 dark:text-amber-200 text-sm">Pay via JazzCash</p>
               <p className="text-sm text-amber-700 dark:text-amber-300">TILL ID: <strong>{jazzcashTillId}</strong></p>
-              <p className="text-xs text-amber-600 dark:text-amber-400">Dial *786*10# and enter TILL ID</p>
+              <p className="text-xs text-amber-600 dark:text-amber-400">Dial *786*10# and enter TILL ID to pay Rs {order.total_price}/-</p>
               {jazzcashQrUrl && (
-                <img src={jazzcashQrUrl.startsWith('/') ? jazzcashQrUrl : jazzcashQrUrl} alt="JazzCash QR" className="w-24 h-24 mt-2 object-contain bg-white rounded-lg" />
+                <img src={jazzcashQrUrl.startsWith('/') ? jazzcashQrUrl : jazzcashQrUrl} alt="JazzCash QR" className="w-24 h-24 object-contain bg-white rounded-lg" />
+              )}
+              {order.jazzcash_proof_url ? (
+                <div className="pt-2 border-t border-amber-200 dark:border-amber-700">
+                  <p className="text-xs font-medium text-green-700 dark:text-green-400 mb-2">Payment proof uploaded</p>
+                  <a href={order.jazzcash_proof_url} target="_blank" rel="noopener noreferrer" className="inline-block">
+                    <img src={order.jazzcash_proof_url} alt="Payment proof" className="max-w-full max-h-40 object-contain rounded-lg border border-amber-200" />
+                  </a>
+                </div>
+              ) : (
+                <div className="pt-2 border-t border-amber-200 dark:border-amber-700">
+                  <p className="text-xs font-medium text-amber-800 dark:text-amber-200 mb-2">After paying, upload payment proof (screenshot)</p>
+                  <input
+                    ref={proofInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file || !user) return;
+                      setUploadingProof(true);
+                      try {
+                        const { data: { session } } = await supabase.auth.getSession();
+                        const fd = new FormData();
+                        fd.append('file', file);
+                        const res = await fetch(`/api/orders/${id}/jazzcash-proof`, {
+                          method: 'POST',
+                          headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {},
+                          body: fd,
+                        });
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.error || 'Upload failed');
+                        setOrder((o) => o ? { ...o, jazzcash_proof_url: data.url } : o);
+                        addToast('Payment proof uploaded');
+                      } catch (err) {
+                        addToast(err instanceof Error ? err.message : 'Upload failed');
+                      } finally {
+                        setUploadingProof(false);
+                        e.target.value = '';
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => proofInputRef.current?.click()}
+                    disabled={uploadingProof}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-600 text-white text-sm font-medium hover:bg-amber-700 disabled:opacity-50"
+                  >
+                    {uploadingProof ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                    {uploadingProof ? 'Uploading...' : 'Attach payment proof'}
+                  </button>
+                </div>
               )}
             </div>
           )}

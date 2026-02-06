@@ -30,6 +30,7 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [refreshingLocation, setRefreshingLocation] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'jazzcash'>('cod');
 
   const subtotal = getSubtotal();
   const geoDeliveryFee = getDeliveryFee();
@@ -161,6 +162,7 @@ export default function CheckoutPage() {
           tax_amount: taxAmount,
           amount_due: total,
           amount_paid: 0,
+          payment_method: paymentMethod,
         })
         .select('id')
         .single();
@@ -358,17 +360,48 @@ export default function CheckoutPage() {
 
           <div className="pt-4">
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Payment options
+              Payment method *
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-              Cash on Delivery (COD) — Pay when your order arrives
-            </p>
-            {jazzcashTillId && (
+            <div className="space-y-3 mb-4">
+              <label className="flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                style={{ borderColor: paymentMethod === 'cod' ? 'var(--color-primary)' : 'transparent', backgroundColor: paymentMethod === 'cod' ? 'rgba(220,38,38,0.05)' : undefined }}>
+                <input
+                  type="radio"
+                  name="payment"
+                  value="cod"
+                  checked={paymentMethod === 'cod'}
+                  onChange={() => setPaymentMethod('cod')}
+                  className="w-4 h-4 text-primary"
+                />
+                <div>
+                  <p className="font-semibold text-gray-900 dark:text-white">Cash on Delivery (COD)</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Pay when your order arrives</p>
+                </div>
+              </label>
+              {jazzcashTillId && (
+                <label className="flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                  style={{ borderColor: paymentMethod === 'jazzcash' ? 'var(--color-primary)' : 'transparent', backgroundColor: paymentMethod === 'jazzcash' ? 'rgba(220,38,38,0.05)' : undefined }}>
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="jazzcash"
+                    checked={paymentMethod === 'jazzcash'}
+                    onChange={() => setPaymentMethod('jazzcash')}
+                    className="w-4 h-4 text-primary"
+                  />
+                  <div>
+                    <p className="font-semibold text-gray-900 dark:text-white">Jazz Cash</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Pay now via TILL ID: {jazzcashTillId}</p>
+                  </div>
+                </label>
+              )}
+            </div>
+            {paymentMethod === 'jazzcash' && jazzcashTillId && (
               <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 mb-4">
                 <p className="font-semibold text-amber-800 dark:text-amber-200 mb-2">Pay via JazzCash</p>
                 <p className="text-sm text-amber-700 dark:text-amber-300 mb-1">TILL ID: <strong>{jazzcashTillId}</strong></p>
                 <p className="text-xs text-amber-600 dark:text-amber-400 mb-2">
-                  Dial <code className="bg-amber-100 dark:bg-amber-900/40 px-1 rounded">*786*10#</code> and enter TILL ID to pay
+                  Dial <code className="bg-amber-100 dark:bg-amber-900/40 px-1 rounded">*786*10#</code> and enter TILL ID to pay. After payment, you can upload proof on the order page.
                 </p>
                 {jazzcashQrUrl && (
                   <div className="mt-2">

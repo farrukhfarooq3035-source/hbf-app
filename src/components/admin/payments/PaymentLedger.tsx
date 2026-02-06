@@ -146,6 +146,7 @@ export function PaymentLedger({ orderId, amountPaid, amountDue }: PaymentLedgerP
                 className="rounded border border-gray-200 px-2 py-1"
               >
                 <option value="cash">Cash</option>
+                <option value="jazzcash">Jazz Cash</option>
                 <option value="card">Card</option>
                 <option value="bank">Bank transfer</option>
                 <option value="wallet">Wallet</option>

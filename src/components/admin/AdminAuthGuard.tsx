@@ -1,23 +1,52 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAdminAuth } from '@/hooks/use-admin-auth';
 import { Loader2 } from 'lucide-react';
 
+const IDLE_TIMEOUT_MS = 3 * 60 * 1000;
+
 export function AdminAuthGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, loading, isAdmin } = useAdminAuth();
+  const { user, loading, isAdmin, signOut } = useAdminAuth();
+  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastActivityRef = useRef<number>(Date.now());
 
   const isLoginPage = pathname === '/admin/login';
 
+  const resetIdleTimer = useCallback(() => {
+    lastActivityRef.current = Date.now();
+    if (idleTimerRef.current) {
+      clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = null;
+    }
+    idleTimerRef.current = setTimeout(() => {
+      signOut();
+      if (typeof window !== 'undefined') sessionStorage.removeItem('hbf-admin-verified');
+      router.replace('/admin/login');
+    }, IDLE_TIMEOUT_MS);
+  }, [signOut, router]);
+
   useEffect(() => {
-    if (loading || isLoginPage) return;
+    if (loading || isLoginPage || !user || !isAdmin) return;
     if (!user || !isAdmin) {
       router.replace('/admin/login');
     }
   }, [user, isAdmin, loading, isLoginPage, router]);
+
+  useEffect(() => {
+    if (isLoginPage || !user || !isAdmin) return;
+    const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
+    resetIdleTimer();
+    const onActivity = () => resetIdleTimer();
+    events.forEach((e) => window.addEventListener(e, onActivity));
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, onActivity));
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    };
+  }, [user, isAdmin, isLoginPage, resetIdleTimer]);
 
   if (isLoginPage) {
     return <>{children}</>;

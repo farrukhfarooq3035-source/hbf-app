@@ -258,6 +258,11 @@ function OnlineOrdersContent() {
                       <span className="ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold bg-blue-100 text-blue-700">
                         Online
                       </span>
+                      {order.payment_method === 'jazzcash' && (
+                        <span className="ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold bg-amber-100 text-amber-700">
+                          Jazz Cash
+                        </span>
+                      )}
                       {isRegular && (
                         <span title="Regular customer (3+ orders)">
                           <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500 flex-shrink-0" />
@@ -283,6 +288,14 @@ function OnlineOrdersContent() {
                     )}
                     {order.distance_km != null && (
                       <p className="text-xs text-gray-900 mt-1">Distance: {Number(order.distance_km).toFixed(1)} km</p>
+                    )}
+                    {order.payment_method === 'jazzcash' && order.jazzcash_proof_url && (
+                      <div className="mt-2 p-2 rounded-lg bg-amber-50 border border-amber-200">
+                        <p className="text-[10px] font-semibold text-amber-800 mb-1">Jazz Cash payment proof</p>
+                        <a href={order.jazzcash_proof_url} target="_blank" rel="noopener noreferrer" className="block">
+                          <img src={order.jazzcash_proof_url} alt="Proof" className="max-w-full max-h-24 object-contain rounded border" />
+                        </a>
+                      </div>
                     )}
                     {order.ready_at != null && (
                       <p className="text-xs text-green-600 mt-1">
