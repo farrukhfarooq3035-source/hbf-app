@@ -138,13 +138,34 @@ export default function AdminProductsPage() {
     }
   };
 
+  const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
+  const deleteCategory = async (id: string, name: string) => {
+    if (!confirm(`Remove category "${name}"? Products in this category will become uncategorized.`)) return;
+    setDeletingCategoryId(id);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: Record<string, string> = {};
+      if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
+      const res = await fetch(`/api/admin/categories?id=${encodeURIComponent(id)}`, { method: 'DELETE', headers });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed');
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      queryClient.invalidateQueries({ queryKey: ['menu-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Failed to remove category');
+    } finally {
+      setDeletingCategoryId(null);
+    }
+  };
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Products</h1>
 
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-        <h2 className="font-semibold mb-4 text-gray-900 dark:text-white">Add Category</h2>
-        <div className="flex gap-2 mb-6">
+        <h2 className="font-semibold mb-4 text-gray-900 dark:text-white">Manage Categories</h2>
+        <div className="flex gap-2 mb-4">
           <input
             placeholder="New category name"
             value={newCategoryName}
@@ -160,6 +181,27 @@ export default function AdminProductsPage() {
             Add Category
           </button>
         </div>
+        {uniqueCategories.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {uniqueCategories.map((c) => (
+              <div
+                key={c.id}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
+              >
+                <span className="text-sm font-medium">{c.name}</span>
+                <button
+                  type="button"
+                  onClick={() => deleteCategory(c.id, c.name ?? '')}
+                  disabled={deletingCategoryId === c.id}
+                  className="p-1 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded disabled:opacity-50"
+                  title="Remove category"
+                >
+                  {deletingCategoryId === c.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">

@@ -80,15 +80,18 @@ export default function MenuPage() {
     return map;
   }, [allProducts, categories]);
 
-  /** Categories: filtered by API; sorted by CATEGORY_ORDER; HBF Deals excluded from pills */
+  /** Categories: filtered by API; HBF Deals excluded. New categories (not in CATEGORY_ORDER) appear right below HBF Deals, then fixed order. */
   const uniqueCategories = useMemo(() => {
     const isHbfDeals = (n: string) => (n ?? '').toLowerCase().includes('hbf') && (n ?? '').toLowerCase().includes('deal');
     const list = uniqueCategoriesByName(categories).filter((c) => !isHbfDeals(c.name));
     const orderMap = new Map(CATEGORY_ORDER.map((n, i) => [n, i]));
     return [...list].sort((a, b) => {
-      const ia = orderMap.get(a.name) ?? 999;
-      const ib = orderMap.get(b.name) ?? 999;
-      return ia - ib;
+      const inOrderA = orderMap.has(a.name);
+      const inOrderB = orderMap.has(b.name);
+      if (!inOrderA && inOrderB) return -1;
+      if (inOrderA && !inOrderB) return 1;
+      if (inOrderA && inOrderB) return (orderMap.get(a.name) ?? 999) - (orderMap.get(b.name) ?? 999);
+      return (a.name ?? '').localeCompare(b.name ?? '');
     });
   }, [categories]);
 
