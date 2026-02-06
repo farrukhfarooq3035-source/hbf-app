@@ -31,6 +31,9 @@ export function useBusinessHours() {
         happy_hour_start: (data.happy_hour_start as string) || '15:00',
         happy_hour_end: (data.happy_hour_end as string) || '17:00',
         happy_hour_discount: (data.happy_hour_discount as number) ?? 20,
+        jazzcash_till_id: (data.jazzcash_till_id as string) || '',
+        jazzcash_qr_url: (data.jazzcash_qr_url as string) || '',
+        promo_banners: (data.promo_banners as { title: string; discount: number; image_url?: string }[]) || [],
       };
     },
     staleTime: 60 * 1000,
@@ -48,6 +51,9 @@ export function useBusinessHours() {
   const showHappyHourDeals = isHappyHour || isAfterMidnight;
   return {
     ...q,
+    jazzcashTillId: data?.jazzcash_till_id ?? '',
+    jazzcashQrUrl: data?.jazzcash_qr_url ?? '',
+    promoBanners: data?.promo_banners ?? [],
     openTime: data?.open_time ?? '10:00',
     closeTime: data?.close_time ?? '01:00',
     closedDays: data?.closed_days ?? [],

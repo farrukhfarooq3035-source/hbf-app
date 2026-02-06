@@ -18,6 +18,8 @@ export default function AdminProductsPage() {
   });
   const [addProductImage, setAddProductImage] = useState<File | null>(null);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [addingCategory, setAddingCategory] = useState(false);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const { data: categories } = useCategories();
@@ -111,12 +113,57 @@ export default function AdminProductsPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-products'] }),
   });
 
+  const addCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    setAddingCategory(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
+      const res = await fetch('/api/admin/categories', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ name: newCategoryName.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed');
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      queryClient.invalidateQueries({ queryKey: ['menu-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      setNewCategoryName('');
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Failed to add category');
+    } finally {
+      setAddingCategory(false);
+    }
+  };
+
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Products</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Products</h1>
 
-      <div className="bg-white rounded-2xl shadow-sm border p-6 mb-6">
-        <h2 className="font-semibold mb-4">Add Product</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+        <h2 className="font-semibold mb-4 text-gray-900 dark:text-white">Add Category</h2>
+        <div className="flex gap-2 mb-6">
+          <input
+            placeholder="New category name"
+            value={newCategoryName}
+            onChange={(e) => setNewCategoryName(e.target.value)}
+            className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white flex-1 max-w-xs"
+          />
+          <button
+            onClick={addCategory}
+            disabled={!newCategoryName.trim() || addingCategory}
+            className="px-4 py-2 bg-primary text-white rounded-xl hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
+          >
+            {addingCategory ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+            Add Category
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+        <h2 className="font-semibold mb-4 text-gray-900 dark:text-white">Add Product</h2>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <input
             placeholder="Name"

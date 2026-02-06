@@ -11,6 +11,7 @@ import { formatOrderNumber } from '@/lib/order-utils';
 import { useNotificationStore } from '@/store/notification-store';
 import { getStorePhone } from '@/lib/store-config';
 import { useAuth } from '@/hooks/use-auth';
+import { useBusinessHours } from '@/hooks/use-business-hours';
 import { StarRating, StarRatingDisplay } from '@/components/customer/StarRating';
 import { RiderMap } from '@/components/RiderMap';
 import { STORE_LAT, STORE_LNG } from '@/lib/geo';
@@ -81,6 +82,7 @@ export default function OrderTrackingPage() {
   const [refreshingRider, setRefreshingRider] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const storePhone = getStorePhone();
+  const { jazzcashTillId, jazzcashQrUrl } = useBusinessHours();
   const addItem = useCartStore((s) => s.addItem);
   const routerForCart = useRouter();
 
@@ -320,6 +322,16 @@ export default function OrderTrackingPage() {
             <p>
               <span className="font-medium">Order notes:</span> {order.notes}
             </p>
+          )}
+          {jazzcashTillId && (
+            <div className="mt-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+              <p className="font-semibold text-amber-800 dark:text-amber-200 text-sm">Pay via JazzCash</p>
+              <p className="text-sm text-amber-700 dark:text-amber-300">TILL ID: <strong>{jazzcashTillId}</strong></p>
+              <p className="text-xs text-amber-600 dark:text-amber-400">Dial *786*10# and enter TILL ID</p>
+              {jazzcashQrUrl && (
+                <img src={jazzcashQrUrl.startsWith('/') ? jazzcashQrUrl : jazzcashQrUrl} alt="JazzCash QR" className="w-24 h-24 mt-2 object-contain bg-white rounded-lg" />
+              )}
+            </div>
           )}
         </div>
         <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">

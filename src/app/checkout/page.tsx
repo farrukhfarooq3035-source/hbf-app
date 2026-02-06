@@ -16,7 +16,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { items, getSubtotal, getDeliveryFee, getGrandTotal, getDistanceKm, getEstimatedDeliveryMinutes, clearCart, setUserLocation } = useCartStore();
-  const { isOpen, openTime, closeTime, isHappyHour, happyHourDiscount } = useBusinessHours();
+  const { isOpen, openTime, closeTime, isHappyHour, happyHourDiscount, jazzcashTillId, jazzcashQrUrl } = useBusinessHours();
   const estMins = getEstimatedDeliveryMinutes();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -357,9 +357,26 @@ export default function CheckoutPage() {
           </div>
 
           <div className="pt-4">
-            <p className="text-sm text-gray-500 mb-2">
-              Payment: Cash on Delivery (COD)
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Payment options
             </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              Cash on Delivery (COD) — Pay when your order arrives
+            </p>
+            {jazzcashTillId && (
+              <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 mb-4">
+                <p className="font-semibold text-amber-800 dark:text-amber-200 mb-2">Pay via JazzCash</p>
+                <p className="text-sm text-amber-700 dark:text-amber-300 mb-1">TILL ID: <strong>{jazzcashTillId}</strong></p>
+                <p className="text-xs text-amber-600 dark:text-amber-400 mb-2">
+                  Dial <code className="bg-amber-100 dark:bg-amber-900/40 px-1 rounded">*786*10#</code> and enter TILL ID to pay
+                </p>
+                {jazzcashQrUrl && (
+                  <div className="mt-2">
+                    <img src={jazzcashQrUrl.startsWith('/') ? jazzcashQrUrl : jazzcashQrUrl} alt="JazzCash QR" className="w-32 h-32 object-contain bg-white rounded-lg" />
+                  </div>
+                )}
+              </div>
+            )}
             <RippleButton
               type="submit"
               disabled={loading || !isOpen || (minOrder > 0 && subtotal < minOrder)}

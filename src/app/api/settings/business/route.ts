@@ -17,7 +17,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
-  const { open_time, close_time, closed_days, happy_hour_start, happy_hour_end, happy_hour_discount } = body;
+  const { open_time, close_time, closed_days, happy_hour_start, happy_hour_end, happy_hour_discount, jazzcash_till_id, jazzcash_qr_url, promo_banners } = body;
   const updates: { key: string; value: unknown }[] = [];
   if (typeof open_time === 'string') updates.push({ key: 'open_time', value: open_time });
   if (typeof close_time === 'string') updates.push({ key: 'close_time', value: close_time });
@@ -25,6 +25,9 @@ export async function POST(req: Request) {
   if (typeof happy_hour_start === 'string') updates.push({ key: 'happy_hour_start', value: happy_hour_start });
   if (typeof happy_hour_end === 'string') updates.push({ key: 'happy_hour_end', value: happy_hour_end });
   if (typeof happy_hour_discount === 'number') updates.push({ key: 'happy_hour_discount', value: happy_hour_discount });
+  if (typeof jazzcash_till_id === 'string') updates.push({ key: 'jazzcash_till_id', value: jazzcash_till_id.trim() });
+  if (typeof jazzcash_qr_url === 'string') updates.push({ key: 'jazzcash_qr_url', value: jazzcash_qr_url.trim() || '' });
+  if (Array.isArray(promo_banners)) updates.push({ key: 'promo_banners', value: promo_banners });
   for (const u of updates) {
     const { error } = await supabaseAdmin
       .from('business_settings')

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Minus, Plus, Trash2, RefreshCw } from 'lucide-react';
 import { RippleButton } from '@/components/customer/RippleButton';
 import { useCartStore } from '@/store/cart-store';
+import { useBusinessHours } from '@/hooks/use-business-hours';
 import type { CartItem } from '@/types';
 
 function CartItemRow({
@@ -58,6 +59,7 @@ function CartItemRow({
 export default function CartPage() {
   const router = useRouter();
   const { items, updateQty, removeItem, getSubtotal, getDeliveryFee, getGrandTotal, getDistanceKm, getEstimatedDeliveryMinutes, deliveryMode, setUserLocation } = useCartStore();
+  const { jazzcashTillId } = useBusinessHours();
   const [refreshingLocation, setRefreshingLocation] = useState(false);
   const estMins = getEstimatedDeliveryMinutes();
   const distanceKm = getDistanceKm();
@@ -132,6 +134,11 @@ export default function CartPage() {
           {estMins != null && (
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Estimated {deliveryMode === 'delivery' ? 'delivery' : 'pickup'}: ~{estMins} min
+            </p>
+          )}
+          {jazzcashTillId && (
+            <p className="text-xs text-amber-600 dark:text-amber-400">
+              Pay via JazzCash at checkout • TILL ID: {jazzcashTillId}
             </p>
           )}
           {deliveryMode === 'delivery' && getSubtotal() < 500 && (

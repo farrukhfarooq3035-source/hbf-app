@@ -1,10 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { getStorePhone, DEFAULT_STORE_PHONE_DISPLAY, getWhatsAppOrderLink } from '@/lib/store-config';
+import { Plus, Trash2, ImagePlus, Loader2 } from 'lucide-react';
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+interface PromoBanner {
+  title: string;
+  discount: number;
+  image_url?: string;
+}
 
 export default function AdminSettingsPage() {
   const storePhone = getStorePhone() || DEFAULT_STORE_PHONE_DISPLAY;
@@ -18,6 +25,12 @@ export default function AdminSettingsPage() {
   const [happyHourStart, setHappyHourStart] = useState('15:00');
   const [happyHourEnd, setHappyHourEnd] = useState('17:00');
   const [happyHourDiscount, setHappyHourDiscount] = useState(20);
+  const [jazzcashTillId, setJazzcashTillId] = useState('');
+  const [jazzcashQrUrl, setJazzcashQrUrl] = useState('');
+  const [promoBanners, setPromoBanners] = useState<PromoBanner[]>([]);
+  const [promoSaving, setPromoSaving] = useState(false);
+  const [promoSaved, setPromoSaved] = useState(false);
+  const promoFileRef = useRef<HTMLInputElement>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -40,6 +53,8 @@ export default function AdminSettingsPage() {
       .then((data: {
         open_time?: string; close_time?: string; closed_days?: number[];
         happy_hour_start?: string; happy_hour_end?: string; happy_hour_discount?: number;
+        jazzcash_till_id?: string; jazzcash_qr_url?: string;
+        promo_banners?: PromoBanner[];
       }) => {
         if (data.open_time) setOpenTime(String(data.open_time));
         if (data.close_time) setCloseTime(String(data.close_time));
@@ -47,6 +62,9 @@ export default function AdminSettingsPage() {
         if (data.happy_hour_start) setHappyHourStart(String(data.happy_hour_start));
         if (data.happy_hour_end) setHappyHourEnd(String(data.happy_hour_end));
         if (typeof data.happy_hour_discount === 'number') setHappyHourDiscount(data.happy_hour_discount);
+        if (data.jazzcash_till_id) setJazzcashTillId(String(data.jazzcash_till_id));
+        if (data.jazzcash_qr_url) setJazzcashQrUrl(String(data.jazzcash_qr_url));
+        if (Array.isArray(data.promo_banners)) setPromoBanners(data.promo_banners);
       })
       .catch(() => {});
   }, []);
@@ -218,6 +236,146 @@ export default function AdminSettingsPage() {
           </div>
         </div>
         <p className="text-sm text-gray-600">Example: 3–5pm, 20% off</p>
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-sm border p-6 max-w-xl mb-6">
+        <h2 className="font-semibold mb-4">Promo Banners (Top & Bottom of App)</h2>
+        <p className="text-gray-800 text-sm mb-4">
+          Create discounted offers with image. Shown at top and bottom of menu.
+        </p>
+        <div className="space-y-4">
+          {promoBanners.map((b, i) => (
+            <div key={i} className="p-4 rounded-xl border border-gray-200 bg-gray-50 flex gap-4">
+              {b.image_url && (
+                <img src={b.image_url} alt="" className="w-16 h-16 object-cover rounded-lg" />
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate">{b.title}</p>
+                <p className="text-sm text-primary font-semibold">{b.discount}% off</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPromoBanners((p) => p.filter((_, j) => j !== i))}
+                className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+          <div className="flex gap-2 flex-wrap">
+            <input
+              ref={promoFileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const { data: { session } } = await supabase.auth.getSession();
+                const fd = new FormData();
+                fd.append('file', file);
+                const headers: Record<string, string> = {};
+                if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
+                const res = await fetch('/api/admin/promotion/upload', { method: 'POST', headers, body: fd });
+                const data = await res.json();
+                if (res.ok && data.url) {
+                  const title = prompt('Offer title?', 'Limited Time Offer');
+                  const discount = parseInt(prompt('Discount %?', '20') || '20', 10);
+                  setPromoBanners((p) => [...p, { title: title || 'Offer', discount, image_url: data.url }]);
+                }
+                e.target.value = '';
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => promoFileRef.current?.click()}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-50"
+            >
+              <ImagePlus className="w-4 h-4" />
+              Add with image
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const title = prompt('Offer title?', '20% Off Today');
+                const discount = parseInt(prompt('Discount %?', '20') || '20', 10);
+                if (title) setPromoBanners((p) => [...p, { title, discount }]);
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-50"
+            >
+              <Plus className="w-4 h-4" />
+              Add text only
+            </button>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setPromoSaving(true);
+              setPromoSaved(false);
+              fetch('/api/settings/business', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ promo_banners: promoBanners }),
+              })
+                .then((res) => { if (res.ok) setPromoSaved(true); })
+                .finally(() => setPromoSaving(false));
+            }}
+            disabled={promoSaving}
+            className="px-4 py-2 bg-primary text-white rounded-xl font-medium hover:bg-red-700 disabled:opacity-50"
+          >
+            {promoSaving ? <Loader2 className="w-4 h-4 animate-spin inline mr-1" /> : null}
+            Save Promo Banners
+          </button>
+          {promoSaved && <span className="ml-2 text-green-600 text-sm">Saved</span>}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-sm border p-6 max-w-xl mb-6">
+        <h2 className="font-semibold mb-4">JazzCash Payment</h2>
+        <p className="text-gray-800 text-sm mb-4">
+          TILL ID and QR image URL for JazzCash payments. Shown on checkout and order page.
+        </p>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">TILL ID</label>
+            <input
+              type="text"
+              value={jazzcashTillId}
+              onChange={(e) => setJazzcashTillId(e.target.value)}
+              placeholder="e.g. 982260759"
+              className="px-3 py-2 rounded-xl border w-full max-w-xs"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">QR Image URL (optional)</label>
+            <input
+              type="text"
+              value={jazzcashQrUrl}
+              onChange={(e) => setJazzcashQrUrl(e.target.value)}
+              placeholder="/jazzcash-qr.png or full URL"
+              className="px-3 py-2 rounded-xl border w-full"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setSaving(true);
+              setSaved(false);
+              fetch('/api/settings/business', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ jazzcash_till_id: jazzcashTillId, jazzcash_qr_url: jazzcashQrUrl }),
+              })
+                .then((res) => { if (res.ok) setSaved(true); })
+                .finally(() => setSaving(false));
+            }}
+            disabled={saving}
+            className="px-4 py-2 bg-primary text-white rounded-xl font-medium hover:bg-red-700 disabled:opacity-50"
+          >
+            {saving ? 'Saving...' : 'Save JazzCash'}
+          </button>
+          {saved && <span className="ml-2 text-green-600 text-sm">Saved</span>}
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border p-6 max-w-xl">

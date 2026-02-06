@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { Star } from 'lucide-react';
+import { Star, Send } from 'lucide-react';
 import { format } from 'date-fns';
+import { PromotionComposeModal } from '@/components/admin/PromotionComposeModal';
 
 interface CustomerRow {
   phone: string;
@@ -13,6 +15,7 @@ interface CustomerRow {
 }
 
 export default function AdminCustomersPage() {
+  const [promoOpen, setPromoOpen] = useState(false);
   const { data: customers, isLoading } = useQuery({
     queryKey: ['admin-customers'],
     queryFn: async () => {
@@ -66,17 +69,36 @@ export default function AdminCustomersPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Customers</h1>
-      <p className="text-gray-600 text-sm mb-4">
-        Unique customers by phone. Regular customers (3+ orders) show a star.
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Customers</h1>
+          <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+            Unique customers by phone. Regular customers (3+ orders) show a star.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setPromoOpen(true)}
+          disabled={!customers?.length}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Send className="w-5 h-5" />
+          Send Promotion
+        </button>
+      </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
+      <PromotionComposeModal
+        open={promoOpen}
+        onClose={() => setPromoOpen(false)}
+        customers={customers ?? []}
+      />
+
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 dark:bg-gray-700/50">
               <tr>
-                <th className="text-left p-4">Name</th>
+                <th className="text-left p-4 text-gray-900 dark:text-white">Name</th>
                 <th className="text-left p-4">Phone</th>
                 <th className="text-left p-4">Total Orders</th>
                 <th className="text-left p-4">Last Order</th>
