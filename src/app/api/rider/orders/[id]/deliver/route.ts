@@ -25,7 +25,7 @@ export async function POST(
 
   const { data: order, error: fetchError } = await supabaseAdmin
     .from('orders')
-    .select('id, rider_id, status, total_price, amount_paid')
+    .select('id, rider_id, status, total_price, amount_paid, payment_method')
     .eq('id', orderId)
     .single();
 
@@ -47,13 +47,15 @@ export async function POST(
     updates.payment_received_at = new Date().toISOString();
     const totalPrice = Number(order.total_price ?? 0);
     const alreadyPaid = Number(order.amount_paid ?? 0);
+    const paymentMethod = order.payment_method === 'jazzcash' ? 'jazzcash' : 'cash';
+    const paymentNotes = paymentMethod === 'jazzcash' ? 'Jazz Cash verified by rider' : 'COD collected by rider';
     if (totalPrice > 0 && alreadyPaid < totalPrice) {
       await supabaseAdmin.from('order_payments').insert({
         order_id: orderId,
         amount: totalPrice - alreadyPaid,
-        method: 'cash',
+        method: paymentMethod,
         channel: 'pos',
-        notes: 'COD collected by rider',
+        notes: paymentNotes,
       });
     }
     if (totalPrice > 0) {

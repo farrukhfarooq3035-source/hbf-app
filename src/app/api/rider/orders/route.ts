@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
   let query = supabaseAdmin
     .from('orders')
-    .select('id, status, total_price, customer_name, address, phone, created_at, delivered_at')
+    .select('id, status, total_price, customer_name, address, phone, created_at, delivered_at, payment_method, jazzcash_proof_url')
     .eq('rider_id', riderId)
     .order('created_at', { ascending: false });
 

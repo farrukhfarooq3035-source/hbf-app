@@ -3,10 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { User, ShoppingBag, ShoppingCart, Moon, Sun, LogIn, LogOut } from 'lucide-react';
+import { User, ShoppingBag, ShoppingCart, RefreshCw, LogIn, LogOut } from 'lucide-react';
 import { useCustomerStore } from '@/store/customer-store';
 import { useCartStore } from '@/store/cart-store';
-import { useThemeStore } from '@/store/theme-store';
 import { useAuth } from '@/hooks/use-auth';
 import { ProfilePanel } from '@/components/customer/ProfilePanel';
 
@@ -15,8 +14,6 @@ export function Header() {
   const [profileOpen, setProfileOpen] = useState(false);
   const { phone } = useCustomerStore();
   const itemCount = useCartStore((s) => s.getItemCount());
-  const theme = useThemeStore((s) => s.theme);
-  const toggleTheme = useThemeStore((s) => s.toggleTheme);
   const { user, loading: authLoading, signOut } = useAuth();
   const isCustomerApp = !pathname.startsWith('/admin');
 
@@ -34,13 +31,13 @@ export function Header() {
           {isCustomerApp && (
             <div className="flex items-center gap-2 sm:gap-3">
               <button
-                onClick={toggleTheme}
+                onClick={() => window.location.reload()}
                 className="flex items-center gap-1.5 p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 tap-highlight"
-                title={theme === 'light' ? 'HBF Black Edition' : 'Light mode'}
+                title="Refresh app"
               >
-                {theme === 'light' ? <Moon className="w-5 h-5 text-gray-600 dark:text-gray-300" /> : <Sun className="w-5 h-5 text-gray-600 dark:text-gray-300" />}
+                <RefreshCw className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                 <span className="hidden sm:inline text-[10px] font-medium text-gray-500 dark:text-gray-400">
-                  {theme === 'dark' ? 'Black' : 'Light'}
+                  Refresh
                 </span>
               </button>
               {user ? (

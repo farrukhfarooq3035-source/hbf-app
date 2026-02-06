@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { MapPin, Loader2, CheckCircle, LogOut, Package, Bike, Check, Truck, Bell } from 'lucide-react';
+import { MapPin, Loader2, CheckCircle, LogOut, Package, Bike, Check, Bell, ExternalLink } from 'lucide-react';
 import { formatOrderNumber } from '@/lib/order-utils';
 import { clearRiderSession, setRiderSession } from '@/app/rider/login/page';
 import { format } from 'date-fns';
@@ -17,6 +17,8 @@ interface RiderOrder {
   phone: string;
   created_at: string;
   delivered_at?: string | null;
+  payment_method?: 'cod' | 'jazzcash' | null;
+  jazzcash_proof_url?: string | null;
 }
 
 export default function RiderPage() {
@@ -28,7 +30,7 @@ export default function RiderPage() {
   const [error, setError] = useState('');
   const [lastSent, setLastSent] = useState<Date | null>(null);
   const [deliveringOrderId, setDeliveringOrderId] = useState<string | null>(null);
-  const [paymentReceived, setPaymentReceived] = useState(true);
+  const [paymentReceivedByOrder, setPaymentReceivedByOrder] = useState<Record<string, boolean>>({});
   const [newOrderToast, setNewOrderToast] = useState<string | null>(null);
   const watchIdRef = useRef<number | null>(null);
   const prevOrderIdsRef = useRef<Set<string>>(new Set());
@@ -131,11 +133,12 @@ export default function RiderPage() {
 
   const handleMarkDelivered = (orderId: string) => {
     setDeliveringOrderId(orderId);
+    const received = paymentReceivedByOrder[orderId] ?? true;
     fetch(`/api/rider/orders/${orderId}/deliver`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ payment_received: paymentReceived }),
+      body: JSON.stringify({ payment_received: received }),
     })
       .then((res) => {
         if (res.ok) refetchOrders();
@@ -311,16 +314,34 @@ export default function RiderPage() {
                     On the way
                   </span>
                 </div>
-                <div className="flex items-center gap-3 pt-2 border-t border-primary/20">
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <span className={`px-2 py-0.5 rounded-lg text-xs font-medium ${
+                    o.payment_method === 'jazzcash' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                  }`}>
+                    {o.payment_method === 'jazzcash' ? 'Jazz Cash' : 'COD'}
+                  </span>
+                  {o.payment_method === 'jazzcash' && o.jazzcash_proof_url && (
+                    <a
+                      href={o.jazzcash_proof_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 hover:underline"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      Check proof
+                    </a>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 pt-2 border-t border-primary/20 mt-2">
                   <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={paymentReceived}
-                      onChange={(e) => setPaymentReceived(e.target.checked)}
+                      checked={paymentReceivedByOrder[o.id] ?? (o.payment_method === 'jazzcash' ? false : true)}
+                      onChange={(e) => setPaymentReceivedByOrder((p) => ({ ...p, [o.id]: e.target.checked }))}
                       className="rounded border-gray-300 text-primary focus:ring-primary"
                     />
                     <Check className="w-4 h-4 text-green-600" />
-                    Payment received
+                    {o.payment_method === 'jazzcash' ? 'Jazz Cash verified & received' : 'Payment received'}
                   </label>
                   <button
                     type="button"
@@ -367,15 +388,22 @@ export default function RiderPage() {
                     Rs {o.total_price}/- · {o.customer_name}
                   </p>
                 </div>
-                <span
-                  className={`px-2 py-0.5 rounded-lg text-xs font-medium ${
-                    o.status === 'delivered'
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                      : 'bg-primary/10 text-primary'
-                  }`}
-                >
-                  {o.status === 'delivered' ? 'Delivered' : o.status}
-                </span>
+                <div className="flex flex-col items-end gap-1">
+                  <span
+                    className={`px-2 py-0.5 rounded-lg text-xs font-medium ${
+                      o.status === 'delivered'
+                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                        : 'bg-primary/10 text-primary'
+                    }`}
+                  >
+                    {o.status === 'delivered' ? 'Delivered' : o.status}
+                  </span>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${
+                    o.payment_method === 'jazzcash' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                  }`}>
+                    {o.payment_method === 'jazzcash' ? 'Jazz Cash' : 'COD'}
+                  </span>
+                </div>
               </div>
             </li>
           ))}
