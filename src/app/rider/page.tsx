@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { MapPin, Loader2, CheckCircle, LogOut, Package, Bike, Check, Bell, ExternalLink } from 'lucide-react';
 import { formatOrderNumber } from '@/lib/order-utils';
+import { RiderOrderDetailDrawer } from '@/components/rider/RiderOrderDetailDrawer';
 import { clearRiderSession, setRiderSession } from '@/app/rider/login/page';
 import { format } from 'date-fns';
 import { supabase } from '@/lib/supabase';
@@ -32,6 +33,7 @@ export default function RiderPage() {
   const [deliveringOrderId, setDeliveringOrderId] = useState<string | null>(null);
   const [paymentReceivedByOrder, setPaymentReceivedByOrder] = useState<Record<string, boolean>>({});
   const [newOrderToast, setNewOrderToast] = useState<string | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<RiderOrder | null>(null);
   const watchIdRef = useRef<number | null>(null);
   const prevOrderIdsRef = useRef<Set<string>>(new Set());
 
@@ -288,10 +290,14 @@ export default function RiderPage() {
             Pending orders ({pendingOrders.length})
           </h2>
           <ul className="space-y-3 mb-6">
-            {onTheWay.map((o) => (
+            {pendingOrders.map((o) => (
               <li
                 key={o.id}
-                className="bg-primary/5 dark:bg-primary/10 rounded-xl border border-primary/20 dark:border-primary/30 p-4"
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelectedOrder(o)}
+                onKeyDown={(e) => e.key === 'Enter' && setSelectedOrder(o)}
+                className="bg-primary/5 dark:bg-primary/10 rounded-xl border border-primary/20 dark:border-primary/30 p-4 cursor-pointer hover:ring-2 hover:ring-primary/30 transition-shadow"
               >
                 <div className="flex justify-between items-start mb-3">
                   <div>
@@ -310,8 +316,10 @@ export default function RiderPage() {
                       </p>
                     )}
                   </div>
-                  <span className="px-2 py-0.5 rounded-lg text-xs font-medium bg-primary/20 text-primary">
-                    On the way
+                  <span className={`px-2 py-0.5 rounded-lg text-xs font-medium ${
+                    o.status === 'on_the_way' ? 'bg-primary/20 text-primary' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                  }`}>
+                    {o.status === 'on_the_way' ? 'On the way' : 'Ready for pickup'}
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -332,7 +340,8 @@ export default function RiderPage() {
                     </a>
                   )}
                 </div>
-                <div className="flex items-center gap-3 pt-2 border-t border-primary/20 mt-2">
+                {o.status === 'on_the_way' && (
+                <div className="flex items-center gap-3 pt-2 border-t border-primary/20 mt-2" onClick={(e) => e.stopPropagation()}>
                   <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
                     <input
                       type="checkbox"
@@ -357,6 +366,7 @@ export default function RiderPage() {
                     Mark delivered
                   </button>
                 </div>
+              )}
               </li>
             ))}
           </ul>
@@ -374,7 +384,11 @@ export default function RiderPage() {
           {orders.map((o) => (
             <li
               key={o.id}
-              className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4"
+              role="button"
+              tabIndex={0}
+              onClick={() => setSelectedOrder(o)}
+              onKeyDown={(e) => e.key === 'Enter' && setSelectedOrder(o)}
+              className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:ring-2 hover:ring-primary/30 transition-shadow"
             >
               <div className="flex justify-between items-start">
                 <div>
@@ -409,6 +423,12 @@ export default function RiderPage() {
           ))}
         </ul>
       )}
+
+      <RiderOrderDetailDrawer
+        order={selectedOrder}
+        open={!!selectedOrder}
+        onClose={() => setSelectedOrder(null)}
+      />
     </div>
   );
 }

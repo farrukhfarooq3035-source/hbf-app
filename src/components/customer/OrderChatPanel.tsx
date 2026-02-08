@@ -204,6 +204,7 @@ export function OrderChatPanel({ orderId, orderNumber, open, onClose, userId }: 
                   </p>
                   {group.items.map((msg) => {
                     const isSelf = msg.sender_type === 'customer' && msg.sender_id === userId;
+                    const senderLabel = msg.sender_type === 'rider' ? 'Rider' : msg.sender_type === 'admin' ? 'Support' : null;
                     return (
                       <div
                         key={msg.id}
@@ -216,6 +217,9 @@ export function OrderChatPanel({ orderId, orderNumber, open, onClose, userId }: 
                               : 'bg-white text-gray-900 rounded-bl-none'
                           }`}
                         >
+                          {senderLabel && (
+                            <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-0.5 uppercase tracking-wide">{senderLabel}</p>
+                          )}
                           <p className="whitespace-pre-wrap break-words">{msg.message}</p>
                           <p
                             className={`text-[10px] mt-1 ${
