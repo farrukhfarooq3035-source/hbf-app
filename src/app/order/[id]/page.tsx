@@ -168,7 +168,7 @@ export default function OrderTrackingPage() {
       return;
     }
     fetchRiderLocation();
-    const interval = setInterval(fetchRiderLocation, 10000);
+    const interval = setInterval(fetchRiderLocation, 5000);
     return () => clearInterval(interval);
   }, [order?.id, order?.status, id, fetchRiderLocation]);
 
@@ -295,7 +295,7 @@ export default function OrderTrackingPage() {
         </div>
       )}
 
-      <div className="text-center mb-8">
+      <div className="text-center mb-6">
         <h1 className="text-2xl font-bold">{formatOrderNumber(order.id)}</h1>
         <p className="text-gray-600 mt-1">
           Status: {order.status}
@@ -311,6 +311,60 @@ export default function OrderTrackingPage() {
             : ''}
         </p>
       </div>
+
+      {order.status === 'on_the_way' && (
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold text-dark dark:text-white">Live tracking</h3>
+            <button
+              type="button"
+              onClick={fetchRiderLocation}
+              disabled={refreshingRider}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${refreshingRider ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          </div>
+          {(riderInfo.name || riderInfo.phone) && (
+            <div className="flex flex-wrap items-center gap-3 mb-4 p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50">
+              {riderInfo.name && (
+                <p className="font-medium text-dark dark:text-white">{riderInfo.name}</p>
+              )}
+              {riderInfo.phone && (
+                <a
+                  href={`tel:${riderInfo.phone.replace(/\D/g, '')}`}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white font-medium tap-highlight hover:bg-red-700"
+                >
+                  <Phone className="w-4 h-4" />
+                  Call rider
+                </a>
+              )}
+            </div>
+          )}
+          {riderLocation ? (
+            <RiderMap
+              storeLat={STORE_LAT}
+              storeLng={STORE_LNG}
+              riderLat={riderLocation.lat}
+              riderLng={riderLocation.lng}
+              height={280}
+            />
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-gray-400 py-6 text-center">
+              Location tab dikhegi jab rider &quot;Start sharing location&quot; karega.
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={() => setChatOpen(true)}
+            className="w-full mt-4 py-3 rounded-xl bg-primary/10 text-primary font-medium flex items-center justify-center gap-2 hover:bg-primary/20"
+          >
+            <MessageCircle className="w-5 h-5" />
+            Chat with rider
+          </button>
+        </div>
+      )}
 
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
         <div className="space-y-2">
@@ -452,55 +506,6 @@ export default function OrderTrackingPage() {
           </button>
         </div>
       </div>
-
-      {order.status === 'on_the_way' && (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="font-bold text-dark dark:text-white">Your rider</h3>
-            <button
-              type="button"
-              onClick={fetchRiderLocation}
-              disabled={refreshingRider}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
-            >
-              <RefreshCw className={`w-4 h-4 ${refreshingRider ? 'animate-spin' : ''}`} />
-              Refresh
-            </button>
-          </div>
-          {(riderInfo.name || riderInfo.phone) && (
-            <div className="flex flex-wrap items-center gap-3 mb-4 p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50">
-              {riderInfo.name && (
-                <p className="font-medium text-dark dark:text-white">{riderInfo.name}</p>
-              )}
-              {riderInfo.phone && (
-                <a
-                  href={`tel:${riderInfo.phone.replace(/\D/g, '')}`}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white font-medium tap-highlight hover:bg-red-700"
-                >
-                  <Phone className="w-4 h-4" />
-                  Call rider
-                </a>
-              )}
-            </div>
-          )}
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Live location — map tab tak dikhegi jab rider /rider page se location share karega.
-          </p>
-          {riderLocation ? (
-            <RiderMap
-              storeLat={STORE_LAT}
-              storeLng={STORE_LNG}
-              riderLat={riderLocation.lat}
-              riderLng={riderLocation.lng}
-              height={240}
-            />
-          ) : (
-            <p className="text-sm text-gray-500 dark:text-gray-400 py-6 text-center">
-              Location tab dikhegi jab rider &quot;Start sharing location&quot; karega.
-            </p>
-          )}
-        </div>
-      )}
 
       {isDeliveredUnrated && !showRatingPopup && (
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-6">

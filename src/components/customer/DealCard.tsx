@@ -80,17 +80,20 @@ export function DealCard({ deal, grid }: DealCardProps) {
             Rs {deal.price}/-
           </p>
         </Link>
-        <div className="px-3 pb-3">
+        <div className="px-3 pb-3" onClick={(e) => e.stopPropagation()}>
           <button
+            type="button"
             onClick={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               addItem({
                 deal_id: deal.id,
                 name: deal.title,
                 price: deal.price,
+                qty: 1,
               });
             }}
-            className="w-full py-2 bg-primary text-white rounded-xl flex items-center justify-center gap-2 font-medium hover:bg-primary-hover transition-colors duration-280 ease-smooth tap-highlight"
+            className="w-full py-2 bg-primary text-white rounded-xl flex items-center justify-center gap-2 font-medium hover:bg-primary-hover transition-colors duration-280 ease-smooth tap-highlight touch-manipulation"
           >
             <Plus className="w-4 h-4" />
             Add
@@ -155,17 +158,20 @@ export function DealCard({ deal, grid }: DealCardProps) {
           Rs {deal.price}/-
         </p>
       </Link>
-      <div className="px-3 pb-3">
+      <div className="px-3 pb-3" onClick={(e) => e.stopPropagation()}>
         <button
+          type="button"
           onClick={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             addItem({
               deal_id: deal.id,
               name: deal.title,
               price: deal.price,
+              qty: 1,
             });
           }}
-          className="w-full py-2 bg-primary text-white rounded-xl flex items-center justify-center gap-2 font-medium hover:bg-primary-hover transition-colors duration-280 ease-smooth tap-highlight"
+          className="w-full py-2 bg-primary text-white rounded-xl flex items-center justify-center gap-2 font-medium hover:bg-primary-hover transition-colors duration-280 ease-smooth tap-highlight touch-manipulation"
         >
           <Plus className="w-4 h-4" />
           Add
