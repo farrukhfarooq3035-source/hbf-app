@@ -30,11 +30,12 @@ export function AdminAuthGuard({ children }: { children: React.ReactNode }) {
   }, [signOut, router]);
 
   useEffect(() => {
-    if (loading || isLoginPage || !user || !isAdmin) return;
+    if (loading || isLoginPage) return;
     if (!user || !isAdmin) {
-      router.replace('/admin/login');
+      window.location.replace('/admin/login');
+      return;
     }
-  }, [user, isAdmin, loading, isLoginPage, router]);
+  }, [user, isAdmin, loading, isLoginPage]);
 
   useEffect(() => {
     if (isLoginPage || !user || !isAdmin) return;

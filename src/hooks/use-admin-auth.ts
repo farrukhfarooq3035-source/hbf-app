@@ -37,6 +37,7 @@ export function useAdminAuth() {
   useEffect(() => {
     if (!user?.email) {
       setAdminCheckDone(true);
+      setLoading(false);
       return;
     }
     if (typeof window !== 'undefined' && sessionStorage.getItem(ADMIN_VERIFIED_KEY)) {
